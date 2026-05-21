@@ -8,7 +8,7 @@ Each item includes status, priority, owning module, and implementation notes.
 ## Scoring & Matching
 
 ### S1 — Definition-based similarity
-**Status**: [ ] not started  
+**Status**: [x] complete  
 **Priority**: high  
 **Files**: `src/.../scoring/definition_similarity.py`, `agents/candidate_generator.py`  
 **Notes**: Add TF-IDF scoring against ontology term definitions (always available).
@@ -18,7 +18,7 @@ Output is a new `Evidence` object with `evidence_type="definition_tfidf"` or
 `compute_aggregate_confidence`.
 
 ### S2 — Unit-aware scoring
-**Status**: [ ] not started  
+**Status**: [x] complete  
 **Priority**: high  
 **Files**: `src/.../scoring/unit_extractor.py`, `agents/adversarial_reviewer.py`  
 **Notes**: Extract unit strings from labels/descriptions (`ng_ml`, `g_dl`, `mmol_l`, etc.)
@@ -27,7 +27,7 @@ using regex. Compare source and target units. Flag unit mismatch as
 `unit_mismatch` adversarial flag with severity=high when units conflict.
 
 ### S3 — Cross-field synonym expansion
-**Status**: [ ] not started  
+**Status**: [x] complete  
 **Priority**: medium  
 **Files**: `src/.../scoring/synonym_expander.py`, `agents/candidate_generator.py`  
 **Notes**: Ship a bundled `data/biomedical_synonyms.tsv` (curated subset: common
@@ -39,7 +39,7 @@ can expand source entity labels before scoring. No external API call required.
 ## Source Formats
 
 ### F1 — JSON Schema loader
-**Status**: [ ] not started  
+**Status**: [x] complete  
 **Priority**: high  
 **Files**: `src/.../io/json_schema_loader.py`, `agents/source_profiler.py`  
 **Notes**: Parse `$schema`, `properties`, `$defs`/`definitions`, `allOf`/`anyOf`.
@@ -47,7 +47,7 @@ Recurse into nested objects up to depth 3. Each property becomes a
 `SourceEntity` with `source_type="json_schema"`.
 
 ### F2 — RDF/OWL ontology loader
-**Status**: [ ] not started  
+**Status**: [x] complete  
 **Priority**: high  
 **Files**: `src/.../io/rdf_ontology_loader.py`, `agents/ontology_profiler.py`  
 **Notes**: Use `rdflib` to load OWL/Turtle/RDF-XML files and SPARQL endpoints.
@@ -60,7 +60,7 @@ YAML profiles for real ontologies (OBI, UBERON, CHEBI, etc.).
 ## Export & Standards
 
 ### E1 — Full SSSOM compliance
-**Status**: [ ] not started  
+**Status**: [x] complete  
 **Priority**: high  
 **Files**: `src/.../io/exporters.py`, `src/.../io/sssom_exporter.py`  
 **Notes**: Add proper SSSOM YAML metadata header block with `mapping_set_id`,
@@ -74,7 +74,7 @@ separate function.
 ## Human Review Workflow
 
 ### W1 — Review ledger
-**Status**: [ ] not started  
+**Status**: [x] complete  
 **Priority**: high  
 **Files**: `src/.../review_ledger/ledger.py`, `src/.../review_ledger/cli.py`  
 **Notes**: Persist human review decisions to a YAML ledger file
@@ -83,7 +83,7 @@ separate function.
 Ledger stores: mapping_id, action, reviewer, timestamp, note, predicate_override.
 
 ### W2 — Re-run mode (skip approved mappings)
-**Status**: [ ] not started  
+**Status**: [x] complete  
 **Priority**: medium  
 **Files**: `agents/orchestrator.py`, `pipeline/run_mapping_pipeline.py`  
 **Notes**: Add `--ledger` flag to pipeline. Before generating candidates, check the
@@ -96,7 +96,7 @@ the end.
 ## LLM Integration
 
 ### L1 — LLM-backed adversarial reviewer
-**Status**: [ ] not started  
+**Status**: [x] complete  
 **Priority**: high  
 **Files**: `src/.../agents/llm_adversarial_reviewer.py`  
 **Notes**: Drop-in replacement for `AdversarialReviewerAgent`. Accepts an optional
