@@ -1,0 +1,16 @@
+animal_id,strain,genotype,sex,age_weeks,weight_g,phenotype_notes,experiment_group,sacrifice_date,tissue_type
+AM001,C57BL/6J,+/+,male,12,28.4,Normal cardiac morphology; no hypertrophy observed,control,2024-03-15,heart
+AM002,C57BL/6J,MYH7-R403Q/+,male,12,27.9,Mild left ventricular hypertrophy; increased wall thickness,HCM-heterozygous,2024-03-15,heart
+AM003,C57BL/6J,MYH7-R403Q/+,female,12,22.1,Mild left ventricular hypertrophy; reduced diastolic function,HCM-heterozygous,2024-03-15,heart
+AM004,C57BL/6J,MYH7-R403Q/MYH7-R403Q,male,12,25.6,Severe concentric hypertrophy; myocyte disarray evident,HCM-homozygous,2024-03-15,heart
+AM005,C57BL/6J,MYH7-R403Q/MYH7-R403Q,female,12,20.3,Severe concentric hypertrophy; interstitial fibrosis,HCM-homozygous,2024-03-15,heart
+AM006,FVB/NJ,+/+,male,16,32.7,Normal cardiac histology; baseline phenotype for FVB background,control,2024-03-22,heart
+AM007,FVB/NJ,MYBPC3-W1098X/+,male,16,30.5,Moderate hypertrophy; reduced myosin-binding protein C expression,HCM-heterozygous,2024-03-22,heart
+AM008,FVB/NJ,MYBPC3-W1098X/+,female,16,24.8,Moderate hypertrophy; diastolic dysfunction score 2/4,HCM-heterozygous,2024-03-22,heart
+AM009,FVB/NJ,MYBPC3-W1098X/MYBPC3-W1098X,male,16,28.1,Severe hypertrophy; systolic dysfunction; ejection fraction 42%,HCM-homozygous,2024-03-22,heart
+AM010,FVB/NJ,MYBPC3-W1098X/MYBPC3-W1098X,female,16,21.9,Severe hypertrophy; reduced exercise tolerance,HCM-homozygous,2024-03-22,heart
+AM011,C57BL/6J,+/+,male,8,22.6,Normal; younger cohort pre-phenotype development,control-young,2024-04-05,heart
+AM012,C57BL/6J,MYH7-R403Q/+,male,8,21.9,No overt hypertrophy yet; molecular changes at transcript level,HCM-heterozygous,2024-04-05,heart
+AM013,C57BL/6J,MYH7-R403Q/+,female,8,17.4,No overt hypertrophy; increased BNP expression,HCM-heterozygous,2024-04-05,heart
+AM014,C57BL/6J,+/+,male,12,29.1,Normal cardiac function; used for proteomics reference,control,2024-04-12,liver
+AM015,C57BL/6J,MYH7-R403Q/+,male,12,27.2,Normal liver histology; concurrent HCM phenotype in heart,HCM-heterozygous,2024-04-12,liver

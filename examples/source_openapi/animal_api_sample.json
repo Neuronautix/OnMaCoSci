@@ -1,0 +1,336 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Animal Metadata API",
+    "version": "1.2.0",
+    "description": "REST API for managing mouse experiment metadata including animal records, tissue samples, and phenotyping measurements. Designed for use in hypertrophic cardiomyopathy (HCM) and related cardiac phenotyping studies.",
+    "contact": {
+      "name": "Preclinical Research Data Team",
+      "email": "preclinical-data@example.org"
+    },
+    "license": {
+      "name": "MIT",
+      "url": "https://opensource.org/licenses/MIT"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.example.org/animal-metadata/v1",
+      "description": "Production server"
+    },
+    {
+      "url": "https://staging-api.example.org/animal-metadata/v1",
+      "description": "Staging server"
+    }
+  ],
+  "paths": {
+    "/animals": {
+      "get": {
+        "operationId": "listAnimals",
+        "summary": "List all animal records",
+        "description": "Returns a paginated list of animal records. Results can be filtered by strain, genotype, sex, or experiment group.",
+        "parameters": [
+          {
+            "name": "strain",
+            "in": "query",
+            "description": "Filter by mouse strain (e.g. C57BL/6J)",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "experiment_group",
+            "in": "query",
+            "description": "Filter by experiment group identifier",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Maximum number of results to return",
+            "schema": {
+              "type": "integer",
+              "default": 50,
+              "minimum": 1,
+              "maximum": 500
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Number of records to skip for pagination",
+            "schema": {
+              "type": "integer",
+              "default": 0,
+              "minimum": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "total": {
+                      "type": "integer",
+                      "description": "Total number of matching records"
+                    },
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Animal"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request – invalid filter parameters"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      },
+      "post": {
+        "operationId": "createAnimal",
+        "summary": "Create a new animal record",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Animal"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Animal record created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Animal"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error"
+          }
+        }
+      }
+    },
+    "/animals/{animal_id}": {
+      "get": {
+        "operationId": "getAnimal",
+        "summary": "Retrieve a single animal record by ID",
+        "parameters": [
+          {
+            "name": "animal_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Animal record found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Animal"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Animal not found"
+          }
+        }
+      }
+    },
+    "/tissues": {
+      "get": {
+        "operationId": "listTissues",
+        "summary": "List tissue sample records",
+        "parameters": [
+          {
+            "name": "animal_id",
+            "in": "query",
+            "description": "Filter by parent animal identifier",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "tissue_type",
+            "in": "query",
+            "description": "Filter by anatomical tissue type",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Tissue"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "createTissue",
+        "summary": "Register a new tissue sample",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Tissue"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Tissue sample registered"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Animal": {
+        "type": "object",
+        "description": "A single experimental animal (mouse) with all associated metadata.",
+        "required": ["id", "strain", "sex"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique identifier for this animal record within the study, e.g. 'AM001'.",
+            "example": "AM001"
+          },
+          "strain": {
+            "type": "string",
+            "description": "Mouse strain or genetic background, using standard nomenclature from the International Mouse Strain Resource (IMSR).",
+            "example": "C57BL/6J"
+          },
+          "genotype": {
+            "type": "string",
+            "description": "Genotype notation indicating allele composition at relevant loci. Uses standard Mouse Genome Informatics (MGI) nomenclature.",
+            "example": "MYH7-R403Q/+"
+          },
+          "sex": {
+            "type": "string",
+            "description": "Biological sex of the animal at time of entry into the study.",
+            "enum": ["male", "female", "unknown"],
+            "example": "male"
+          },
+          "age_weeks": {
+            "type": "number",
+            "description": "Age of the animal in whole weeks at the time of the primary phenotyping measurement or sacrifice.",
+            "example": 12
+          },
+          "weight_g": {
+            "type": "number",
+            "description": "Body weight in grams measured at the time of sacrifice or last phenotyping timepoint.",
+            "example": 28.4
+          },
+          "phenotype_notes": {
+            "type": "string",
+            "description": "Free-text field for recording macroscopic and histological phenotype observations, including cardiac morphology, fibrosis scores, and functional assessments.",
+            "example": "Mild left ventricular hypertrophy; increased wall thickness"
+          },
+          "experiment_group": {
+            "type": "string",
+            "description": "Study arm or experimental group to which this animal was assigned (e.g. 'control', 'HCM-heterozygous', 'HCM-homozygous').",
+            "example": "HCM-heterozygous"
+          },
+          "sacrifice_date": {
+            "type": "string",
+            "format": "date",
+            "description": "ISO 8601 date on which the animal was sacrificed and tissues collected.",
+            "example": "2024-03-15"
+          }
+        }
+      },
+      "Tissue": {
+        "type": "object",
+        "description": "A tissue sample collected from an experimental animal at sacrifice or biopsy.",
+        "required": ["tissue_id", "animal_id", "tissue_type"],
+        "properties": {
+          "tissue_id": {
+            "type": "string",
+            "description": "Unique identifier for this tissue sample, typically incorporating the animal ID and tissue abbreviation.",
+            "example": "AM001-HRT"
+          },
+          "animal_id": {
+            "type": "string",
+            "description": "Foreign key referencing the parent Animal record from which this sample was collected.",
+            "example": "AM001"
+          },
+          "tissue_type": {
+            "type": "string",
+            "description": "Anatomical tissue type using controlled vocabulary aligned with the Mouse Anatomy ontology (MA). Common values: 'heart', 'liver', 'lung', 'kidney', 'skeletal muscle'.",
+            "example": "heart"
+          },
+          "collection_date": {
+            "type": "string",
+            "format": "date",
+            "description": "ISO 8601 date on which the tissue sample was collected from the animal.",
+            "example": "2024-03-15"
+          },
+          "storage_condition": {
+            "type": "string",
+            "description": "Storage condition applied to the sample after collection.",
+            "enum": ["fresh_frozen", "formalin_fixed", "rna_later", "snap_frozen", "paraffin_embedded"],
+            "example": "snap_frozen"
+          },
+          "weight_mg": {
+            "type": "number",
+            "description": "Wet weight of the collected tissue sample in milligrams.",
+            "example": 142.5
+          },
+          "notes": {
+            "type": "string",
+            "description": "Free-text field for recording collection conditions, sample quality observations, or downstream processing notes.",
+            "example": "Cardiac apex removed for functional assay prior to snap-freeze"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  },
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ]
+}

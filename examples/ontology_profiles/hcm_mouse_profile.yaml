@@ -1,0 +1,256 @@
+ontology_id: "mbo"
+ontology_source: "Mouse Background Ontology (fictional example for HCM/mouse phenotyping research)"
+description: >
+  A curated subset of terms relevant to mouse phenotyping experiments and
+  hypertrophic cardiomyopathy (HCM) research. This profile covers entity
+  types commonly recorded in preclinical study metadata: animal identifiers,
+  genetic background, sex, body weight, age, tissue sampling, and phenotypic
+  observations. Term definitions follow conventions from OBO Foundry
+  (https://obofoundry.org/) and Mouse Phenome Database (MPD) best practices.
+
+terms:
+
+  - term_id: "mbo:AnimalIdentifier"
+    label: "animal identifier"
+    definition: >
+      A unique alphanumeric code assigned to an individual experimental animal
+      that distinguishes it from all other animals within and across study
+      cohorts. The identifier serves as the primary key linking all data
+      records generated from a single animal.
+    synonyms:
+      - "animal ID"
+      - "subject ID"
+      - "mouse ID"
+      - "specimen identifier"
+      - "animal code"
+    parent_terms:
+      - "mbo:ExperimentalMetadata"
+    term_type: "class"
+    extra_context:
+      xref: "schema:identifier"
+      example_values: ["AM001", "M-2024-0042", "3F-ctrl-001"]
+
+  - term_id: "mbo:GeneticBackground"
+    label: "genetic background"
+    definition: >
+      The overall genetic composition of an organism, encompassing both the
+      inbred strain lineage and any engineered allelic modifications. Genetic
+      background determines baseline physiological traits and influences
+      penetrance and expressivity of introduced mutations.
+    synonyms:
+      - "strain"
+      - "mouse strain"
+      - "genetic strain"
+      - "background strain"
+      - "inbred background"
+    parent_terms:
+      - "mbo:BiologicalCharacteristic"
+    term_type: "class"
+    extra_context:
+      xref: "NCBITaxon:10090"
+      related_db: "IMSR"
+
+  - term_id: "mbo:MouseStrain"
+    label: "mouse strain"
+    definition: >
+      A genetically defined lineage of laboratory mice maintained by
+      controlled inbreeding or cryopreservation, characterised by a
+      reproducible and stable genetic composition. Strain designation follows
+      the nomenclature conventions of the International Mouse Strain Resource
+      (IMSR) and the Mouse Genome Informatics (MGI) database.
+    synonyms:
+      - "inbred strain"
+      - "mouse line"
+      - "murine strain"
+      - "background"
+    parent_terms:
+      - "mbo:GeneticBackground"
+    term_type: "class"
+    extra_context:
+      xref: "MGI:2683688"
+      example_values: ["C57BL/6J", "FVB/NJ", "BALB/cJ", "129S1/SvImJ"]
+      note: "Standardised names include repository prefix (e.g. JAX:000664)"
+
+  - term_id: "mbo:Genotype"
+    label: "genotype"
+    definition: >
+      The specific allelic composition of an organism at one or more loci of
+      interest, recorded using standard genetic nomenclature. In the context
+      of engineered mouse models, genotype typically specifies whether a
+      target allele is present in hemizygous, heterozygous, or homozygous
+      configuration.
+    synonyms:
+      - "allele composition"
+      - "allelic state"
+      - "genetic modification status"
+      - "transgene status"
+    parent_terms:
+      - "mbo:GeneticBackground"
+    term_type: "class"
+    extra_context:
+      xref: "SO:0001027"
+      example_values: ["+/+", "MYH7-R403Q/+", "MYBPC3-W1098X/MYBPC3-W1098X"]
+      notation_standard: "MGI allele nomenclature"
+
+  - term_id: "mbo:BiologicalSex"
+    label: "sex"
+    definition: >
+      The biological sex of an experimental animal, determined by chromosomal
+      composition or gonadal phenotype. Sex is a critical experimental variable
+      in cardiovascular research as cardiac hypertrophy shows sex-specific
+      differences in severity, age of onset, and hormonal modulation.
+    synonyms:
+      - "biological sex"
+      - "animal sex"
+      - "gender"
+      - "sex category"
+    parent_terms:
+      - "mbo:BiologicalCharacteristic"
+    term_type: "class"
+    extra_context:
+      xref: "PATO:0000047"
+      allowed_values: ["male", "female", "unknown"]
+      note: "Use 'unknown' only when sex was not determined or is indeterminate"
+
+  - term_id: "mbo:BodyWeight"
+    label: "body weight"
+    definition: >
+      The total mass of an experimental animal measured at a defined
+      timepoint, expressed in grams. Body weight is recorded at sacrifice or
+      at the final phenotyping session as a proxy for general health status
+      and to enable normalisation of organ mass measurements.
+    synonyms:
+      - "weight"
+      - "total body weight"
+      - "animal weight"
+      - "body mass"
+      - "weight_g"
+    parent_terms:
+      - "mbo:PhysicalMeasurement"
+    term_type: "class"
+    extra_context:
+      xref: "CMO:0000012"
+      unit: "gram"
+      unit_symbol: "g"
+
+  - term_id: "mbo:AgeAtMeasurement"
+    label: "age"
+    definition: >
+      The chronological age of an experimental animal at the time of a
+      specified measurement or experimental event, expressed in weeks from
+      birth unless otherwise stated. Standardised age reporting is essential
+      for comparing phenotypic data across cohorts and publications.
+    synonyms:
+      - "age in weeks"
+      - "animal age"
+      - "postnatal age"
+      - "age_weeks"
+      - "weeks of age"
+    parent_terms:
+      - "mbo:TemporalCharacteristic"
+    term_type: "class"
+    extra_context:
+      xref: "PATO:0000011"
+      unit: "week"
+      unit_symbol: "wk"
+      note: "Record as whole number of completed postnatal weeks"
+
+  - term_id: "mbo:TissueType"
+    label: "tissue type"
+    definition: >
+      The anatomical classification of a biological tissue sample collected
+      from an experimental animal, using a controlled vocabulary aligned with
+      the Mouse Anatomy Ontology (MA). Tissue type determines which downstream
+      analytical protocols and reference datasets are applicable.
+    synonyms:
+      - "anatomical tissue"
+      - "organ type"
+      - "tissue class"
+      - "sample tissue"
+      - "tissue"
+    parent_terms:
+      - "mbo:SampleCharacteristic"
+    term_type: "class"
+    extra_context:
+      xref: "MA:0000001"
+      example_values: ["heart", "liver", "lung", "kidney", "skeletal muscle", "brain"]
+
+  - term_id: "mbo:PhenotypeObservation"
+    label: "phenotype notes"
+    definition: >
+      A free-text or structured record of observable physical or functional
+      characteristics of an experimental animal or tissue, as assessed by
+      gross morphology, histology, echocardiography, or other phenotyping
+      modalities. Phenotype notes capture deviations from wild-type and
+      quantitative severity assessments.
+    synonyms:
+      - "phenotype"
+      - "phenotypic observation"
+      - "clinical notes"
+      - "morphological findings"
+      - "phenotype description"
+    parent_terms:
+      - "mbo:ExperimentalObservation"
+    term_type: "class"
+    extra_context:
+      xref: "MP:0000001"
+      related_ontologies: ["MP", "HP", "MPATH"]
+
+  - term_id: "mbo:ExperimentGroup"
+    label: "experiment group"
+    definition: >
+      The study arm or treatment cohort to which an experimental animal was
+      assigned, used to stratify animals for comparative analysis. Common
+      group designations in HCM mouse studies include wild-type controls,
+      heterozygous carriers, and homozygous mutant animals.
+    synonyms:
+      - "study group"
+      - "treatment group"
+      - "cohort"
+      - "experimental arm"
+      - "group assignment"
+    parent_terms:
+      - "mbo:ExperimentalMetadata"
+    term_type: "class"
+    extra_context:
+      example_values: ["control", "HCM-heterozygous", "HCM-homozygous", "treated", "vehicle"]
+
+  - term_id: "mbo:SacrificeDate"
+    label: "sacrifice date"
+    definition: >
+      The calendar date on which an experimental animal was humanely killed
+      and tissues were collected for analysis. The sacrifice date anchors all
+      tissue-level measurements to a point in time and, combined with date of
+      birth, provides an independent estimate of animal age.
+    synonyms:
+      - "date of sacrifice"
+      - "necropsy date"
+      - "euthanasia date"
+      - "collection date"
+      - "harvest date"
+    parent_terms:
+      - "mbo:TemporalCharacteristic"
+    term_type: "class"
+    extra_context:
+      xref: "NCIT:C19332"
+      format: "ISO 8601 (YYYY-MM-DD)"
+
+  - term_id: "mbo:TissueCollection"
+    label: "tissue collection"
+    definition: >
+      The act of excising and preserving one or more tissue samples from an
+      experimental animal, together with the metadata (date, weight, storage
+      condition) needed to ensure sample traceability and analytical
+      reproducibility. A tissue collection event is associated with exactly
+      one animal and one sacrifice date.
+    synonyms:
+      - "tissue harvest"
+      - "sample collection"
+      - "organ harvest"
+      - "biopsy collection"
+    parent_terms:
+      - "mbo:ExperimentalProcedure"
+    term_type: "class"
+    extra_context:
+      xref: "OBI:0000659"
+      related_terms: ["mbo:TissueType", "mbo:SacrificeDate"]
