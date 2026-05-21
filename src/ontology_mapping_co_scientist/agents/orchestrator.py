@@ -66,6 +66,7 @@ class OrchestratorAgent:
         pipeline_run_id: str | None = None,
         ledger_path=None,
         llm_adversarial_review: bool = False,
+        cost_tracker=None,
     ) -> dict:
         """Execute the full ontology mapping pipeline.
 
@@ -249,6 +250,9 @@ class OrchestratorAgent:
                 LLMAdversarialReviewerAgent,
             )
             reviewer = LLMAdversarialReviewerAgent.from_env()
+            # Pass cost_tracker if the reviewer supports it
+            if cost_tracker is not None and hasattr(reviewer, "cost_tracker"):
+                reviewer.cost_tracker = cost_tracker
             logger.info(
                 "LLM adversarial review enabled (llm_client=%s).",
                 "active" if reviewer.llm_client is not None else "heuristic fallback",
@@ -336,7 +340,7 @@ class OrchestratorAgent:
             duration,
         )
 
-        return {
+        result_dict = {
             "pipeline_run_id": pipeline_run_id,
             "source_entities_count": len(source_entities),
             "ontology_terms_count": len(ontology_terms),
@@ -352,6 +356,11 @@ class OrchestratorAgent:
                 "markdown": str(md_path),
             },
         }
+
+        if cost_tracker is not None:
+            result_dict["cost_summary"] = cost_tracker.summary()
+
+        return result_dict
 
     # ------------------------------------------------------------------
     # Private export helpers

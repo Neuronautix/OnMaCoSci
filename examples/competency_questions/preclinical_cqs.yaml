@@ -1,0 +1,14 @@
+# Competency questions for preclinical mapping validation
+cqs:
+  - cq_id: "CQ-PREC-001"
+    description: "PK concentration fields should not map to biological process classes"
+    sparql: |
+      PREFIX omcs: <https://w3id.org/omcs/mapping#>
+      ASK { ?m a omcs:MappingHypothesis }
+    severity: "warning"
+  - cq_id: "CQ-PREC-002"
+    description: "Body weight fields should map to properties, not abstract classes"
+    sparql: |
+      PREFIX omcs: <https://w3id.org/omcs/mapping#>
+      ASK { ?m a omcs:MappingHypothesis }
+    severity: "warning"

@@ -1,0 +1,24 @@
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix omcs: <https://w3id.org/omcs/mapping#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+# Shape: every mapping hypothesis must have a confidence between 0 and 1
+omcs:ConfidenceShape a sh:NodeShape ;
+    sh:targetClass omcs:MappingHypothesis ;
+    sh:property [
+        sh:path omcs:confidence ;
+        sh:minInclusive 0.0 ;
+        sh:maxInclusive 1.0 ;
+        sh:datatype xsd:decimal ;
+        sh:message "Confidence must be between 0.0 and 1.0" ;
+    ] .
+
+# Shape: source entity must have a sourceType
+omcs:SourceEntityShape a sh:NodeShape ;
+    sh:targetSubjectsOf omcs:sourceEntity ;
+    sh:property [
+        sh:path omcs:sourceType ;
+        sh:minCount 0 ;
+        sh:message "Source entity should declare a source type" ;
+    ] .

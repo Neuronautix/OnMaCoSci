@@ -19,6 +19,7 @@ from ontology_mapping_co_scientist.models.review import (
     AdversarialFlag,
     AdversarialReviewResult,
 )
+from ontology_mapping_co_scientist.scoring.datatype_validator import build_datatype_flag
 from ontology_mapping_co_scientist.scoring.lexical_similarity import normalize_label
 from ontology_mapping_co_scientist.scoring.unit_extractor import build_unit_mismatch_flag
 
@@ -74,6 +75,7 @@ class AdversarialReviewerAgent:
             self._check_exactmatch,
             self._check_broad_narrow_ambiguity,
             self._check_datatype_mismatch,
+            self._check_datatype_compatibility,
             self._check_missing_examples,
             self._check_unit_ambiguity,
             self._check_identifier_confusion,
@@ -303,6 +305,24 @@ class AdversarialReviewerAgent:
                 severity="medium",
             )
         return None
+
+    def _check_datatype_compatibility(
+        self, hypothesis: MappingHypothesis
+    ) -> AdversarialFlag | None:
+        """Check datatype compatibility using the datatype_validator module.
+
+        Delegates to :func:`~ontology_mapping_co_scientist.scoring.datatype_validator.build_datatype_flag`
+        which validates source datatype against target term_type and rdfs:range.
+
+        Args:
+            hypothesis: The hypothesis to inspect.
+
+        Returns:
+            An :class:`AdversarialFlag` or ``None``.
+        """
+        if hypothesis.predicate == MappingPredicate.NO_MAPPING:
+            return None
+        return build_datatype_flag(hypothesis.source_entity, hypothesis.target_entity)
 
     def _check_missing_examples(
         self, hypothesis: MappingHypothesis

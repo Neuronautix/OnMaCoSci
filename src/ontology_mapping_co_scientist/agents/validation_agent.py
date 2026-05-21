@@ -15,6 +15,10 @@ from ontology_mapping_co_scientist.models.mapping_hypothesis import (
     MappingPredicate,
     ValidationStatus,
 )
+from ontology_mapping_co_scientist.scoring.datatype_validator import build_datatype_flag
+from ontology_mapping_co_scientist.scoring.transformation_validator import (
+    validate_transform_mapping,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -161,6 +165,121 @@ class ValidationAgent:
             summary["failed"],
         )
         return hypotheses
+
+    def validate_with_datatype_check(
+        self, hypothesis: MappingHypothesis
+    ) -> MappingHypothesis:
+        """Runs datatype compatibility check and updates hypothesis warnings.
+
+        Calls :func:`~ontology_mapping_co_scientist.scoring.datatype_validator.build_datatype_flag`
+        and, if a flag is produced, appends a ``[datatype]``-prefixed warning to
+        :attr:`~.MappingHypothesis.warnings`.  If the hypothesis was previously
+        ``PASSED``, the status is downgraded to ``WARNING``.
+
+        Args:
+            hypothesis: The hypothesis to check (mutated in place).
+
+        Returns:
+            The same hypothesis with updated warnings and status.
+        """
+        flag = build_datatype_flag(hypothesis.source_entity, hypothesis.target_entity)
+        if flag:
+            warning_msg = f"[datatype] {flag.description}"
+            if warning_msg not in hypothesis.warnings:
+                hypothesis.warnings.append(warning_msg)
+            if hypothesis.validation_status == ValidationStatus.PASSED:
+                hypothesis.validation_status = ValidationStatus.WARNING
+        return hypothesis
+
+    def validate_transform_conditions(
+        self, hypothesis: MappingHypothesis
+    ) -> MappingHypothesis:
+        """For requiresTransform mappings, validates the transform specification.
+
+        Calls
+        :func:`~ontology_mapping_co_scientist.scoring.transformation_validator.validate_transform_mapping`
+        and appends ``[transform]``-prefixed warnings for any non-actionable
+        conditions.  If the transform status is ``WARNING`` and the hypothesis
+        was previously ``PASSED``, the status is downgraded to ``WARNING``.
+
+        This method is a no-op for non-REQUIRES_TRANSFORM predicates.
+
+        Args:
+            hypothesis: The hypothesis to check (mutated in place).
+
+        Returns:
+            The same hypothesis with updated warnings and status.
+        """
+        if hypothesis.predicate == MappingPredicate.REQUIRES_TRANSFORM:
+            status, messages = validate_transform_mapping(hypothesis)
+            for msg in messages:
+                warning_msg = f"[transform] {msg}"
+                if warning_msg not in hypothesis.warnings:
+                    hypothesis.warnings.append(warning_msg)
+            if (
+                status == ValidationStatus.WARNING
+                and hypothesis.validation_status == ValidationStatus.PASSED
+            ):
+                hypothesis.validation_status = ValidationStatus.WARNING
+        return hypothesis
+
+    def validate_all_extended(
+        self, hypotheses: list[MappingHypothesis]
+    ) -> list[MappingHypothesis]:
+        """Runs all validators: base + datatype + transform.
+
+        For each hypothesis, calls (in order):
+
+        1. :meth:`validate_hypothesis` — base confidence, predicate, and
+           evidence checks.
+        2. :meth:`validate_with_datatype_check` — datatype vs term_type
+           compatibility.
+        3. :meth:`validate_transform_conditions` — transform specification
+           quality for REQUIRES_TRANSFORM predicates.
+
+        Args:
+            hypotheses: The list of mapping hypotheses to validate.
+
+        Returns:
+            The same list (mutated in place) with updated validation statuses
+            and warnings.
+        """
+        results: list[MappingHypothesis] = []
+        for h in hypotheses:
+            h = self.validate_hypothesis(h)
+            h = self.validate_with_datatype_check(h)
+            h = self.validate_transform_conditions(h)
+            results.append(h)
+        return results
+
+    def generate_full_report(
+        self, hypotheses: list[MappingHypothesis]
+    ) -> dict:
+        """Extended report including all validator results.
+
+        Builds on top of :meth:`generate_validation_summary` and adds two
+        additional counters:
+
+        * ``with_datatype_warnings`` — hypotheses that carry at least one
+          ``[datatype]``-prefixed warning.
+        * ``with_transform_warnings`` — hypotheses that carry at least one
+          ``[transform]``-prefixed warning.
+
+        Args:
+            hypotheses: The list of (already validated) mapping hypotheses.
+
+        Returns:
+            The base summary dict augmented with ``with_datatype_warnings``
+            and ``with_transform_warnings`` keys.
+        """
+        base = self.generate_validation_summary(hypotheses)
+        base["with_datatype_warnings"] = sum(
+            1 for h in hypotheses if any("[datatype]" in w for w in h.warnings)
+        )
+        base["with_transform_warnings"] = sum(
+            1 for h in hypotheses if any("[transform]" in w for w in h.warnings)
+        )
+        return base
 
     def generate_validation_summary(
         self, hypotheses: list[MappingHypothesis]
