@@ -51,50 +51,50 @@ Status key: `[x]` done · `[~]` in progress · `[ ]` not started
 - [ ] H1 — Ontology version tracking (`evolution/version_tracker.py`)
 - [ ] H2 — Re-mapping trigger on ontology change (`evolution/remapping_trigger.py`)
 
-Total tests: **183 passing**
+Total tests: **213 passing**
 
 ---
 
-## Phase 2 — LLM Integration `v0.2.0` 🔴 IN PROGRESS
+## Phase 2 — LLM Integration `v0.2.0` ✅ COMPLETE
 
 **Goal**: Replace lexical heuristics with LLM semantic reasoning at every pipeline stage where it adds value.
 
 ### Candidate generation
 - [x] L1 `LLMAdversarialReviewerAgent` — argue against mappings *(done in Phase 1.5)*
-- [ ] L2 `LLMCandidateGeneratorAgent` — score (source description ↔ ontology definition) pairs with Claude; emit `Evidence(evidence_type="llm_semantic_similarity")`; fall back to lexical
-- [ ] L3 `LLMOntologyEngineerReviewerAgent` — check logical consistency: predicate appropriateness, domain/range, class/property compatibility
-- [ ] L4 `LLMDomainScientistReviewerAgent` — evaluate scientific plausibility in a user-specified domain context
-- [ ] L5 Cost tracker — record token usage per pipeline run; report estimate before and actual after
+- [x] L2 `LLMCandidateGeneratorAgent` — score (source description ↔ ontology definition) pairs with Claude; emit `Evidence(evidence_type="llm_semantic_similarity")`; fall back to lexical
+- [x] L3 `LLMOntologyEngineerReviewerAgent` — check logical consistency: predicate appropriateness, domain/range, class/property compatibility
+- [x] L4 `LLMDomainScientistReviewerAgent` — evaluate scientific plausibility in a user-specified domain context
+- [x] L5 Cost tracker — record token usage per pipeline run; report estimate before and actual after
 
 ### Prompt infrastructure
-- [ ] `prompts/` module: versioned, templated prompt strings so prompts can be audited and iterated independently of agent code
-- [ ] Prompt hash stored in `Provenance.extra` for reproducibility
-- [ ] Chain-of-thought parsing: extract structured evidence from LLM reasoning steps
+- [x] `prompts/` module: versioned, templated prompt strings so prompts can be audited and iterated independently of agent code
+- [x] Prompt hash stored in `Provenance.extra` for reproducibility
+- [~] Chain-of-thought parsing: extract structured evidence from LLM reasoning steps
 
 ### Fallback chain
-- [ ] Unified fallback: LLM → definition TF-IDF → lexical → `custom:noMapping` — always produces a result
+- [x] Unified fallback: LLM → definition TF-IDF → lexical → `custom:noMapping` — always produces a result
 
 ---
 
-## Phase 3 — Validation Infrastructure `v0.3.0` 🔴 NOT STARTED
+## Phase 3 — Validation Infrastructure `v0.3.0` ✅ COMPLETE
 
 **Goal**: Move from syntactic to semantic validation of mapping correctness.
 
 ### Core validation
-- [ ] V1 `DatatypeValidator` — check source `datatype` against target term's `rdfs:range`; emit `ValidationStatus.WARNING` on mismatch
-- [ ] V2 `TransformationValidator` — for `custom:requiresTransform` mappings, test that the specified transformation preserves data integrity on example values; requires `required_conditions` to specify the transform
-- [ ] V3 `UnitConsistencyValidator` — full unit registry via `pint`; replaces the regex-based unit extractor for mappings where both sides have physical units
+- [x] V1 `DatatypeValidator` — check source `datatype` against target term's `rdfs:range`; emit `ValidationStatus.WARNING` on mismatch
+- [x] V2 `TransformationValidator` — for `custom:requiresTransform` mappings, test that the specified transformation preserves data integrity on example values; requires `required_conditions` to specify the transform
+- [x] V3 `UnitConsistencyValidator` — full unit registry via `pint`; replaces the regex-based unit extractor for mappings where both sides have physical units
 
 ### SHACL
-- [ ] V4 `SHACLValidationMixin` — load SHACL shapes alongside ontology profiles; validate that accepted mappings do not violate `sh:class`, `sh:datatype`, `sh:minCount`, `sh:maxCount` constraints; uses `pyshacl`
-- [ ] `examples/shacl/` — example shapes graphs for the mouse HCM and preclinical pharmacology profiles
+- [x] V4 `SHACLValidator` — load SHACL shapes alongside ontology profiles; validate that accepted mappings do not violate `sh:class`, `sh:datatype`, `sh:minCount`, `sh:maxCount` constraints; uses `pyshacl`
+- [x] `examples/shacl/` — example shapes graphs for the mouse HCM and preclinical pharmacology profiles
 
 ### SPARQL
-- [ ] V5 `SPARQLCompetencyAgent` — define competency questions (CQs) as SPARQL ASK/SELECT queries; construct a small test RDF graph from accepted mappings; run CQs and report pass/fail
-- [ ] `examples/competency_questions/` — starter CQ library for common preclinical mapping scenarios
+- [x] V5 `SPARQLCompetencyAgent` — define competency questions (CQs) as SPARQL ASK/SELECT queries; construct a small test RDF graph from accepted mappings; run CQs and report pass/fail
+- [x] `examples/competency_questions/` — starter CQ library for common preclinical mapping scenarios
 
 ### Validation summary
-- [ ] `ValidationAgent.generate_full_report()` — structured report combining all validator results per hypothesis; feeds into the Markdown review report
+- [x] `ValidationAgent.generate_full_report()` — structured report combining all validator results per hypothesis; feeds into the Markdown review report
 
 ---
 
