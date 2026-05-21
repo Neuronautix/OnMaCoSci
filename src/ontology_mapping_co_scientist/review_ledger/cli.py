@@ -2,12 +2,12 @@
 CLI for recording human review decisions into the mapping review ledger.
 
 Usage:
-  omcs-review accept <mapping_id> --source <entity_id> [--reviewer NAME] [--note TEXT] [--ledger PATH]
-  omcs-review reject <mapping_id> --source <entity_id> [--reviewer NAME] [--note TEXT] [--ledger PATH]
-  omcs-review change-predicate <mapping_id> --source <entity_id> --predicate skos:closeMatch [--note TEXT]
-  omcs-review request-evidence <mapping_id> --source <entity_id> [--note TEXT]
-  omcs-review status [--ledger PATH]
-  omcs-review list [--ledger PATH] [--action approve|reject|...]
+  omcs-review [--ledger PATH] accept <mapping_id> --source <entity_id> [--reviewer NAME] [--note TEXT]
+  omcs-review [--ledger PATH] reject <mapping_id> --source <entity_id> [--reviewer NAME] [--note TEXT]
+  omcs-review [--ledger PATH] change-predicate <mapping_id> --source <entity_id> --predicate skos:closeMatch [--note TEXT]
+  omcs-review [--ledger PATH] request-evidence <mapping_id> --source <entity_id> [--note TEXT]
+  omcs-review [--ledger PATH] status
+  omcs-review [--ledger PATH] list [--action approve|reject|...]
 """
 
 from __future__ import annotations
