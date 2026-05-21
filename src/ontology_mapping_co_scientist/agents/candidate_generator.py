@@ -315,6 +315,21 @@ class CandidateGeneratorAgent:
                 )
                 evidence_list.append(syn_ev)
 
+            # Definition TF-IDF evidence (when enabled and term has a definition)
+            if self.use_definition_scoring and tfidf_index is not None and term.definition:
+                source_text = " ".join(
+                    filter(None, [entity.label, entity.description])
+                )
+                def_score = score_definition_similarity(source_text, term, tfidf_index)
+                if def_score > 0.1:
+                    def_ev = build_definition_evidence(
+                        source_label=entity.label,
+                        term=term,
+                        score=def_score,
+                        method="tfidf",
+                    )
+                    evidence_list.append(def_ev)
+
             confidence = compute_aggregate_confidence(evidence_list, [])
             best_score = max(lex_score, syn_score)
             predicate = label_to_predicate(best_score)

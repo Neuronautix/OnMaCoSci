@@ -39,6 +39,7 @@ dev = [
 
 [project.scripts]
 omcs-run = "ontology_mapping_co_scientist.pipeline.run_mapping_pipeline:main"
+omcs-review = "ontology_mapping_co_scientist.review_ledger.cli:main"
 
 [tool.setuptools]
 package-dir = { "" = "src" }

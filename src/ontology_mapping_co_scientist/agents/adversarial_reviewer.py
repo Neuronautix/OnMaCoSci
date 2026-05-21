@@ -20,6 +20,7 @@ from ontology_mapping_co_scientist.models.review import (
     AdversarialReviewResult,
 )
 from ontology_mapping_co_scientist.scoring.lexical_similarity import normalize_label
+from ontology_mapping_co_scientist.scoring.unit_extractor import build_unit_mismatch_flag
 
 logger = logging.getLogger(__name__)
 
@@ -82,6 +83,14 @@ class AdversarialReviewerAgent:
             result = checker(hypothesis)
             if result is not None:
                 flags.append(result)
+
+        # Unit-mismatch check via unit_extractor (structural, not keyword-based)
+        if hypothesis.predicate != MappingPredicate.NO_MAPPING:
+            unit_flag = build_unit_mismatch_flag(
+                hypothesis.source_entity, hypothesis.target_entity
+            )
+            if unit_flag is not None:
+                flags.append(unit_flag)
 
         overall_severity = _compute_overall_severity(flags)
         recommendation = _derive_recommendation(overall_severity)

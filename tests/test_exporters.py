@@ -418,3 +418,176 @@ class TestExportToSssomTsv:
         assert sorted(exported_object_ids) == sorted(expected_object_ids), (
             "object_id values must match target_entity.term_id of each hypothesis"
         )
+
+
+# ---------------------------------------------------------------------------
+# SSSOM-compliant exporter tests
+# ---------------------------------------------------------------------------
+
+
+class TestExportToSssomCompliant:
+    """Tests for the export_to_sssom_compliant / sssom_exporter.export_to_sssom function."""
+
+    def test_sssom_compliant_creates_file(
+        self, tmp_path: Path, sample_hypotheses: list[MappingHypothesis]
+    ) -> None:
+        """export_to_sssom_compliant must create the output file at the specified path."""
+        from ontology_mapping_co_scientist.io.exporters import export_to_sssom_compliant
+
+        output_path = tmp_path / "compliant.tsv"
+        export_to_sssom_compliant(sample_hypotheses, output_path)
+
+        assert output_path.exists(), f"Output file was not created at {output_path}"
+        assert output_path.is_file()
+
+    def test_sssom_compliant_has_yaml_header(
+        self, tmp_path: Path, sample_hypotheses: list[MappingHypothesis]
+    ) -> None:
+        """The output must contain the SSSOM YAML metadata header line."""
+        from ontology_mapping_co_scientist.io.exporters import export_to_sssom_compliant
+
+        output_path = tmp_path / "compliant.tsv"
+        export_to_sssom_compliant(sample_hypotheses, output_path)
+
+        content = output_path.read_text(encoding="utf-8")
+        assert "# mapping_set_id:" in content, (
+            "SSSOM-compliant output must contain '# mapping_set_id:' in YAML header"
+        )
+
+    def test_sssom_compliant_has_curie_map(
+        self, tmp_path: Path, sample_hypotheses: list[MappingHypothesis]
+    ) -> None:
+        """The output must contain a curie_map section in the YAML header."""
+        from ontology_mapping_co_scientist.io.exporters import export_to_sssom_compliant
+
+        output_path = tmp_path / "compliant.tsv"
+        export_to_sssom_compliant(sample_hypotheses, output_path)
+
+        content = output_path.read_text(encoding="utf-8")
+        assert "# curie_map:" in content, (
+            "SSSOM-compliant output must contain '# curie_map:' in YAML header"
+        )
+
+    def test_sssom_compliant_predicate_is_full_uri(
+        self, tmp_path: Path, sample_hypotheses: list[MappingHypothesis]
+    ) -> None:
+        """The predicate_id column must contain full http:// URIs, not CURIEs."""
+        from ontology_mapping_co_scientist.io.exporters import export_to_sssom_compliant
+
+        output_path = tmp_path / "compliant.tsv"
+        export_to_sssom_compliant(sample_hypotheses, output_path)
+
+        lines = output_path.read_text(encoding="utf-8").splitlines()
+        non_comment = [l for l in lines if not l.startswith("#") and l.strip()]
+        header = non_comment[0].split("\t")
+        pred_idx = header.index("predicate_id")
+
+        for data_line in non_comment[1:]:
+            cols = data_line.split("\t")
+            predicate_val = cols[pred_idx]
+            assert predicate_val.startswith("http://") or predicate_val.startswith("https://"), (
+                f"predicate_id must be a full URI, got: {predicate_val!r}"
+            )
+
+    def test_sssom_compliant_justification_semapv(
+        self, tmp_path: Path, sample_hypotheses: list[MappingHypothesis]
+    ) -> None:
+        """The mapping_justification column values must start with 'semapv:'."""
+        from ontology_mapping_co_scientist.io.exporters import export_to_sssom_compliant
+
+        output_path = tmp_path / "compliant.tsv"
+        export_to_sssom_compliant(sample_hypotheses, output_path)
+
+        lines = output_path.read_text(encoding="utf-8").splitlines()
+        non_comment = [l for l in lines if not l.startswith("#") and l.strip()]
+        header = non_comment[0].split("\t")
+        just_idx = header.index("mapping_justification")
+
+        for data_line in non_comment[1:]:
+            cols = data_line.split("\t")
+            justification = cols[just_idx]
+            assert justification.startswith("semapv:"), (
+                f"mapping_justification must start with 'semapv:', got: {justification!r}"
+            )
+
+    def test_sssom_compliant_excludes_no_mapping_by_default(
+        self, tmp_path: Path
+    ) -> None:
+        """Hypotheses with NO_MAPPING predicate must be excluded by default."""
+        from ontology_mapping_co_scientist.io.exporters import export_to_sssom_compliant
+
+        no_map_hyp = _make_hypothesis(
+            "map-nomapping",
+            "unmappable_field",
+            "NoTerm",
+            predicate=MappingPredicate.NO_MAPPING,
+            confidence=0.10,
+            entity_id="csv:test.unmappable",
+            term_id="custom:noTerm",
+        )
+        normal_hyp = _make_hypothesis(
+            "map-normal",
+            "strain",
+            "mouse strain",
+            predicate=MappingPredicate.EXACT_MATCH,
+            confidence=0.90,
+            entity_id="csv:test.strain",
+            term_id="mbo:MouseStrain",
+        )
+
+        output_path = tmp_path / "compliant_no_map.tsv"
+        export_to_sssom_compliant([no_map_hyp, normal_hyp], output_path)
+
+        content = output_path.read_text(encoding="utf-8")
+        assert "unmappable_field" not in content, (
+            "NO_MAPPING hypothesis must not appear in output by default"
+        )
+        assert "strain" in content, (
+            "Normal hypothesis must still appear in output"
+        )
+
+    def test_sssom_compliant_only_top_ranked(
+        self, tmp_path: Path
+    ) -> None:
+        """When hypotheses have rank set, only rank=1 per subject_id must appear."""
+        from ontology_mapping_co_scientist.io.exporters import export_to_sssom_compliant
+
+        rank1 = _make_hypothesis(
+            "map-rank1",
+            "strain",
+            "mouse strain",
+            predicate=MappingPredicate.EXACT_MATCH,
+            confidence=0.92,
+            entity_id="csv:test.strain",
+            term_id="mbo:MouseStrain",
+        )
+        rank1.rank = 1
+
+        rank2 = _make_hypothesis(
+            "map-rank2",
+            "strain",
+            "genetic background",
+            predicate=MappingPredicate.CLOSE_MATCH,
+            confidence=0.75,
+            entity_id="csv:test.strain",
+            term_id="mbo:GeneticBackground",
+        )
+        rank2.rank = 2
+
+        output_path = tmp_path / "compliant_ranked.tsv"
+        export_to_sssom_compliant([rank1, rank2], output_path)
+
+        lines = output_path.read_text(encoding="utf-8").splitlines()
+        non_comment = [l for l in lines if not l.startswith("#") and l.strip()]
+        # Header + exactly 1 data row
+        data_rows = non_comment[1:]
+        assert len(data_rows) == 1, (
+            f"Expected exactly 1 data row (rank=1 only), got {len(data_rows)}"
+        )
+        # The kept row must be for "mouse strain" (rank=1)
+        assert "mouse strain" in data_rows[0], (
+            "The exported row must be the rank=1 hypothesis"
+        )
+        assert "genetic background" not in data_rows[0], (
+            "The rank=2 hypothesis must not appear in the output"
+        )
