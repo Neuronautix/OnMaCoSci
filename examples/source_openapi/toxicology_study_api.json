@@ -1,0 +1,660 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Preclinical Toxicology Study API",
+    "version": "1.2.0",
+    "description": "API for storing and retrieving preclinical safety and toxicology study data, including GLP-compliant repeat-dose toxicology, cardiovascular safety, and genotoxicity studies."
+  },
+  "paths": {
+    "/studies": {
+      "get": {
+        "summary": "List toxicology studies",
+        "parameters": [
+          { "name": "sponsor_compound_id", "in": "query", "schema": { "type": "string" } },
+          { "name": "study_type", "in": "query", "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of studies",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/StudyList" } } }
+          }
+        }
+      }
+    },
+    "/studies/{study_id}/animals": {
+      "get": {
+        "summary": "Get animals enrolled in a study",
+        "parameters": [{ "name": "study_id", "in": "path", "required": true, "schema": { "type": "string" } }],
+        "responses": {
+          "200": {
+            "description": "List of animals",
+            "content": { "application/json": { "schema": { "type": "array", "items": { "$ref": "#/components/schemas/StudyAnimal" } } } }
+          }
+        }
+      }
+    },
+    "/studies/{study_id}/clinical-observations": {
+      "post": {
+        "summary": "Submit clinical observation records",
+        "requestBody": {
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ClinicalObservation" } } }
+        },
+        "responses": { "201": { "description": "Created" } }
+      }
+    },
+    "/studies/{study_id}/organ-weights": {
+      "post": {
+        "summary": "Submit terminal organ weight data",
+        "requestBody": {
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/OrganWeight" } } }
+        },
+        "responses": { "201": { "description": "Created" } }
+      }
+    },
+    "/studies/{study_id}/histopathology": {
+      "post": {
+        "summary": "Submit histopathology findings",
+        "requestBody": {
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/HistopathologyFinding" } } }
+        },
+        "responses": { "201": { "description": "Created" } }
+      }
+    },
+    "/studies/{study_id}/hematology": {
+      "post": {
+        "summary": "Submit hematology laboratory results",
+        "requestBody": {
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/HematologyResult" } } }
+        },
+        "responses": { "201": { "description": "Created" } }
+      }
+    },
+    "/studies/{study_id}/clinical-chemistry": {
+      "post": {
+        "summary": "Submit clinical chemistry laboratory results",
+        "requestBody": {
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ClinicalChemistryResult" } } }
+        },
+        "responses": { "201": { "description": "Created" } }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "StudyList": {
+        "type": "object",
+        "properties": {
+          "studies": { "type": "array", "items": { "$ref": "#/components/schemas/ToxicologyStudy" } },
+          "total": { "type": "integer" }
+        }
+      },
+      "ToxicologyStudy": {
+        "type": "object",
+        "required": ["study_id", "sponsor_compound_id", "study_type", "species", "regulatory_guideline"],
+        "properties": {
+          "study_id": {
+            "type": "string",
+            "description": "Unique GLP study identifier assigned by the testing facility",
+            "example": "TOX-2024-GLP-007"
+          },
+          "sponsor_compound_id": {
+            "type": "string",
+            "description": "Internal compound identifier assigned by the sponsoring organization",
+            "example": "CPD-0042"
+          },
+          "compound_name": {
+            "type": "string",
+            "description": "Chemical or generic name of the investigational compound",
+            "example": "Compound A"
+          },
+          "cas_number": {
+            "type": "string",
+            "description": "CAS Registry Number for the test article",
+            "example": "12345-67-8"
+          },
+          "study_type": {
+            "type": "string",
+            "description": "Classification of the toxicology study design",
+            "enum": ["single_dose_acute", "repeat_dose_subacute", "repeat_dose_subchronic", "repeat_dose_chronic", "genotoxicity_ames", "genotoxicity_micronucleus", "cardiovascular_safety", "respiratory_safety", "cns_safety"],
+            "example": "repeat_dose_subchronic"
+          },
+          "regulatory_guideline": {
+            "type": "string",
+            "description": "ICH or OECD guideline under which the study was conducted",
+            "example": "ICH S7A"
+          },
+          "glp_compliant": {
+            "type": "boolean",
+            "description": "Whether the study was conducted under Good Laboratory Practice regulations",
+            "example": true
+          },
+          "species": {
+            "type": "string",
+            "description": "Test species used in the study",
+            "enum": ["rat", "mouse", "dog", "monkey", "rabbit", "minipig"],
+            "example": "rat"
+          },
+          "strain_or_breed": {
+            "type": "string",
+            "description": "Strain (rodents) or breed (non-rodents) of the test animals",
+            "example": "Wistar Han"
+          },
+          "study_duration_days": {
+            "type": "integer",
+            "description": "Total duration of the dosing phase in calendar days",
+            "example": 28
+          },
+          "recovery_duration_days": {
+            "type": "integer",
+            "description": "Duration of the satellite recovery group observation period in days",
+            "example": 14
+          },
+          "dose_formulation": {
+            "type": "string",
+            "description": "Vehicle or formulation used to prepare the test article",
+            "example": "0.5% methylcellulose in water"
+          },
+          "route_of_administration": {
+            "type": "string",
+            "description": "Route by which the test article was administered to animals",
+            "enum": ["oral_gavage", "intravenous_bolus", "intravenous_infusion", "subcutaneous", "intraperitoneal", "inhalation", "dermal", "intramuscular"],
+            "example": "oral_gavage"
+          },
+          "dose_frequency": {
+            "type": "string",
+            "description": "Frequency of test article administration",
+            "enum": ["once_daily", "twice_daily", "three_times_daily", "once_weekly", "continuous_infusion"],
+            "example": "once_daily"
+          },
+          "number_of_dose_groups": {
+            "type": "integer",
+            "description": "Total number of treatment groups including vehicle control",
+            "example": 4
+          },
+          "noael_mg_kg_day": {
+            "type": "number",
+            "description": "No Observed Adverse Effect Level in mg/kg/day as determined by the study director",
+            "example": 30.0
+          },
+          "study_start_date": {
+            "type": "string",
+            "format": "date",
+            "description": "Date on which dosing commenced",
+            "example": "2024-01-08"
+          },
+          "study_director": {
+            "type": "string",
+            "description": "Name of the GLP study director responsible for the study",
+            "example": "Dr. J. Smith"
+          },
+          "testing_facility": {
+            "type": "string",
+            "description": "Name of the contract research organization or internal facility conducting the study",
+            "example": "SafetyFirst Labs, Inc."
+          }
+        }
+      },
+      "StudyAnimal": {
+        "type": "object",
+        "required": ["animal_id", "study_id", "dose_group_id", "sex"],
+        "properties": {
+          "animal_id": {
+            "type": "string",
+            "description": "Unique animal identifier within the study (ear tag or microchip number)",
+            "example": "TOX-2024-007-M-001"
+          },
+          "study_id": {
+            "type": "string",
+            "description": "Reference to the parent study",
+            "example": "TOX-2024-GLP-007"
+          },
+          "dose_group_id": {
+            "type": "string",
+            "description": "Treatment group designation (e.g., G1=vehicle, G2=low, G3=mid, G4=high)",
+            "example": "G3"
+          },
+          "dose_level_mg_kg_day": {
+            "type": "number",
+            "description": "Nominal dose administered in milligrams per kilogram body weight per day",
+            "example": 30.0
+          },
+          "sex": {
+            "type": "string",
+            "description": "Biological sex of the animal",
+            "enum": ["male", "female"],
+            "example": "male"
+          },
+          "age_at_start_weeks": {
+            "type": "integer",
+            "description": "Age of the animal in whole weeks at the first day of dosing",
+            "example": 8
+          },
+          "body_weight_at_start_g": {
+            "type": "number",
+            "description": "Body weight in grams recorded at randomisation prior to first dose",
+            "example": 241.5
+          },
+          "randomisation_date": {
+            "type": "string",
+            "format": "date",
+            "description": "Date on which the animal was allocated to its treatment group",
+            "example": "2024-01-05"
+          },
+          "satellite_group": {
+            "type": "boolean",
+            "description": "Whether the animal belongs to a recovery satellite group",
+            "example": false
+          },
+          "premature_death": {
+            "type": "boolean",
+            "description": "Whether the animal died or was humanely killed prior to scheduled termination",
+            "example": false
+          },
+          "cause_of_death": {
+            "type": "string",
+            "description": "If premature death occurred, the recorded or probable cause",
+            "example": null
+          },
+          "necropsy_date": {
+            "type": "string",
+            "format": "date",
+            "description": "Date on which the animal was terminated and necropsied",
+            "example": "2024-02-05"
+          }
+        }
+      },
+      "ClinicalObservation": {
+        "type": "object",
+        "required": ["observation_id", "animal_id", "observation_date", "observation_type"],
+        "properties": {
+          "observation_id": {
+            "type": "string",
+            "description": "Unique identifier for this observation record",
+            "example": "OBS-0000123"
+          },
+          "animal_id": {
+            "type": "string",
+            "description": "Reference to the observed animal",
+            "example": "TOX-2024-007-M-001"
+          },
+          "observation_date": {
+            "type": "string",
+            "format": "date",
+            "description": "Calendar date on which the clinical observation was made",
+            "example": "2024-01-22"
+          },
+          "study_day": {
+            "type": "integer",
+            "description": "Day of study on which the observation was recorded (Day 1 = first dose day)",
+            "example": 15
+          },
+          "observation_type": {
+            "type": "string",
+            "description": "Category of clinical sign observed",
+            "enum": ["cage_side", "detailed_clinical", "body_weight", "food_consumption", "ophthalmology", "electrocardiography"],
+            "example": "cage_side"
+          },
+          "clinical_sign": {
+            "type": "string",
+            "description": "Standardised clinical sign term (from a controlled vocabulary such as SEND or MedDRA)",
+            "example": "piloerection"
+          },
+          "severity_grade": {
+            "type": "string",
+            "description": "Severity grade of the observed clinical sign",
+            "enum": ["minimal", "mild", "moderate", "marked", "severe"],
+            "example": "mild"
+          },
+          "body_weight_g": {
+            "type": "number",
+            "description": "Body weight in grams if this record is a body weight measurement",
+            "example": 278.4
+          },
+          "food_consumption_g_day": {
+            "type": "number",
+            "description": "Mean daily food consumption in grams per animal per day over the interval",
+            "example": 22.3
+          },
+          "observer_id": {
+            "type": "string",
+            "description": "Identifier of the study personnel who recorded the observation",
+            "example": "TEC-04"
+          },
+          "reversibility": {
+            "type": "string",
+            "description": "Assessment of whether the finding was reversible during the recovery period",
+            "enum": ["reversible", "partially_reversible", "not_reversible", "not_assessed"],
+            "example": "reversible"
+          }
+        }
+      },
+      "OrganWeight": {
+        "type": "object",
+        "required": ["record_id", "animal_id", "organ_name", "absolute_weight_g"],
+        "properties": {
+          "record_id": {
+            "type": "string",
+            "description": "Unique identifier for this organ weight record",
+            "example": "OW-0000456"
+          },
+          "animal_id": {
+            "type": "string",
+            "description": "Reference to the animal from which the organ was collected",
+            "example": "TOX-2024-007-M-001"
+          },
+          "organ_name": {
+            "type": "string",
+            "description": "Standardised name of the organ or tissue weighed at necropsy",
+            "example": "liver"
+          },
+          "absolute_weight_g": {
+            "type": "number",
+            "description": "Absolute organ weight in grams measured at necropsy",
+            "example": 12.47
+          },
+          "relative_to_body_weight_pct": {
+            "type": "number",
+            "description": "Organ weight expressed as a percentage of terminal body weight",
+            "example": 4.21
+          },
+          "relative_to_brain_weight_pct": {
+            "type": "number",
+            "description": "Organ weight expressed as a percentage of brain weight",
+            "example": null
+          },
+          "paired_organ": {
+            "type": "boolean",
+            "description": "Whether the organ is a paired organ (e.g., kidneys, adrenals, testes); if true, weight is combined",
+            "example": false
+          },
+          "weigh_condition": {
+            "type": "string",
+            "description": "Condition of the organ when weighed",
+            "enum": ["fresh", "fixed", "trimmed"],
+            "example": "fresh"
+          }
+        }
+      },
+      "HistopathologyFinding": {
+        "type": "object",
+        "required": ["finding_id", "animal_id", "tissue", "finding_term", "severity_grade"],
+        "properties": {
+          "finding_id": {
+            "type": "string",
+            "description": "Unique identifier for this histopathology finding",
+            "example": "HISTO-0000789"
+          },
+          "animal_id": {
+            "type": "string",
+            "description": "Reference to the animal from which the tissue section was prepared",
+            "example": "TOX-2024-007-M-001"
+          },
+          "tissue": {
+            "type": "string",
+            "description": "Anatomical tissue or organ from which the section was taken",
+            "example": "liver"
+          },
+          "finding_term": {
+            "type": "string",
+            "description": "Standardised histopathology term describing the microscopic finding (INHAND nomenclature preferred)",
+            "example": "hepatocellular hypertrophy"
+          },
+          "severity_grade": {
+            "type": "string",
+            "description": "Numerical or descriptive severity grade assigned by the pathologist",
+            "enum": ["1_minimal", "2_mild", "3_moderate", "4_marked", "5_severe"],
+            "example": "2_mild"
+          },
+          "distribution": {
+            "type": "string",
+            "description": "Anatomical distribution or zonation of the finding within the tissue",
+            "enum": ["focal", "multifocal", "diffuse", "centrilobular", "periportal", "midzonal", "random"],
+            "example": "centrilobular"
+          },
+          "test_article_related": {
+            "type": "boolean",
+            "description": "Pathologist's assessment of whether the finding is related to test article administration",
+            "example": true
+          },
+          "adverse": {
+            "type": "boolean",
+            "description": "Whether the finding is classified as adverse by the pathologist",
+            "example": false
+          },
+          "pathologist_id": {
+            "type": "string",
+            "description": "Identifier of the board-certified pathologist who made the diagnosis",
+            "example": "PATH-02"
+          },
+          "peer_review_status": {
+            "type": "string",
+            "description": "Status of pathology peer review for this finding",
+            "enum": ["pending", "agreed", "modified_after_review", "escalated_to_arbiter"],
+            "example": "agreed"
+          }
+        }
+      },
+      "HematologyResult": {
+        "type": "object",
+        "required": ["result_id", "animal_id", "collection_date", "wbc_10e9_l"],
+        "properties": {
+          "result_id": {
+            "type": "string",
+            "description": "Unique identifier for this hematology result record",
+            "example": "HEM-0000321"
+          },
+          "animal_id": {
+            "type": "string",
+            "description": "Reference to the animal from which blood was collected",
+            "example": "TOX-2024-007-M-001"
+          },
+          "collection_date": {
+            "type": "string",
+            "format": "date",
+            "description": "Date on which the blood sample was collected",
+            "example": "2024-02-04"
+          },
+          "collection_timepoint": {
+            "type": "string",
+            "description": "Study timepoint at which blood was collected (e.g., pre-dose, interim, terminal)",
+            "enum": ["pre-dose_baseline", "interim_week2", "interim_week4", "terminal", "recovery_terminal"],
+            "example": "terminal"
+          },
+          "wbc_10e9_l": {
+            "type": "number",
+            "description": "White blood cell count in units of 10^9 cells per litre",
+            "example": 7.42
+          },
+          "rbc_10e12_l": {
+            "type": "number",
+            "description": "Red blood cell count in units of 10^12 cells per litre",
+            "example": 8.15
+          },
+          "hemoglobin_g_dl": {
+            "type": "number",
+            "description": "Haemoglobin concentration in grams per decilitre",
+            "example": 15.3
+          },
+          "hematocrit_pct": {
+            "type": "number",
+            "description": "Haematocrit expressed as a percentage of packed cell volume",
+            "example": 46.2
+          },
+          "mcv_fl": {
+            "type": "number",
+            "description": "Mean corpuscular volume in femtolitres",
+            "example": 56.8
+          },
+          "mch_pg": {
+            "type": "number",
+            "description": "Mean corpuscular haemoglobin in picograms",
+            "example": 18.8
+          },
+          "mchc_g_dl": {
+            "type": "number",
+            "description": "Mean corpuscular haemoglobin concentration in grams per decilitre",
+            "example": 33.1
+          },
+          "platelets_10e9_l": {
+            "type": "number",
+            "description": "Platelet count in units of 10^9 cells per litre",
+            "example": 842.0
+          },
+          "neutrophils_10e9_l": {
+            "type": "number",
+            "description": "Absolute neutrophil count in units of 10^9 cells per litre",
+            "example": 1.84
+          },
+          "lymphocytes_10e9_l": {
+            "type": "number",
+            "description": "Absolute lymphocyte count in units of 10^9 cells per litre",
+            "example": 4.91
+          },
+          "monocytes_10e9_l": {
+            "type": "number",
+            "description": "Absolute monocyte count in units of 10^9 cells per litre",
+            "example": 0.43
+          },
+          "reticulocytes_pct": {
+            "type": "number",
+            "description": "Reticulocyte count expressed as a percentage of total red blood cells",
+            "example": 2.8
+          },
+          "prothrombin_time_s": {
+            "type": "number",
+            "description": "Prothrombin time in seconds",
+            "example": 14.2
+          },
+          "aptt_s": {
+            "type": "number",
+            "description": "Activated partial thromboplastin time in seconds",
+            "example": 22.6
+          }
+        }
+      },
+      "ClinicalChemistryResult": {
+        "type": "object",
+        "required": ["result_id", "animal_id", "collection_date"],
+        "properties": {
+          "result_id": {
+            "type": "string",
+            "description": "Unique identifier for this clinical chemistry result record",
+            "example": "CHEM-0000654"
+          },
+          "animal_id": {
+            "type": "string",
+            "description": "Reference to the animal from which serum or plasma was collected",
+            "example": "TOX-2024-007-M-001"
+          },
+          "collection_date": {
+            "type": "string",
+            "format": "date",
+            "description": "Date of sample collection",
+            "example": "2024-02-04"
+          },
+          "sample_type": {
+            "type": "string",
+            "description": "Type of biological matrix analysed",
+            "enum": ["serum", "plasma_edta", "plasma_heparin", "urine"],
+            "example": "serum"
+          },
+          "fasting_status": {
+            "type": "boolean",
+            "description": "Whether the animal was fasted prior to sample collection",
+            "example": true
+          },
+          "alt_u_l": {
+            "type": "number",
+            "description": "Alanine aminotransferase (ALT/GPT) activity in units per litre — marker of hepatocellular damage",
+            "example": 42.0
+          },
+          "ast_u_l": {
+            "type": "number",
+            "description": "Aspartate aminotransferase (AST/GOT) activity in units per litre — marker of liver and muscle damage",
+            "example": 87.5
+          },
+          "alp_u_l": {
+            "type": "number",
+            "description": "Alkaline phosphatase activity in units per litre",
+            "example": 156.3
+          },
+          "ggt_u_l": {
+            "type": "number",
+            "description": "Gamma-glutamyl transferase activity in units per litre",
+            "example": 2.1
+          },
+          "total_bilirubin_umol_l": {
+            "type": "number",
+            "description": "Total bilirubin concentration in micromoles per litre",
+            "example": 3.4
+          },
+          "total_protein_g_l": {
+            "type": "number",
+            "description": "Total serum protein concentration in grams per litre",
+            "example": 64.8
+          },
+          "albumin_g_l": {
+            "type": "number",
+            "description": "Serum albumin concentration in grams per litre",
+            "example": 38.2
+          },
+          "globulin_g_l": {
+            "type": "number",
+            "description": "Serum globulin concentration in grams per litre (calculated as total protein minus albumin)",
+            "example": 26.6
+          },
+          "creatinine_umol_l": {
+            "type": "number",
+            "description": "Serum creatinine concentration in micromoles per litre — marker of renal function",
+            "example": 44.2
+          },
+          "bun_mmol_l": {
+            "type": "number",
+            "description": "Blood urea nitrogen concentration in millimoles per litre",
+            "example": 6.8
+          },
+          "glucose_mmol_l": {
+            "type": "number",
+            "description": "Serum glucose concentration in millimoles per litre",
+            "example": 7.2
+          },
+          "cholesterol_mmol_l": {
+            "type": "number",
+            "description": "Total serum cholesterol in millimoles per litre",
+            "example": 2.1
+          },
+          "triglycerides_mmol_l": {
+            "type": "number",
+            "description": "Serum triglyceride concentration in millimoles per litre",
+            "example": 1.4
+          },
+          "calcium_mmol_l": {
+            "type": "number",
+            "description": "Serum ionised calcium concentration in millimoles per litre",
+            "example": 2.42
+          },
+          "phosphorus_mmol_l": {
+            "type": "number",
+            "description": "Serum inorganic phosphorus in millimoles per litre",
+            "example": 2.18
+          },
+          "sodium_mmol_l": {
+            "type": "number",
+            "description": "Serum sodium concentration in millimoles per litre",
+            "example": 142.0
+          },
+          "potassium_mmol_l": {
+            "type": "number",
+            "description": "Serum potassium concentration in millimoles per litre",
+            "example": 4.6
+          },
+          "chloride_mmol_l": {
+            "type": "number",
+            "description": "Serum chloride concentration in millimoles per litre",
+            "example": 102.0
+          }
+        }
+      }
+    }
+  }
+}

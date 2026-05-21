@@ -156,8 +156,8 @@ def load_ontology_profile(filepath: str | Path) -> list[OntologyTerm]:
             raw.get("ontology_source") or default_ontology_source
         )
 
-        extra_context: dict[str, Any] | None = raw.get("extra_context")
-        if extra_context is not None and not isinstance(extra_context, dict):
+        extra_context: dict[str, Any] = raw.get("extra_context") or {}
+        if not isinstance(extra_context, dict):
             extra_context = {"value": extra_context}
 
         term = OntologyTerm(

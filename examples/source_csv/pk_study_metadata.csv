@@ -1,0 +1,25 @@
+study_id,compound_id,compound_name,dose_level,dose_mg_kg,route_of_administration,species,strain,sex,age_weeks,body_weight_g,timepoint_h,matrix,plasma_conc_ng_ml,brain_conc_ng_g,liver_conc_ng_g,auc_0_t_ng_h_ml,auc_0_inf_ng_h_ml,cmax_ng_ml,tmax_h,t_half_h,clearance_ml_min_kg,volume_of_distribution_l_kg,bioavailability_pct,protein_binding_pct,metabolite_id,analyst_id,analysis_date,lc_ms_method,lloq_ng_ml,sample_quality_flag
+PK-2024-001,CPD-0042,Compound A,Low,3,PO,rat,Sprague-Dawley,male,8,245,0.25,plasma,12.4,,, , , , , , , , ,87.3,M1,AN-07,2024-03-15,LCMS-v2,0.5,pass
+PK-2024-001,CPD-0042,Compound A,Low,3,PO,rat,Sprague-Dawley,male,8,247,0.5,plasma,38.7,,, , , , , , , , ,87.3,M1,AN-07,2024-03-15,LCMS-v2,0.5,pass
+PK-2024-001,CPD-0042,Compound A,Low,3,PO,rat,Sprague-Dawley,male,8,251,1,plasma,61.2,,, , , , , , , , ,87.3,M1,AN-07,2024-03-15,LCMS-v2,0.5,pass
+PK-2024-001,CPD-0042,Compound A,Low,3,PO,rat,Sprague-Dawley,male,8,249,2,plasma,84.5,,, , , , , , , , ,87.3,M1,AN-07,2024-03-15,LCMS-v2,0.5,pass
+PK-2024-001,CPD-0042,Compound A,Low,3,PO,rat,Sprague-Dawley,male,8,246,4,plasma,72.1,,, , , , , , , , ,87.3,M1,AN-07,2024-03-15,LCMS-v2,0.5,pass
+PK-2024-001,CPD-0042,Compound A,Low,3,PO,rat,Sprague-Dawley,male,8,250,8,plasma,41.3,,, , , , , , , , ,87.3,M1,AN-07,2024-03-15,LCMS-v2,0.5,pass
+PK-2024-001,CPD-0042,Compound A,Low,3,PO,rat,Sprague-Dawley,male,8,248,12,plasma,18.9,,, , , , , , , , ,87.3,M1,AN-07,2024-03-15,LCMS-v2,0.5,pass
+PK-2024-001,CPD-0042,Compound A,Low,3,PO,rat,Sprague-Dawley,male,8,245,24,plasma,4.2,,, , , , , , , , ,87.3,M1,AN-07,2024-03-15,LCMS-v2,0.5,pass
+PK-2024-001,CPD-0042,Compound A,Mid,10,PO,rat,Sprague-Dawley,male,8,252,1,plasma,198.7,,, , , , , , , , ,88.1,M1,AN-07,2024-03-15,LCMS-v2,0.5,pass
+PK-2024-001,CPD-0042,Compound A,Mid,10,PO,rat,Sprague-Dawley,male,8,253,2,plasma,267.4,,, , , , , , , , ,88.1,M1,AN-07,2024-03-15,LCMS-v2,0.5,pass
+PK-2024-001,CPD-0042,Compound A,Mid,10,PO,rat,Sprague-Dawley,male,8,248,4,plasma,231.8,,, , , , , , , , ,88.1,M1,AN-07,2024-03-15,LCMS-v2,0.5,pass
+PK-2024-001,CPD-0042,Compound A,Mid,10,PO,rat,Sprague-Dawley,male,8,255,8,plasma,142.6,,, , , , , , , , ,88.1,M1,AN-07,2024-03-15,LCMS-v2,0.5,pass
+PK-2024-001,CPD-0042,Compound A,High,30,IV,rat,Sprague-Dawley,male,8,249,0.083,plasma,1420.0,,, , , , , , , , ,88.4,M1,AN-07,2024-03-15,LCMS-v2,0.5,pass
+PK-2024-001,CPD-0042,Compound A,High,30,IV,rat,Sprague-Dawley,male,8,251,0.25,plasma,987.3,,, , , , , , , , ,88.4,M1,AN-07,2024-03-15,LCMS-v2,0.5,pass
+PK-2024-001,CPD-0042,Compound A,High,30,IV,rat,Sprague-Dawley,female,8,198,0.5,plasma,843.1,,, , , , , , , , ,89.2,M1,AN-08,2024-03-15,LCMS-v2,0.5,pass
+PK-2024-001,CPD-0042,Compound A,High,30,IV,rat,Sprague-Dawley,female,8,201,1,plasma,612.7,,, , , , , , , , ,89.2,M1,AN-08,2024-03-15,LCMS-v2,0.5,pass
+PK-2024-001,CPD-0042,Compound A,High,30,IV,rat,Sprague-Dawley,female,8,195,2,plasma,398.4,,, , , , , , , , ,89.2,M1,AN-08,2024-03-15,LCMS-v2,0.5,pass
+PK-2024-001,CPD-0042,Compound A,High,30,IV,rat,Sprague-Dawley,female,8,200,4,plasma,187.2,,, , , , , , , , ,89.2,M1,AN-08,2024-03-15,LCMS-v2,0.5,fail_hemolysis
+PK-2024-002,CPD-0042,Compound A,Mid,10,PO,mouse,C57BL/6J,male,10,27,0.5,plasma,52.1,310.4,,,,,,,,,,85.9,M1,AN-07,2024-03-22,LCMS-v2,0.5,pass
+PK-2024-002,CPD-0042,Compound A,Mid,10,PO,mouse,C57BL/6J,male,10,26,1,plasma,89.3,428.7,,,,,,,,,,85.9,M1,AN-07,2024-03-22,LCMS-v2,0.5,pass
+PK-2024-002,CPD-0042,Compound A,Mid,10,PO,mouse,C57BL/6J,male,10,28,2,plasma,118.6,512.3,,,,,,,,,,85.9,M1,AN-07,2024-03-22,LCMS-v2,0.5,pass
+PK-2024-002,CPD-0042,Compound A,Mid,10,PO,mouse,C57BL/6J,male,10,27,4,plasma,97.4,389.1,,,,,,,,,,85.9,M1,AN-07,2024-03-22,LCMS-v2,0.5,pass
+PK-2024-002,CPD-0042,Compound A,Mid,10,PO,mouse,C57BL/6J,female,10,22,1,plasma,76.8,341.2,,,,,,,,,,86.7,M1,AN-08,2024-03-22,LCMS-v2,0.5,pass
+PK-2024-002,CPD-0042,Compound A,Mid,10,PO,mouse,C57BL/6J,female,10,23,2,plasma,104.3,467.8,,,,,,,,,,86.7,M1,AN-08,2024-03-22,LCMS-v2,0.5,pass

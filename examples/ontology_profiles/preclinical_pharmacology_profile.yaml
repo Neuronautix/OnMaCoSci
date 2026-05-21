@@ -1,0 +1,710 @@
+ontology_id: "pco"
+ontology_source: "Preclinical Ontology (fictional example for mapping demonstration)"
+description: >
+  A representative subset of terms for annotating preclinical pharmacology,
+  pharmacokinetics, and toxicology study metadata. Terms are illustrative
+  and draw from concepts found in real ontologies such as OBI, NCIT, BAO,
+  CHEBI, and SEND/CDISC controlled terminology. Do not use in production
+  without validation against a real authoritative ontology.
+
+terms:
+
+  # ── Study-level terms ─────────────────────────────────────────────────────
+
+  - term_id: "pco:PreclinicalStudy"
+    label: "preclinical study"
+    definition: >
+      An in vivo or in vitro investigation conducted in non-human biological
+      systems to characterise the safety, efficacy, or pharmacology of an
+      investigational compound prior to first-in-human clinical trials.
+    synonyms: ["nonclinical study", "animal study", "in vivo study"]
+    parent_terms: ["pco:BiomedicalInvestigation"]
+    term_type: "class"
+    extra_context:
+      cdisc_send_mapping: "STUDYID domain"
+      related_standards: ["OECD TG 407", "ICH S7A", "ICH M3(R2)"]
+
+  - term_id: "pco:StudyIdentifier"
+    label: "study identifier"
+    definition: >
+      A unique alphanumeric code assigned to a preclinical study by the
+      testing facility or sponsor, used to track all data and documents
+      associated with a single study.
+    synonyms: ["study ID", "study number", "study code", "trial identifier"]
+    parent_terms: ["pco:Identifier"]
+    term_type: "property"
+    extra_context:
+      cdisc_variable: "STUDYID"
+
+  - term_id: "pco:StudyType"
+    label: "study type"
+    definition: >
+      A classification of a preclinical study based on its scientific objective,
+      duration, and regulatory framework (e.g., single-dose acute toxicity,
+      repeat-dose subchronic toxicity, genotoxicity, safety pharmacology).
+    synonyms: ["study design type", "study classification", "toxicology study type"]
+    parent_terms: ["pco:StudyDesignAttribute"]
+    term_type: "class"
+
+  - term_id: "pco:RegulatoryGuideline"
+    label: "regulatory guideline"
+    definition: >
+      An internationally recognised guidance document issued by a regulatory
+      authority (e.g., ICH, OECD, FDA, EMA) that specifies requirements for
+      the design and conduct of a preclinical study.
+    synonyms: ["ICH guideline", "OECD test guideline", "regulatory requirement", "study guideline"]
+    parent_terms: ["pco:RegulatoryDocument"]
+    term_type: "class"
+
+  - term_id: "pco:GLPCompliance"
+    label: "GLP compliance status"
+    definition: >
+      An attribute indicating whether a study was designed, conducted, and
+      reported in accordance with Good Laboratory Practice regulations
+      (OECD Principles of GLP or equivalent national regulations).
+    synonyms: ["GLP compliant", "good laboratory practice", "GLP status"]
+    parent_terms: ["pco:StudyQualityAttribute"]
+    term_type: "property"
+
+  - term_id: "pco:StudyDuration"
+    label: "study duration"
+    definition: >
+      The length of the dosing or treatment phase of a preclinical study,
+      typically expressed in days. Does not include pre-treatment acclimation
+      or post-treatment recovery periods unless specified.
+    synonyms: ["dosing duration", "treatment period", "study length", "duration days"]
+    parent_terms: ["pco:TemporalAttribute"]
+    term_type: "property"
+
+  - term_id: "pco:RecoveryPeriod"
+    label: "recovery period"
+    definition: >
+      A post-dosing observation phase during which satellite animals are
+      monitored to assess whether study-related findings are reversible
+      following cessation of compound administration.
+    synonyms: ["satellite recovery period", "reversibility period", "washout period"]
+    parent_terms: ["pco:StudyPhase"]
+    term_type: "class"
+
+  - term_id: "pco:NOAEL"
+    label: "no observed adverse effect level"
+    definition: >
+      The highest dose level at which no statistically or biologically
+      significant increase in the frequency or severity of adverse effects
+      is observed in the exposed population compared with an appropriate
+      control group.
+    synonyms: ["NOAEL", "no-adverse-effect level", "noael_mg_kg_day", "maximum tolerated dose no adverse"]
+    parent_terms: ["pco:ToxicologicalEndpoint"]
+    term_type: "property"
+    extra_context:
+      units: "mg/kg/day"
+      ich_reference: "ICH Q3C"
+
+  # ── Compound / test article ────────────────────────────────────────────────
+
+  - term_id: "pco:CompoundIdentifier"
+    label: "compound identifier"
+    definition: >
+      A unique identifier assigned to an investigational chemical compound
+      or biological molecule, used to track the substance across studies
+      and internal databases.
+    synonyms: ["compound ID", "test article ID", "sponsor compound ID", "drug identifier", "compound number"]
+    parent_terms: ["pco:ChemicalEntity"]
+    term_type: "property"
+
+  - term_id: "pco:CompoundName"
+    label: "compound name"
+    definition: >
+      The chemical, generic, or internal code name assigned to the
+      investigational compound or test article.
+    synonyms: ["drug name", "test article name", "chemical name", "INN", "generic name"]
+    parent_terms: ["pco:ChemicalEntity"]
+    term_type: "property"
+
+  - term_id: "pco:CASNumber"
+    label: "CAS registry number"
+    definition: >
+      A unique numerical identifier assigned to a chemical substance by the
+      Chemical Abstracts Service (CAS), used unambiguously to identify
+      chemical entities.
+    synonyms: ["CAS number", "CAS RN", "chemical abstracts number"]
+    parent_terms: ["pco:ChemicalIdentifier"]
+    term_type: "property"
+
+  - term_id: "pco:DoseFormulation"
+    label: "dose formulation"
+    definition: >
+      The vehicle, solvent, or excipient mixture used to prepare the test
+      article for administration to study animals.
+    synonyms: ["vehicle", "formulation", "dosing vehicle", "test article formulation"]
+    parent_terms: ["pco:DosePreparation"]
+    term_type: "property"
+
+  # ── Animal / subject ──────────────────────────────────────────────────────
+
+  - term_id: "pco:AnimalIdentifier"
+    label: "animal identifier"
+    definition: >
+      A unique identifier (e.g., ear tag number, tattoo, microchip code) used
+      to distinguish an individual animal within a study.
+    synonyms: ["animal ID", "subject ID", "animal number", "ear tag", "animal code"]
+    parent_terms: ["pco:SubjectIdentifier"]
+    term_type: "property"
+
+  - term_id: "pco:TestSpecies"
+    label: "test species"
+    definition: >
+      The biological species used as the animal model in a preclinical study
+      (e.g., Rattus norvegicus, Mus musculus, Canis familiaris).
+    synonyms: ["species", "animal species", "test animal species", "study species"]
+    parent_terms: ["pco:BiologicalCharacteristic"]
+    term_type: "class"
+
+  - term_id: "pco:StrainOrBreed"
+    label: "strain or breed"
+    definition: >
+      The inbred, outbred, or transgenic strain of a rodent test animal, or
+      the breed of a non-rodent species, used in a preclinical study.
+    synonyms: ["strain", "breed", "animal strain", "mouse strain", "rat strain", "genetic background", "strain or breed"]
+    parent_terms: ["pco:BiologicalCharacteristic"]
+    term_type: "class"
+
+  - term_id: "pco:BiologicalSex"
+    label: "biological sex"
+    definition: >
+      The chromosomally or gonadally determined sex of an animal, recorded
+      as male or female. Used as a stratification variable in preclinical studies.
+    synonyms: ["sex", "gender", "animal sex", "sex of animal"]
+    parent_terms: ["pco:AnimalCharacteristic"]
+    term_type: "property"
+
+  - term_id: "pco:AgeAtStudyStart"
+    label: "age at study start"
+    definition: >
+      The age of the animal in whole weeks at the time of the first day of
+      compound administration or the first study procedure.
+    synonyms: ["age at start", "age weeks", "animal age", "age at randomisation", "starting age"]
+    parent_terms: ["pco:TemporalCharacteristic"]
+    term_type: "property"
+    extra_context:
+      units: "weeks"
+
+  - term_id: "pco:BodyWeightAtRandomisation"
+    label: "body weight at randomisation"
+    definition: >
+      The body weight of an individual animal recorded immediately prior to
+      or at the time of randomisation into treatment groups.
+    synonyms: ["body weight", "weight at start", "initial body weight", "pre-dose body weight", "body weight at start"]
+    parent_terms: ["pco:BodyWeight"]
+    term_type: "property"
+    extra_context:
+      units: "grams"
+
+  - term_id: "pco:DoseGroup"
+    label: "dose group"
+    definition: >
+      A treatment group within a preclinical study that receives the same
+      compound, dose level, and route of administration. Typically designated
+      with a group identifier such as G1 (vehicle control), G2 (low dose), etc.
+    synonyms: ["treatment group", "dose group ID", "study group", "cohort", "group designation"]
+    parent_terms: ["pco:StudyGroup"]
+    term_type: "class"
+
+  - term_id: "pco:SatelliteGroup"
+    label: "satellite recovery group"
+    definition: >
+      A subset of study animals designated for a post-treatment recovery period
+      to allow assessment of reversibility of compound-related findings.
+    synonyms: ["satellite group", "recovery group", "recovery satellite"]
+    parent_terms: ["pco:DoseGroup"]
+    term_type: "class"
+
+  # ── Dose / administration ─────────────────────────────────────────────────
+
+  - term_id: "pco:DoseLevel"
+    label: "dose level"
+    definition: >
+      The amount of a test article administered to an animal per unit body
+      weight per dosing occasion, typically expressed in milligrams per
+      kilogram body weight.
+    synonyms: ["dose", "dose mg/kg", "dose mg per kg", "nominal dose", "dose level mg/kg/day", "administered dose"]
+    parent_terms: ["pco:DoseAttribute"]
+    term_type: "property"
+    extra_context:
+      units: "mg/kg/day"
+
+  - term_id: "pco:RouteOfAdministration"
+    label: "route of administration"
+    definition: >
+      The path by which a test article is introduced into the body of an
+      animal (e.g., oral gavage, intravenous injection, subcutaneous injection).
+    synonyms: ["administration route", "dosing route", "route", "ROA"]
+    parent_terms: ["pco:AdministrationAttribute"]
+    term_type: "property"
+
+  - term_id: "pco:DoseFrequency"
+    label: "dosing frequency"
+    definition: >
+      The number of times per day, week, or other time unit that the test
+      article is administered to an animal.
+    synonyms: ["frequency of dosing", "administration frequency", "dosing schedule", "dose frequency"]
+    parent_terms: ["pco:AdministrationAttribute"]
+    term_type: "property"
+
+  # ── PK parameters ────────────────────────────────────────────────────────
+
+  - term_id: "pco:PlasmaConcentration"
+    label: "plasma concentration"
+    definition: >
+      The measured concentration of a compound or metabolite in plasma at a
+      specific time after administration, typically reported in nanograms per
+      millilitre (ng/mL).
+    synonyms: ["plasma conc", "drug concentration", "plasma drug concentration", "plasma_conc_ng_ml", "blood concentration"]
+    parent_terms: ["pco:PKParameter"]
+    term_type: "property"
+    extra_context:
+      units: "ng/mL"
+
+  - term_id: "pco:BrainConcentration"
+    label: "brain concentration"
+    definition: >
+      The measured concentration of a compound or metabolite in brain tissue
+      at a defined time after administration, used to assess CNS penetration.
+    synonyms: ["brain conc", "CNS concentration", "brain tissue concentration", "brain_conc_ng_g"]
+    parent_terms: ["pco:TissueConcentration"]
+    term_type: "property"
+    extra_context:
+      units: "ng/g"
+
+  - term_id: "pco:AUC"
+    label: "area under the concentration-time curve"
+    definition: >
+      The integral of the plasma concentration-time curve over a defined
+      interval, representing total drug exposure. Commonly reported as
+      AUC(0-t) for a specific interval or AUC(0-inf) extrapolated to infinity.
+    synonyms: ["AUC", "AUC0-t", "AUC0-inf", "drug exposure", "auc_0_t_ng_h_ml", "area under curve"]
+    parent_terms: ["pco:PKParameter"]
+    term_type: "property"
+    extra_context:
+      units: "ng·h/mL"
+
+  - term_id: "pco:Cmax"
+    label: "maximum plasma concentration"
+    definition: >
+      The highest plasma concentration of a compound observed after
+      administration, representing the peak drug exposure.
+    synonyms: ["Cmax", "peak concentration", "maximum concentration", "cmax_ng_ml"]
+    parent_terms: ["pco:PKParameter"]
+    term_type: "property"
+    extra_context:
+      units: "ng/mL"
+
+  - term_id: "pco:Tmax"
+    label: "time to maximum plasma concentration"
+    definition: >
+      The time after administration at which the maximum plasma concentration
+      (Cmax) is observed.
+    synonyms: ["Tmax", "time to Cmax", "peak time", "tmax_h"]
+    parent_terms: ["pco:PKParameter"]
+    term_type: "property"
+    extra_context:
+      units: "hours"
+
+  - term_id: "pco:HalfLife"
+    label: "plasma elimination half-life"
+    definition: >
+      The time required for the plasma concentration of a compound to decrease
+      by 50% during the terminal elimination phase.
+    synonyms: ["t1/2", "half-life", "t_half", "elimination half-life", "t_half_h", "terminal half life"]
+    parent_terms: ["pco:PKParameter"]
+    term_type: "property"
+    extra_context:
+      units: "hours"
+
+  - term_id: "pco:Clearance"
+    label: "plasma clearance"
+    definition: >
+      The volume of plasma from which a compound is completely removed per
+      unit time, a measure of the body's ability to eliminate the compound.
+    synonyms: ["CL", "total clearance", "systemic clearance", "clearance ml/min/kg"]
+    parent_terms: ["pco:PKParameter"]
+    term_type: "property"
+    extra_context:
+      units: "mL/min/kg"
+
+  - term_id: "pco:VolumeOfDistribution"
+    label: "volume of distribution"
+    definition: >
+      A theoretical volume that relates the total amount of drug in the body
+      to its plasma concentration, indicating the extent of tissue distribution.
+    synonyms: ["Vd", "Vss", "apparent volume of distribution", "volume_of_distribution_l_kg"]
+    parent_terms: ["pco:PKParameter"]
+    term_type: "property"
+    extra_context:
+      units: "L/kg"
+
+  - term_id: "pco:OralBioavailability"
+    label: "oral bioavailability"
+    definition: >
+      The fraction of an orally administered dose that reaches the systemic
+      circulation in unchanged form, expressed as a percentage relative to
+      intravenous administration.
+    synonyms: ["bioavailability", "%F", "F%", "oral F", "absolute bioavailability", "bioavailability_pct"]
+    parent_terms: ["pco:PKParameter"]
+    term_type: "property"
+    extra_context:
+      units: "percent"
+
+  - term_id: "pco:ProteinBinding"
+    label: "plasma protein binding"
+    definition: >
+      The extent to which a compound binds reversibly to plasma proteins
+      (primarily albumin and alpha-1-acid glycoprotein), expressed as a
+      percentage of the total plasma concentration.
+    synonyms: ["protein binding", "PPB", "plasma protein binding", "plasma binding", "protein_binding_pct"]
+    parent_terms: ["pco:PKParameter"]
+    term_type: "property"
+    extra_context:
+      units: "percent"
+
+  - term_id: "pco:SamplingTimepoint"
+    label: "sampling timepoint"
+    definition: >
+      The elapsed time after compound administration at which a biological
+      sample was collected for concentration measurement.
+    synonyms: ["timepoint", "sampling time", "time point", "time after dose", "timepoint_h"]
+    parent_terms: ["pco:StudyTimepoint"]
+    term_type: "property"
+    extra_context:
+      units: "hours"
+
+  - term_id: "pco:BioanalyticalMatrix"
+    label: "bioanalytical matrix"
+    definition: >
+      The biological fluid or tissue used as the source material for compound
+      concentration measurement (e.g., plasma, whole blood, brain homogenate,
+      urine, cerebrospinal fluid).
+    synonyms: ["matrix", "sample matrix", "biological matrix", "sample type"]
+    parent_terms: ["pco:BiologicalSample"]
+    term_type: "class"
+
+  - term_id: "pco:LLOQ"
+    label: "lower limit of quantification"
+    definition: >
+      The lowest concentration at which an analyte can be reliably quantified
+      with acceptable precision and accuracy in a validated bioanalytical method.
+    synonyms: ["LLOQ", "lower limit of quantitation", "LOQ", "lloq_ng_ml", "quantification limit"]
+    parent_terms: ["pco:AnalyticalParameter"]
+    term_type: "property"
+    extra_context:
+      units: "ng/mL"
+
+  - term_id: "pco:SampleQualityFlag"
+    label: "sample quality flag"
+    definition: >
+      A categorical assessment of the analytical quality of a biological sample,
+      indicating whether the sample met acceptance criteria for analysis
+      (e.g., pass, fail_hemolysis, fail_lipemia, excluded).
+    synonyms: ["quality flag", "sample flag", "QC flag", "sample quality", "analysis flag"]
+    parent_terms: ["pco:SampleAttribute"]
+    term_type: "property"
+
+  # ── Toxicology endpoints ──────────────────────────────────────────────────
+
+  - term_id: "pco:ClinicalSign"
+    label: "clinical sign"
+    definition: >
+      An objectively observed abnormality in an animal's appearance, behaviour,
+      or physiological function, recorded during routine cage-side or detailed
+      clinical observations in a toxicology study.
+    synonyms: ["clinical observation", "clinical finding", "toxic sign", "adverse clinical sign"]
+    parent_terms: ["pco:ClinicalObservation"]
+    term_type: "class"
+
+  - term_id: "pco:SeverityGrade"
+    label: "severity grade"
+    definition: >
+      A semi-quantitative assessment of the magnitude of a finding, typically
+      scored on a scale from minimal (1) to severe (5), used in clinical
+      observations and histopathology.
+    synonyms: ["grade", "severity", "severity score", "grading", "severity_grade"]
+    parent_terms: ["pco:ObservationAttribute"]
+    term_type: "property"
+
+  - term_id: "pco:BodyWeight"
+    label: "body weight"
+    definition: >
+      The measured mass of an animal's body at a defined study timepoint,
+      used to monitor animal welfare, calculate dose, and detect compound-related
+      growth effects.
+    synonyms: ["weight", "body weight g", "animal weight", "terminal body weight", "body_weight_g"]
+    parent_terms: ["pco:AnimalMeasurement"]
+    term_type: "property"
+    extra_context:
+      units: "grams"
+
+  - term_id: "pco:FoodConsumption"
+    label: "food consumption"
+    definition: >
+      The mean daily amount of food consumed by an animal over a defined
+      interval, typically reported in grams per animal per day.
+    synonyms: ["food intake", "feed consumption", "diet consumption", "food_consumption_g_day"]
+    parent_terms: ["pco:AnimalMeasurement"]
+    term_type: "property"
+    extra_context:
+      units: "g/day"
+
+  - term_id: "pco:OrganWeight"
+    label: "organ weight"
+    definition: >
+      The measured mass of a dissected organ or tissue collected at necropsy,
+      reported as absolute weight (grams) or as a ratio to terminal body weight
+      or brain weight.
+    synonyms: ["absolute organ weight", "terminal organ weight", "tissue weight", "absolute_weight_g"]
+    parent_terms: ["pco:NecropsyFinding"]
+    term_type: "property"
+    extra_context:
+      units: "grams"
+
+  - term_id: "pco:RelativeOrganWeight"
+    label: "relative organ weight"
+    definition: >
+      Organ weight expressed as a percentage of the animal's terminal body
+      weight, used to adjust for body weight differences between animals.
+    synonyms: ["organ weight relative to body weight", "organ/body weight ratio", "relative_to_body_weight_pct"]
+    parent_terms: ["pco:NecropsyFinding"]
+    term_type: "property"
+    extra_context:
+      units: "percent of body weight"
+
+  - term_id: "pco:HistopathologyFinding"
+    label: "histopathology finding"
+    definition: >
+      A microscopic alteration observed in a tissue section examined by a
+      board-certified veterinary pathologist, described using standardised
+      nomenclature (INHAND preferred).
+    synonyms: ["histological finding", "microscopic finding", "pathology finding", "finding_term"]
+    parent_terms: ["pco:PathologyFinding"]
+    term_type: "class"
+
+  - term_id: "pco:TestArticleRelated"
+    label: "test article related"
+    definition: >
+      A pathologist's assessment of whether a histopathology or clinical finding
+      is causally associated with administration of the test article.
+    synonyms: ["treatment related", "compound related", "drug related", "test_article_related"]
+    parent_terms: ["pco:PathologyAttribute"]
+    term_type: "property"
+
+  - term_id: "pco:AdverseFinding"
+    label: "adverse finding"
+    definition: >
+      A finding classified as harmful to the animal's health or wellbeing by
+      the study pathologist, used to distinguish toxicologically significant
+      changes from adaptive or incidental findings.
+    synonyms: ["adverse effect", "adverse change", "harmful finding", "adverse"]
+    parent_terms: ["pco:ToxicologicalEndpoint"]
+    term_type: "property"
+
+  - term_id: "pco:Reversibility"
+    label: "reversibility assessment"
+    definition: >
+      An evaluation of whether a study-related finding returned to normal or
+      baseline condition after cessation of compound administration during the
+      recovery period.
+    synonyms: ["reversible", "reversibility", "finding reversibility", "recovery potential"]
+    parent_terms: ["pco:ToxicologicalEndpoint"]
+    term_type: "property"
+
+  # ── Haematology ───────────────────────────────────────────────────────────
+
+  - term_id: "pco:WhiteBloodCellCount"
+    label: "white blood cell count"
+    definition: >
+      The total number of leukocytes per unit volume of blood, a key
+      haematology parameter for assessing immune function and haematotoxicity.
+    synonyms: ["WBC", "leukocyte count", "total WBC", "wbc_10e9_l"]
+    parent_terms: ["pco:HaematologyParameter"]
+    term_type: "property"
+    extra_context:
+      units: "10^9/L"
+
+  - term_id: "pco:RedBloodCellCount"
+    label: "red blood cell count"
+    definition: >
+      The number of erythrocytes per unit volume of blood, used to assess
+      anaemia, polycythaemia, and erythropoiesis.
+    synonyms: ["RBC", "erythrocyte count", "red cell count", "rbc_10e12_l"]
+    parent_terms: ["pco:HaematologyParameter"]
+    term_type: "property"
+    extra_context:
+      units: "10^12/L"
+
+  - term_id: "pco:Haemoglobin"
+    label: "haemoglobin concentration"
+    definition: >
+      The concentration of haemoglobin in whole blood, reflecting the
+      oxygen-carrying capacity of the blood.
+    synonyms: ["hemoglobin", "HGB", "haemoglobin", "Hb", "hemoglobin_g_dl"]
+    parent_terms: ["pco:HaematologyParameter"]
+    term_type: "property"
+    extra_context:
+      units: "g/dL"
+
+  - term_id: "pco:Haematocrit"
+    label: "haematocrit"
+    definition: >
+      The proportion of red blood cells in a given volume of blood, expressed
+      as a percentage. Also known as packed cell volume (PCV).
+    synonyms: ["hematocrit", "PCV", "packed cell volume", "HCT", "hematocrit_pct"]
+    parent_terms: ["pco:HaematologyParameter"]
+    term_type: "property"
+    extra_context:
+      units: "percent"
+
+  - term_id: "pco:PlateletCount"
+    label: "platelet count"
+    definition: >
+      The number of thrombocytes per unit volume of blood, used to assess
+      haemostasis and detect thrombocytopenia or thrombocytosis.
+    synonyms: ["platelets", "thrombocyte count", "PLT", "platelets_10e9_l"]
+    parent_terms: ["pco:HaematologyParameter"]
+    term_type: "property"
+    extra_context:
+      units: "10^9/L"
+
+  - term_id: "pco:NeutrophilCount"
+    label: "neutrophil count"
+    definition: >
+      The absolute number of neutrophils per unit volume of blood.
+    synonyms: ["neutrophils", "NEUT", "absolute neutrophil count", "ANC", "neutrophils_10e9_l"]
+    parent_terms: ["pco:DifferentialLeukocyteCount"]
+    term_type: "property"
+    extra_context:
+      units: "10^9/L"
+
+  - term_id: "pco:LymphocyteCount"
+    label: "lymphocyte count"
+    definition: >
+      The absolute number of lymphocytes per unit volume of blood.
+    synonyms: ["lymphocytes", "LYMPH", "absolute lymphocyte count", "lymphocytes_10e9_l"]
+    parent_terms: ["pco:DifferentialLeukocyteCount"]
+    term_type: "property"
+    extra_context:
+      units: "10^9/L"
+
+  # ── Clinical chemistry ────────────────────────────────────────────────────
+
+  - term_id: "pco:ALT"
+    label: "alanine aminotransferase activity"
+    definition: >
+      The catalytic activity of alanine aminotransferase (ALT, also known as
+      GPT) in serum or plasma. An elevated ALT is the primary biomarker of
+      hepatocellular injury.
+    synonyms: ["ALT", "GPT", "SGPT", "alanine transaminase", "alt_u_l"]
+    parent_terms: ["pco:LiverEnzyme"]
+    term_type: "property"
+    extra_context:
+      units: "U/L"
+
+  - term_id: "pco:AST"
+    label: "aspartate aminotransferase activity"
+    definition: >
+      The catalytic activity of aspartate aminotransferase (AST, also known as
+      GOT) in serum or plasma. Elevated AST may indicate liver, muscle, or
+      cardiac damage.
+    synonyms: ["AST", "GOT", "SGOT", "aspartate transaminase", "ast_u_l"]
+    parent_terms: ["pco:LiverEnzyme"]
+    term_type: "property"
+    extra_context:
+      units: "U/L"
+
+  - term_id: "pco:AlkalinePhosphatase"
+    label: "alkaline phosphatase activity"
+    definition: >
+      The catalytic activity of alkaline phosphatase in serum. Elevated levels
+      may indicate liver, bone, or biliary disease.
+    synonyms: ["ALP", "alkaline phosphatase", "alp_u_l"]
+    parent_terms: ["pco:LiverEnzyme"]
+    term_type: "property"
+    extra_context:
+      units: "U/L"
+
+  - term_id: "pco:TotalBilirubin"
+    label: "total bilirubin"
+    definition: >
+      The total concentration of bilirubin (conjugated + unconjugated) in
+      serum. Elevated bilirubin may indicate liver disease or haemolysis.
+    synonyms: ["bilirubin", "TBIL", "total bilirubin", "total_bilirubin_umol_l"]
+    parent_terms: ["pco:LiverFunction"]
+    term_type: "property"
+    extra_context:
+      units: "µmol/L"
+
+  - term_id: "pco:Creatinine"
+    label: "serum creatinine"
+    definition: >
+      The concentration of creatinine in serum, a waste product of muscle
+      metabolism filtered by the kidneys. Elevated serum creatinine is a
+      marker of reduced renal function.
+    synonyms: ["creatinine", "CREA", "serum creatinine", "creatinine_umol_l"]
+    parent_terms: ["pco:RenalFunction"]
+    term_type: "property"
+    extra_context:
+      units: "µmol/L"
+
+  - term_id: "pco:BloodUreaNitrogen"
+    label: "blood urea nitrogen"
+    definition: >
+      The concentration of urea nitrogen in blood, used as a marker of renal
+      function and protein metabolism.
+    synonyms: ["BUN", "urea nitrogen", "blood urea", "bun_mmol_l"]
+    parent_terms: ["pco:RenalFunction"]
+    term_type: "property"
+    extra_context:
+      units: "mmol/L"
+
+  - term_id: "pco:Glucose"
+    label: "serum glucose"
+    definition: >
+      The concentration of glucose in serum or plasma, reflecting carbohydrate
+      metabolism and pancreatic function.
+    synonyms: ["blood glucose", "glucose", "GLUC", "fasting glucose", "glucose_mmol_l"]
+    parent_terms: ["pco:MetabolicParameter"]
+    term_type: "property"
+    extra_context:
+      units: "mmol/L"
+
+  - term_id: "pco:TotalCholesterol"
+    label: "total cholesterol"
+    definition: >
+      The total concentration of cholesterol in serum, including both
+      HDL and LDL fractions.
+    synonyms: ["cholesterol", "CHOL", "total cholesterol", "cholesterol_mmol_l"]
+    parent_terms: ["pco:LipidParameter"]
+    term_type: "property"
+    extra_context:
+      units: "mmol/L"
+
+  - term_id: "pco:Albumin"
+    label: "serum albumin"
+    definition: >
+      The concentration of albumin in serum, the most abundant plasma protein.
+      Low albumin may indicate hepatic dysfunction, malnutrition, or
+      acute-phase response.
+    synonyms: ["albumin", "ALB", "serum albumin", "albumin_g_l"]
+    parent_terms: ["pco:LiverFunction"]
+    term_type: "property"
+    extra_context:
+      units: "g/L"
+
+  - term_id: "pco:TotalProtein"
+    label: "total serum protein"
+    definition: >
+      The combined concentration of all proteins in serum, principally albumin
+      and globulins.
+    synonyms: ["total protein", "TP", "serum protein", "total_protein_g_l"]
+    parent_terms: ["pco:LiverFunction"]
+    term_type: "property"
+    extra_context:
+      units: "g/L"
