@@ -1,141 +1,146 @@
 # Development Roadmap
 
-This document describes the planned evolution of the Ontology Mapping Co-Scientist. The MVP (v0.1.0) establishes the architecture and a working lexical-similarity baseline. Each subsequent phase builds on that foundation without breaking it.
+Status key: `[x]` done · `[~]` in progress · `[ ]` not started
 
 ---
 
-## Phase 1 — MVP (Current: v0.1.0)
+## Phase 1 — MVP `v0.1.0` ✅ COMPLETE
 
-**Goal**: Establish the architecture, data models, and a functional end-to-end pipeline using only lexical similarity.
+**Goal**: Working end-to-end pipeline on lexical similarity alone.
 
-### Delivered
-- Pydantic-based `MappingHypothesis` model with full provenance, evidence, and review state
-- Source profiler for CSV and OpenAPI 3.x schemas
-- Ontology profiler with label and synonym indexing
-- Candidate generator using `rapidfuzz` WRatio lexical similarity
-- Adversarial reviewer with 9 heuristic flag types
-- Ranking agent with adversarial-penalty-adjusted scoring
-- Validation agent with basic consistency checks
-- Human review agent with suggested action logic
-- Orchestrator wiring all agents together
-- JSON, SSSOM-inspired TSV, and Markdown report exporters
-- 114 pytest tests
-- Example data: mouse HCM phenotyping context (CSV + OpenAPI + ontology profile)
-- `python scripts/run_example.py` produces all three output types
-
-### Known limitations of Phase 1
-- Lexical similarity only — no semantic understanding
-- No synonym expansion beyond what is in the profile
-- No definition-based matching
-- No SHACL or SPARQL validation
-- Human review is output-only (no interactive interface)
-- SSSOM output is inspired by but not fully compliant with the SSSOM standard
-- Only CSV and OpenAPI sources supported
+- [x] Pydantic `MappingHypothesis` model with provenance, evidence, review state
+- [x] `SourceProfilerAgent` — CSV and OpenAPI 3.x
+- [x] `OntologyProfilerAgent` — YAML profiles, label/synonym index
+- [x] `CandidateGeneratorAgent` — rapidfuzz WRatio lexical similarity
+- [x] `AdversarialReviewerAgent` — 9 heuristic flag types
+- [x] `RankingAgent` — adversarial-penalty-adjusted scoring
+- [x] `ValidationAgent` — basic consistency checks
+- [x] `HumanReviewAgent` — suggested action logic + review packets
+- [x] `OrchestratorAgent` — full pipeline wiring
+- [x] Exporters: JSON, SSSOM-inspired TSV, Markdown review report
+- [x] 114 pytest tests
+- [x] Example data: mouse HCM (CSV + OpenAPI + ontology profile)
+- [x] `python scripts/run_example.py` produces all three output types
 
 ---
 
-## Phase 2 — LLM Integration (Target: v0.2.0)
+## Phase 1.5 — Scoring & Format Improvements `v0.1.5` ✅ COMPLETE
 
-**Goal**: Replace or augment lexical heuristics with LLM-based semantic reasoning.
+*Improvements implemented after MVP, before LLM integration.*
 
-### Planned
-- `LLMCandidateGeneratorAgent`: uses LLM to assess semantic similarity between source field descriptions and ontology term definitions; falls back to lexical when LLM unavailable
-- `LLMAdversarialReviewerAgent`: prompts an LLM to argue against each mapping from a domain scientist perspective
-- `LLMOntologyEngineerReviewerAgent`: checks logical consistency of proposed mappings
-- `LLMDomainScientistReviewerAgent`: evaluates scientific plausibility
-- Structured prompts with chain-of-thought evidence extraction
-- LLM output parsed into `Evidence` objects — the LLM's reasoning becomes traceable
-- Fallback chain: LLM → lexical → no-mapping (always produces a result)
-- Cost estimation per pipeline run
+**Scoring**
+- [x] S1 — Definition-based similarity (TF-IDF; sentence-transformers optional)
+- [x] S2 — Unit-aware scoring (regex unit extractor; high-severity mismatch flag)
+- [x] S3 — Cross-field synonym expansion (45-entry biomedical abbreviation dictionary)
 
-### Extension points already in the codebase
-- Each agent class is independently replaceable
-- `Evidence.source` field can record LLM model/version
-- `Provenance.method` distinguishes lexical vs. LLM approaches
-- `CandidateGeneratorAgent.generate_candidates` signature is stable
+**Source formats**
+- [x] F1 — JSON Schema loader (`$ref`, `allOf/anyOf`, nested dot-notation, depth limit)
+- [x] F2 — RDF/OWL ontology loader (`rdflib`; optional dep, clean `ImportError`)
 
----
+**Export & standards**
+- [x] E1 — Full SSSOM compliance (YAML header, full SKOS IRIs, `semapv:` justification)
 
-## Phase 3 — Validation Infrastructure (Target: v0.3.0)
+**Human review workflow**
+- [x] W1 — Review ledger (`ReviewDecision` YAML store, `omcs-review` CLI)
+- [x] W2 — Re-run mode (`--ledger` flag; approved entities skip re-generation)
 
-**Goal**: Move beyond syntactic checks to semantic validation.
+**LLM (partial)**
+- [x] L1 — `LLMAdversarialReviewerAgent` (Anthropic SDK; heuristic fallback)
 
-### Planned
-- **SHACL validation**: load SHACL shapes alongside ontology profiles; validate that proposed mappings do not violate domain/range constraints
-- **SPARQL competency questions**: define a set of competency questions that must be answerable given the accepted mappings; run them against a test RDF graph
-- **Transformation tests**: for `custom:requiresTransform` mappings, validate that the specified transformation preserves data integrity on example values
-- **Unit consistency checker**: detect unit mismatches using a unit registry (e.g., `pint`)
-- **Datatype validator**: verify that the source datatype is compatible with the target term's `rdfs:range`
+**Evolution (not yet)**
+- [ ] H1 — Ontology version tracking (`evolution/version_tracker.py`)
+- [ ] H2 — Re-mapping trigger on ontology change (`evolution/remapping_trigger.py`)
 
-### `ValidationAgent` extension
-The existing `ValidationAgent` has a `validate_hypothesis` method designed to be extended. Phase 3 will add:
-```python
-class SHACLValidationMixin:
-    def validate_with_shacl(self, hypothesis, shapes_graph): ...
-
-class SPARQLValidationMixin:
-    def validate_with_sparql(self, hypothesis, endpoint): ...
-```
+Total tests: **183 passing**
 
 ---
 
-## Phase 4 — Export and Standards Compliance (Target: v0.4.0)
+## Phase 2 — LLM Integration `v0.2.0` 🔴 IN PROGRESS
 
-**Goal**: Produce outputs that are interoperable with the broader semantic web and data management ecosystem.
+**Goal**: Replace lexical heuristics with LLM semantic reasoning at every pipeline stage where it adds value.
 
-### Planned
-- **Full SSSOM compliance**: generate valid SSSOM TSV with all required metadata headers, correct predicate IRIs, and a YAML header block
-- **JSON-LD export**: serialize accepted mappings as JSON-LD with proper `@context`; enable direct loading into RDF triplestores
-- **RO-Crate packaging**: wrap the full mapping run (inputs, outputs, provenance) as a Research Object Crate for FAIR data compliance
-- **OWL axiom generation**: for `skos:exactMatch` mappings, optionally generate `owl:equivalentClass` or `owl:equivalentProperty` axioms
-- **Bridging ontology export**: generate a lightweight bridging ontology that formalizes the accepted mappings
+### Candidate generation
+- [x] L1 `LLMAdversarialReviewerAgent` — argue against mappings *(done in Phase 1.5)*
+- [ ] L2 `LLMCandidateGeneratorAgent` — score (source description ↔ ontology definition) pairs with Claude; emit `Evidence(evidence_type="llm_semantic_similarity")`; fall back to lexical
+- [ ] L3 `LLMOntologyEngineerReviewerAgent` — check logical consistency: predicate appropriateness, domain/range, class/property compatibility
+- [ ] L4 `LLMDomainScientistReviewerAgent` — evaluate scientific plausibility in a user-specified domain context
+- [ ] L5 Cost tracker — record token usage per pipeline run; report estimate before and actual after
 
----
+### Prompt infrastructure
+- [ ] `prompts/` module: versioned, templated prompt strings so prompts can be audited and iterated independently of agent code
+- [ ] Prompt hash stored in `Provenance.extra` for reproducibility
+- [ ] Chain-of-thought parsing: extract structured evidence from LLM reasoning steps
 
-## Phase 5 — Collaborative Review Interface (Target: v0.5.0)
-
-**Goal**: Support structured multi-reviewer workflows.
-
-### Planned
-- Web-based review interface (FastAPI backend + simple frontend) for viewing and acting on review packets
-- Role-based review forms: Domain Scientist, Ontology Engineer, Data Engineer perspectives
-- Multi-reviewer consensus: require N reviewers before accepting a high-stakes mapping
-- Review versioning: track changes to mapping decisions over time
-- Notification system: alert reviewers when new candidates are ready
-- Conflict resolution workflow: when reviewers disagree, escalate to a designated decision maker
-- Integration with GitHub Issues / JIRA for tracking new ontology term requests
+### Fallback chain
+- [ ] Unified fallback: LLM → definition TF-IDF → lexical → `custom:noMapping` — always produces a result
 
 ---
 
-## Phase 6 — Ontology Evolution Tracking (Target: v1.0.0)
+## Phase 3 — Validation Infrastructure `v0.3.0` 🔴 NOT STARTED
 
-**Goal**: Maintain mapping quality as ontologies and source schemas change.
+**Goal**: Move from syntactic to semantic validation of mapping correctness.
 
-### Planned
-- Change detection: when a new version of an ontology or source schema is loaded, detect which mappings may be affected
-- Re-mapping triggers: automatically flag accepted mappings for re-review when their source or target terms change
-- Mapping versioning: track the full history of each mapping hypothesis, including all revisions
-- Deprecation handling: when a target term is deprecated, find replacement candidates automatically
-- Semantic drift detection: use LLMs to compare old and new term definitions and flag meaningful changes
-- Changelog integration: link mapping changes to ontology release notes
+### Core validation
+- [ ] V1 `DatatypeValidator` — check source `datatype` against target term's `rdfs:range`; emit `ValidationStatus.WARNING` on mismatch
+- [ ] V2 `TransformationValidator` — for `custom:requiresTransform` mappings, test that the specified transformation preserves data integrity on example values; requires `required_conditions` to specify the transform
+- [ ] V3 `UnitConsistencyValidator` — full unit registry via `pint`; replaces the regex-based unit extractor for mappings where both sides have physical units
 
----
+### SHACL
+- [ ] V4 `SHACLValidationMixin` — load SHACL shapes alongside ontology profiles; validate that accepted mappings do not violate `sh:class`, `sh:datatype`, `sh:minCount`, `sh:maxCount` constraints; uses `pyshacl`
+- [ ] `examples/shacl/` — example shapes graphs for the mouse HCM and preclinical pharmacology profiles
 
-## Principles Guiding All Phases
+### SPARQL
+- [ ] V5 `SPARQLCompetencyAgent` — define competency questions (CQs) as SPARQL ASK/SELECT queries; construct a small test RDF graph from accepted mappings; run CQs and report pass/fail
+- [ ] `examples/competency_questions/` — starter CQ library for common preclinical mapping scenarios
 
-1. **Backward compatibility of data models**: the `MappingHypothesis` schema should be stable; new fields are additive
-2. **Graceful degradation**: if an advanced feature (LLM, SHACL) is unavailable, the system falls back to what is available
-3. **Provenance at every step**: every automated decision records what made it
-4. **Human authority**: no phase removes the human from the final decision; automation narrows the search space, it does not replace judgement
-5. **Small, testable components**: each new feature should be independently testable without running the full pipeline
-6. **Scientific honesty**: the system must never present a mapping as more certain than the evidence warrants
+### Validation summary
+- [ ] `ValidationAgent.generate_full_report()` — structured report combining all validator results per hypothesis; feeds into the Markdown review report
 
 ---
 
-## Contributing to the Roadmap
+## Phase 4 — Export & Standards `v0.4.0`
 
-If you are using this system in a domain with specific requirements not covered here, please open an issue describing:
-- Your source schema type(s)
-- Your target ontology or ontologies
-- The mapping use case (data integration, annotation, federated query, etc.)
-- Which phase 2–6 features would be most valuable to you
+**Goal**: Outputs interoperable with the semantic web and FAIR data ecosystem.
+
+- [x] E1 Full SSSOM compliance *(done in Phase 1.5)*
+- [ ] E2 JSON-LD export — serialize accepted mappings with proper `@context`; load directly into RDF triplestores
+- [ ] E3 RO-Crate packaging — wrap a full pipeline run (inputs, outputs, provenance) as a Research Object Crate
+- [ ] E4 OWL axiom generation — for `skos:exactMatch`, optionally emit `owl:equivalentClass` / `owl:equivalentProperty`
+- [ ] E5 Bridging ontology export — lightweight OWL file formalizing accepted mappings
+
+---
+
+## Phase 5 — Collaborative Review Interface `v0.5.0`
+
+**Goal**: Structured multi-reviewer workflows beyond the CLI ledger.
+
+- [x] W1 Review ledger CLI *(done in Phase 1.5)*
+- [ ] FastAPI backend — serve review packets as JSON; accept decisions via REST
+- [ ] Minimal web UI — per-entity review form (approve/reject/change/request)
+- [ ] Role-based review forms — separate views for Domain Scientist, Ontology Engineer, Data Engineer
+- [ ] Multi-reviewer consensus — require N approvals before a mapping is accepted
+- [ ] Review versioning — full history of each mapping decision
+- [ ] Conflict resolution — escalate disagreements to a designated arbiter
+
+---
+
+## Phase 6 — Ontology Evolution `v1.0.0`
+
+**Goal**: Keep accepted mappings correct as ontologies and source schemas change.
+
+- [ ] H1 Ontology version tracking — diff two profile snapshots; emit `ChangeReport`
+- [ ] H2 Re-mapping trigger — flag accepted mappings whose target term changed; reset `human_review_status` to `awaiting_review`
+- [ ] H3 Deprecation handler — when a target term is deprecated, find replacement candidates automatically
+- [ ] H4 Semantic drift detection — use LLMs to compare old and new term definitions; flag meaningful conceptual shifts
+- [ ] H5 Changelog integration — link mapping changes to ontology release notes
+
+---
+
+## Design Principles (all phases)
+
+1. Backward-compatible data models — new fields are additive; existing pipelines never break
+2. Graceful degradation — if LLM/SHACL/rdflib is unavailable, fall back silently with a logged warning
+3. Provenance at every step — every automated decision records who made it, when, and how
+4. Human authority — no phase removes the human from the final decision
+5. Small, independently testable components — each feature can be exercised without running the full pipeline
+6. Scientific honesty — never present a mapping as more certain than the evidence warrants
