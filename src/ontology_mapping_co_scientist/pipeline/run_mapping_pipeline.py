@@ -824,6 +824,25 @@ def main() -> None:
         default=False,
         help="Enable INFO-level logging to stdout.",
     )
+    parser.add_argument(
+        "--llm-adversarial-review",
+        action="store_true",
+        default=False,
+        help=(
+            "Use the LLM-backed adversarial reviewer (requires ANTHROPIC_API_KEY). "
+            "When the API key is not set, falls back to the heuristic reviewer."
+        ),
+    )
+    parser.add_argument(
+        "--ledger",
+        default=None,
+        metavar="PATH",
+        help=(
+            "Optional path to a review ledger YAML file.  When provided, entities "
+            "already approved or rejected in the ledger are skipped during candidate "
+            "generation (re-run mode)."
+        ),
+    )
 
     args = parser.parse_args()
 
@@ -833,6 +852,8 @@ def main() -> None:
         output_dir=args.output_dir,
         pipeline_run_id=args.run_id,
         verbose=args.verbose,
+        llm_adversarial_review=args.llm_adversarial_review,
+        ledger_path=args.ledger,
     )
 
     # Print summary to stdout regardless of verbose flag

@@ -141,6 +141,81 @@ class OrchestratorAgent:
         )
 
         # ------------------------------------------------------------------
+        # Ledger filtering (re-run mode)
+        # ------------------------------------------------------------------
+        synthetic_hypotheses: list[MappingHypothesis] = []
+        skipped_approved = 0
+        skipped_rejected = 0
+
+        if ledger_path is not None:
+            ledger = load_ledger(ledger_path)
+            approved_ids = get_approved_source_ids(ledger)
+            rejected_ids = get_rejected_source_ids(ledger)
+            decisions_by_source = get_decisions_by_source(ledger)
+
+            skipped_approved = len(approved_ids & {e.entity_id for e in source_entities})
+            skipped_rejected = len(rejected_ids & {e.entity_id for e in source_entities})
+            already_reviewed_ids = approved_ids | rejected_ids
+
+            if already_reviewed_ids:
+                logger.info(
+                    "Skipping %d already-reviewed source entities (%d approved, %d rejected)",
+                    skipped_approved + skipped_rejected,
+                    skipped_approved,
+                    skipped_rejected,
+                )
+
+            # Build synthetic hypotheses for approved entities
+            now_iso = datetime.now(tz=timezone.utc).isoformat()
+            for entity in source_entities:
+                if entity.entity_id not in approved_ids:
+                    continue
+                decision = decisions_by_source[entity.entity_id]
+
+                # Determine predicate from ledger decision
+                if decision.predicate_override:
+                    try:
+                        predicate = MappingPredicate(decision.predicate_override)
+                    except ValueError:
+                        predicate = MappingPredicate.EXACT_MATCH
+                else:
+                    predicate = MappingPredicate.EXACT_MATCH
+
+                # Minimal synthetic target
+                target = OntologyTerm(
+                    term_id="human:approved",
+                    label="human approved",
+                    term_type="class",
+                    ontology_id="human",
+                )
+
+                mapping_id = f"human-approved-{entity.entity_id}"
+                synth = MappingHypothesis(
+                    mapping_id=mapping_id,
+                    source_entity=entity,
+                    target_entity=target,
+                    predicate=predicate,
+                    confidence=1.0,
+                    human_review_status=HumanReviewStatus.APPROVED,
+                    reviewer_notes=[decision.note] if decision.note else [],
+                    provenance=Provenance(
+                        created_by=f"human:{decision.reviewer}",
+                        created_at=now_iso,
+                        method="human_review_ledger",
+                        pipeline_run_id=pipeline_run_id,
+                    ),
+                )
+                synthetic_hypotheses.append(synth)
+
+            # Filter out already-reviewed entities from candidate generation
+            source_entities = [
+                e for e in source_entities
+                if e.entity_id not in already_reviewed_ids
+            ]
+
+        new_candidates = len(source_entities)
+
+        # ------------------------------------------------------------------
         # Step 2: Load ontology profile
         # ------------------------------------------------------------------
         logger.info("[Step 2/11] Loading ontology profile from: %s", ontology_filepath)
@@ -161,6 +236,8 @@ class OrchestratorAgent:
             ontology_terms=ontology_terms,
             pipeline_run_id=pipeline_run_id,
         )
+        # Merge synthetic (pre-approved) hypotheses with newly generated ones
+        hypotheses = synthetic_hypotheses + hypotheses
         logger.info("Candidate generation complete: %d hypotheses.", len(hypotheses))
 
         # ------------------------------------------------------------------
@@ -265,6 +342,9 @@ class OrchestratorAgent:
             "ontology_terms_count": len(ontology_terms),
             "total_hypotheses": len(hypotheses),
             "validation_summary": validation_summary,
+            "skipped_approved": skipped_approved,
+            "skipped_rejected": skipped_rejected,
+            "new_candidates": new_candidates,
             "output_files": {
                 "json": str(json_path),
                 "tsv": str(tsv_path),
