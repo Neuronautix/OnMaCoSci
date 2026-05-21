@@ -500,6 +500,7 @@ def run_pipeline(
     pipeline_run_id: str | None = None,
     verbose: bool = False,
     llm_adversarial_review: bool = False,
+    ledger_path: str | Path | None = None,
 ) -> dict:
     """Execute the full ontology mapping pipeline.
 
