@@ -64,6 +64,8 @@ class OrchestratorAgent:
         ontology_filepath: str | Path,
         output_dir: str | Path,
         pipeline_run_id: str | None = None,
+        ledger_path=None,
+        llm_adversarial_review: bool = False,
     ) -> dict:
         """Execute the full ontology mapping pipeline.
 
@@ -165,14 +167,25 @@ class OrchestratorAgent:
         # Step 4: Adversarial review
         # ------------------------------------------------------------------
         logger.info("[Step 4/11] Running adversarial review.")
-        adv_results = self.adversarial_reviewer.review_all(hypotheses)
+        if llm_adversarial_review:
+            from ontology_mapping_co_scientist.agents.llm_adversarial_reviewer import (
+                LLMAdversarialReviewerAgent,
+            )
+            reviewer = LLMAdversarialReviewerAgent.from_env()
+            logger.info(
+                "LLM adversarial review enabled (llm_client=%s).",
+                "active" if reviewer.llm_client is not None else "heuristic fallback",
+            )
+        else:
+            reviewer = self.adversarial_reviewer
+        adv_results = reviewer.review_all(hypotheses)
         adv_results_index = {r.mapping_id: r for r in adv_results}
 
         # ------------------------------------------------------------------
         # Step 5: Apply adversarial flags back to hypotheses
         # ------------------------------------------------------------------
         logger.info("[Step 5/11] Applying adversarial flags to hypotheses.")
-        hypotheses = self.adversarial_reviewer.apply_flags_to_hypotheses(
+        hypotheses = reviewer.apply_flags_to_hypotheses(
             hypotheses, adv_results
         )
 

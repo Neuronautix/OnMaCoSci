@@ -499,6 +499,7 @@ def run_pipeline(
     output_dir: str | Path,
     pipeline_run_id: str | None = None,
     verbose: bool = False,
+    llm_adversarial_review: bool = False,
 ) -> dict:
     """Execute the full ontology mapping pipeline.
 
@@ -621,15 +622,29 @@ def run_pipeline(
     # ------------------------------------------------------------------
     logger.info("[Stage 4/7] Adversarial review ...")
     review_results: dict[str, AdversarialReviewResult] = {}
-    for h in hypotheses:
-        result = _adversarial_review(h)
-        review_results[h.mapping_id] = result
-        if result.has_blocking_issues():
-            logger.debug(
-                "  [BLOCK] %s — %d high-severity flag(s)",
-                h.mapping_id,
-                sum(1 for f in result.flags if f.severity == "high"),
-            )
+
+    if llm_adversarial_review:
+        from ontology_mapping_co_scientist.agents.llm_adversarial_reviewer import (
+            LLMAdversarialReviewerAgent,
+        )
+        _llm_reviewer = LLMAdversarialReviewerAgent.from_env()
+        logger.info(
+            "  LLM adversarial review enabled (mode=%s).",
+            "llm" if _llm_reviewer.llm_client is not None else "heuristic-fallback",
+        )
+        for result in _llm_reviewer.review_all(hypotheses):
+            review_results[result.mapping_id] = result
+    else:
+        for h in hypotheses:
+            result = _adversarial_review(h)
+            review_results[h.mapping_id] = result
+            if result.has_blocking_issues():
+                logger.debug(
+                    "  [BLOCK] %s — %d high-severity flag(s)",
+                    h.mapping_id,
+                    sum(1 for f in result.flags if f.severity == "high"),
+                )
+
     n_blocked = sum(1 for r in review_results.values() if r.has_blocking_issues())
     logger.info(
         "  -> %d hypotheses reviewed; %d with blocking issues",
