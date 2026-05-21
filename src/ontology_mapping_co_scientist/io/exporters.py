@@ -221,3 +221,13 @@ def export_to_sssom_tsv(
                 "comment": comment,
             }
             writer.writerow(row)
+
+
+def export_to_sssom_compliant(
+    hypotheses: list[MappingHypothesis],
+    output_path: str | Path,
+    **kwargs,
+) -> None:
+    """Exports using the full SSSOM-compliant format. See sssom_exporter module."""
+    from ontology_mapping_co_scientist.io.sssom_exporter import export_to_sssom
+    export_to_sssom(hypotheses, output_path, **kwargs)

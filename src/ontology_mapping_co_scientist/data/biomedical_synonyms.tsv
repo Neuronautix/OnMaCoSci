@@ -1,0 +1,46 @@
+term	synonyms
+AUC	area under the curve|drug exposure|auc0-t|auc0-inf|area under curve
+Cmax	maximum concentration|peak concentration|peak plasma concentration|maximum plasma concentration
+Tmax	time to peak|time to maximum concentration|time of maximum concentration
+t½	half life|half-life|elimination half life|t half|t1/2|terminal half life
+CL	clearance|total clearance|systemic clearance|plasma clearance
+Vd	volume of distribution|apparent volume|apparent volume of distribution
+ALT	alanine aminotransferase|GPT|SGPT|alanine transaminase|alanine amino transferase
+AST	aspartate aminotransferase|GOT|SGOT|aspartate transaminase|aspartate amino transferase
+ALP	alkaline phosphatase|alk phos|alkaline phosphatase activity
+GGT	gamma glutamyl transferase|gamma-GT|gamma glutamyltransferase|GGT activity
+WBC	white blood cell count|leukocyte count|total leucocytes|white cell count|WBC count
+RBC	red blood cell count|erythrocyte count|red cell count|RBC count
+Hb	hemoglobin|haemoglobin|HGB|hemoglobin concentration
+HCT	hematocrit|haematocrit|PCV|packed cell volume|hematocrit fraction
+PLT	platelet count|thrombocyte count|platelets|platelet number
+NOAEL	no observed adverse effect level|no-adverse-effect level|no observed adverse effect|NOAEL value
+BUN	blood urea nitrogen|urea nitrogen|blood urea|BUN concentration
+CREA	creatinine|serum creatinine|creatinine concentration|plasma creatinine
+GLUC	glucose|blood glucose|serum glucose|plasma glucose|fasting glucose
+CHOL	cholesterol|total cholesterol|serum cholesterol|plasma cholesterol
+ALB	albumin|serum albumin|plasma albumin|albumin concentration
+PPB	protein binding|plasma protein binding|protein bound fraction|PPB percent|plasma protein binding percent
+PO	oral|oral gavage|per os|oral administration|oral route
+IV	intravenous|intravenous bolus|intravenous injection|IV administration|IV route
+SC	subcutaneous|subcutaneous injection|SC administration|SC route
+IP	intraperitoneal|intraperitoneal injection|IP administration|IP route
+GLP	good laboratory practice|GLP compliant|GLP study|GLP certified
+CAS	CAS number|CAS registry number|CAS RN|chemical abstract service number
+LLOQ	lower limit of quantification|lower limit of quantitation|LOQ|limit of quantification
+F%	bioavailability|oral bioavailability|absolute bioavailability|bioavailability fraction
+ROA	route of administration|administration route|dosing route|administration path
+QD	once daily|once a day|daily dosing|QD dosing|q.d.
+BID	twice daily|twice a day|BID dosing|b.i.d.
+CNS	central nervous system|brain penetration|CNS penetration|brain distribution
+PK	pharmacokinetics|pharmacokinetic parameter|PK parameter|pharmacokinetic profile
+BBB	blood brain barrier|brain penetration|blood-brain barrier|BBB crossing
+NCA	non-compartmental analysis|non-compartmental PK|NCA analysis
+GFR	glomerular filtration rate|renal clearance|GFR value|kidney filtration rate
+TID	three times daily|thrice daily|three times a day|t.i.d.
+AUCinf	area under the curve infinity|AUC0-inf|AUC extrapolated to infinity
+MRT	mean residence time|mean residence time systemic
+Kel	elimination rate constant|terminal elimination rate constant
+VdSS	volume of distribution at steady state|Vss|steady state volume
+Fu	fraction unbound|unbound fraction|free fraction
+Fup	fraction unbound plasma|plasma free fraction

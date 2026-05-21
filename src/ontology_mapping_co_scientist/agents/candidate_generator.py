@@ -20,6 +20,11 @@ from ontology_mapping_co_scientist.models.mapping_hypothesis import (
     Provenance,
     ValidationStatus,
 )
+from ontology_mapping_co_scientist.scoring.definition_similarity import (
+    build_definition_evidence,
+    build_tfidf_index,
+    score_definition_similarity,
+)
 from ontology_mapping_co_scientist.scoring.evidence_scoring import (
     build_lexical_evidence,
     build_synonym_evidence,
@@ -31,6 +36,10 @@ from ontology_mapping_co_scientist.scoring.lexical_similarity import (
     label_to_predicate,
     normalize_label,
 )
+from ontology_mapping_co_scientist.scoring.synonym_expander import (
+    get_expanded_labels,
+    load_synonym_dictionary,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -41,7 +50,13 @@ _METHOD = "lexical_similarity_v1"
 class CandidateGeneratorAgent:
     """Generates mapping hypotheses between source entities and ontology terms using lexical similarity."""
 
-    def __init__(self, top_k: int = 5, min_confidence: float = 0.0) -> None:
+    def __init__(
+        self,
+        top_k: int = 5,
+        min_confidence: float = 0.0,
+        use_definition_scoring: bool = True,
+        use_synonym_expansion: bool = True,
+    ) -> None:
         """Initialise the candidate generator.
 
         Args:
@@ -51,9 +66,22 @@ class CandidateGeneratorAgent:
                 hypothesis to be included.  Candidates below this threshold are
                 omitted; if *all* candidates fall below it a single
                 ``NO_MAPPING`` hypothesis is created instead (default 0.0).
+            use_definition_scoring: When ``True`` (default), compute a TF-IDF
+                definition similarity score after building initial evidence and
+                add it as additional :class:`Evidence` when the score exceeds
+                0.1.
+            use_synonym_expansion: When ``True`` (default), expand source entity
+                labels using the biomedical synonym dictionary and search all
+                expanded labels in :func:`find_best_matches`.
         """
         self.top_k = top_k
         self.min_confidence = min_confidence
+        self.use_definition_scoring = use_definition_scoring
+        self.use_synonym_expansion = use_synonym_expansion
+
+        # Lazy-initialised state (populated on first call to generate_candidates)
+        self._tfidf_index: dict | None = None
+        self._synonym_dict: dict[str, list[str]] | None = None
 
     # ------------------------------------------------------------------
     # Public interface
@@ -98,6 +126,19 @@ class CandidateGeneratorAgent:
         if not ontology_terms:
             logger.warning("No ontology terms provided — all hypotheses will be NO_MAPPING.")
 
+        # Lazy initialisation of TF-IDF index
+        if self.use_definition_scoring and self._tfidf_index is None:
+            logger.debug("Building TF-IDF definition index over %d terms.", len(ontology_terms))
+            self._tfidf_index = build_tfidf_index(ontology_terms)
+
+        # Lazy initialisation of synonym dictionary
+        if self.use_synonym_expansion and self._synonym_dict is None:
+            try:
+                self._synonym_dict = load_synonym_dictionary()
+            except Exception as exc:
+                logger.warning("Could not load synonym dictionary: %s", exc)
+                self._synonym_dict = {}
+
         term_label_pairs = [(t.term_id, t.label) for t in ontology_terms]
 
         # Build fast lookup: normalised label -> OntologyTerm
@@ -123,6 +164,8 @@ class CandidateGeneratorAgent:
                 label_to_term=label_to_term,
                 synonym_to_terms=synonym_to_terms,
                 pipeline_run_id=pipeline_run_id,
+                tfidf_index=self._tfidf_index,
+                synonym_dict=self._synonym_dict,
             )
             all_hypotheses.extend(hypotheses)
 
@@ -145,6 +188,8 @@ class CandidateGeneratorAgent:
         label_to_term: dict[str, OntologyTerm],
         synonym_to_terms: dict[str, list[OntologyTerm]],
         pipeline_run_id: str | None,
+        tfidf_index: dict | None = None,
+        synonym_dict: dict[str, list[str]] | None = None,
     ) -> list[MappingHypothesis]:
         """Generate hypotheses for a single source entity.
 
@@ -155,14 +200,33 @@ class CandidateGeneratorAgent:
             label_to_term: Normalised-label-to-term lookup dict.
             synonym_to_terms: Normalised-synonym-to-terms lookup dict.
             pipeline_run_id: Optional pipeline run identifier for provenance.
+            tfidf_index: Pre-built TF-IDF index, or ``None`` to skip definition scoring.
+            synonym_dict: Biomedical synonym dictionary, or ``None`` to skip expansion.
 
         Returns:
             A list of :class:`MappingHypothesis` objects for this entity.
         """
         now = datetime.now(tz=timezone.utc).isoformat()
 
-        # Lexical matches on preferred labels
-        label_matches = find_best_matches(entity.label, term_label_pairs, top_k=self.top_k)
+        # Expand source label with synonyms when requested
+        if synonym_dict is not None and self.use_synonym_expansion:
+            expanded_labels = get_expanded_labels(entity.label, synonym_dict)
+        else:
+            expanded_labels = [entity.label]
+
+        # Lexical matches on preferred labels — try all expanded labels and
+        # merge results, keeping the best score per term.
+        _seen_in_label_matches: dict[str, tuple[str, str, float]] = {}
+        for exp_label in expanded_labels:
+            for tid, matched_label, score in find_best_matches(
+                exp_label, term_label_pairs, top_k=self.top_k
+            ):
+                if tid not in _seen_in_label_matches or score > _seen_in_label_matches[tid][2]:
+                    _seen_in_label_matches[tid] = (tid, matched_label, score)
+
+        label_matches: list[tuple[str, str, float]] = sorted(
+            _seen_in_label_matches.values(), key=lambda x: x[2], reverse=True
+        )[: self.top_k]
 
         # Synonym matches — collect unique additional terms
         syn_matches: list[tuple[str, float, OntologyTerm]] = []

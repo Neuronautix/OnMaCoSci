@@ -12,6 +12,7 @@ from collections import Counter, defaultdict
 from pathlib import Path
 
 from ontology_mapping_co_scientist.io.ontology_profile_loader import load_ontology_profile
+from ontology_mapping_co_scientist.io.rdf_ontology_loader import load_rdf_ontology
 from ontology_mapping_co_scientist.models.entities import OntologyTerm
 from ontology_mapping_co_scientist.scoring.lexical_similarity import (
     find_best_matches,
@@ -57,6 +58,40 @@ class OntologyProfilerAgent:
         logger.info("Loading ontology profile from: %s", filepath)
         self._terms = load_ontology_profile(filepath)
         logger.info("Loaded %d ontology terms from: %s", len(self._terms), filepath)
+        self._build_index()
+        return self._terms
+
+    def load_rdf_ontology(
+        self,
+        filepath: str | Path,
+        ontology_id: str | None = None,
+    ) -> list[OntologyTerm]:
+        """Load ontology terms from an RDF/OWL file and build lookup indexes.
+
+        Calls :func:`~ontology_mapping_co_scientist.io.rdf_ontology_loader.load_rdf_ontology`,
+        stores the results internally, and then builds normalised label and
+        synonym indexes via :meth:`_build_index`.
+
+        Args:
+            filepath: Path to the RDF/OWL file (Turtle, OWL/XML, N-Triples,
+                JSON-LD).
+            ontology_id: Optional short identifier for the ontology.  If
+                ``None``, one is derived from the ontology URI in the graph.
+
+        Returns:
+            The list of :class:`~ontology_mapping_co_scientist.models.entities.OntologyTerm`
+            objects that were loaded.
+
+        Raises:
+            ImportError: If rdflib is not installed.
+            FileNotFoundError: If *filepath* does not exist.
+        """
+        filepath = Path(filepath)
+        logger.info("Loading RDF/OWL ontology from: %s", filepath)
+        self._terms = load_rdf_ontology(filepath, ontology_id=ontology_id)
+        logger.info(
+            "Loaded %d ontology terms from RDF/OWL: %s", len(self._terms), filepath
+        )
         self._build_index()
         return self._terms
 

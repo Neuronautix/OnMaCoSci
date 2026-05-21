@@ -200,6 +200,18 @@ class OrchestratorAgent:
         tsv_path = self._export_sssom_tsv(hypotheses, tsv_path)
 
         # ------------------------------------------------------------------
+        # Step 10b: Export fully SSSOM-compliant TSV
+        # ------------------------------------------------------------------
+        sssom_compliant_stem = tsv_path.stem  # e.g. "mappings.sssom"
+        sssom_compliant_path = output_dir / f"{sssom_compliant_stem}_sssom_compliant.tsv"
+        logger.info(
+            "[Step 10b] Exporting SSSOM-compliant TSV: %s", sssom_compliant_path
+        )
+        sssom_compliant_path = self._export_sssom_compliant(
+            hypotheses, sssom_compliant_path, pipeline_run_id
+        )
+
+        # ------------------------------------------------------------------
         # Step 11: Generate Markdown report
         # ------------------------------------------------------------------
         md_path = output_dir / "report.md"
@@ -230,6 +242,7 @@ class OrchestratorAgent:
             "output_files": {
                 "json": str(json_path),
                 "tsv": str(tsv_path),
+                "sssom_compliant": str(sssom_compliant_path),
                 "markdown": str(md_path),
             },
         }
@@ -311,6 +324,43 @@ class OrchestratorAgent:
             self._write_sssom_tsv_fallback(hypotheses, output_path)
 
         logger.debug("SSSOM TSV export written to: %s", output_path)
+        return output_path
+
+    def _export_sssom_compliant(
+        self,
+        hypotheses: list,
+        output_path: Path,
+        pipeline_run_id: str,
+    ) -> Path:
+        """Export hypotheses to a fully SSSOM-compliant TSV file.
+
+        Uses :func:`~ontology_mapping_co_scientist.io.sssom_exporter.export_to_sssom`
+        to produce a file that includes a proper YAML metadata block and full
+        SKOS predicate URIs.
+
+        Args:
+            hypotheses: List of :class:`~.MappingHypothesis` objects.
+            output_path: Destination file path.
+            pipeline_run_id: The pipeline run identifier, used as the mapping
+                set ID when individual hypotheses do not carry one.
+
+        Returns:
+            The resolved output path.
+        """
+        try:
+            from ontology_mapping_co_scientist.io.exporters import export_to_sssom_compliant
+
+            export_to_sssom_compliant(
+                hypotheses,
+                output_path,
+                mapping_set_id=pipeline_run_id,
+            )
+        except ImportError:
+            logger.warning(
+                "export_to_sssom_compliant not available; skipping compliant export."
+            )
+
+        logger.debug("SSSOM-compliant TSV written to: %s", output_path)
         return output_path
 
     def _write_sssom_tsv_fallback(self, hypotheses: list, output_path: Path) -> None:
