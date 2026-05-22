@@ -14,6 +14,7 @@ Covers:
 from __future__ import annotations
 
 import sys
+import json
 from pathlib import Path
 
 import pytest
@@ -31,6 +32,11 @@ from ontology_mapping_co_scientist.review_ledger.ledger import (
     get_rejected_source_ids,
     load_ledger,
     save_ledger,
+)
+from ontology_mapping_co_scientist.review_ledger.cli import (
+    action_from_choice,
+    approval_blockers,
+    load_review_packets,
 )
 
 
@@ -223,6 +229,129 @@ def test_ledger_roundtrip(tmp_path: Path) -> None:
     assert d.note == "round-trip test"
     assert d.predicate_override == "skos:closeMatch"
     assert d.pipeline_run_id == "run-42"
+
+
+# ---------------------------------------------------------------------------
+# Tests: interactive review helpers
+# ---------------------------------------------------------------------------
+
+
+def test_load_review_packets_from_review_queue(tmp_path: Path) -> None:
+    """The chat CLI can load the dedicated pipeline review queue format."""
+    review_path = tmp_path / "review_queue.json"
+    review_path.write_text(
+        json.dumps(
+            {
+                "metadata": {"pipeline_run_id": "run-queue-001"},
+                "review_packets": [
+                    {
+                        "source_entity_id": "csv:animals.strain",
+                        "source_entity_label": "strain",
+                        "top_mapping": {
+                            "mapping_id": "map-001",
+                            "predicate": "skos:exactMatch",
+                            "confidence": 0.91,
+                            "validation_status": "passed",
+                            "target_entity": {
+                                "term_id": "mbo:MouseStrain",
+                                "label": "mouse strain",
+                            },
+                        },
+                        "alternative_mappings": [],
+                        "all_warnings": [],
+                    }
+                ],
+            },
+        ),
+        encoding="utf-8",
+    )
+
+    metadata, packets = load_review_packets(review_path)
+
+    assert metadata["pipeline_run_id"] == "run-queue-001"
+    assert len(packets) == 1
+    assert packets[0]["source_entity_id"] == "csv:animals.strain"
+
+
+def test_load_review_packets_from_mappings_json(tmp_path: Path) -> None:
+    """The chat CLI can synthesize packets from raw mappings JSON."""
+    review_path = tmp_path / "mappings.json"
+    review_path.write_text(
+        json.dumps(
+            {
+                "metadata": {"pipeline_run_id": "run-mappings-001"},
+                "mappings": [
+                    {
+                        "mapping_id": "map-001",
+                        "source_entity": {
+                            "entity_id": "csv:animals.strain",
+                            "label": "strain",
+                        },
+                        "target_entity": {
+                            "term_id": "mbo:MouseStrain",
+                            "label": "mouse strain",
+                        },
+                        "predicate": "skos:exactMatch",
+                        "confidence": 0.91,
+                        "rank": 1,
+                        "validation_status": "passed",
+                        "warnings": [],
+                    }
+                ],
+            },
+        ),
+        encoding="utf-8",
+    )
+
+    metadata, packets = load_review_packets(review_path)
+
+    assert metadata["pipeline_run_id"] == "run-mappings-001"
+    assert len(packets) == 1
+    assert packets[0]["top_mapping"]["mapping_id"] == "map-001"
+
+
+def test_action_from_choice_blocks_approval_for_high_severity() -> None:
+    """Strict chat mode prevents approval when adversarial review blocks it."""
+    packet = {
+        "top_mapping": {
+            "mapping_id": "map-001",
+            "predicate": "skos:exactMatch",
+            "validation_status": "passed",
+            "_adv_flags": [
+                {
+                    "flag_type": "strong_exactmatch_claim",
+                    "severity": "high",
+                    "description": "Exact match is too strong.",
+                }
+            ],
+        },
+        "all_warnings": [],
+    }
+
+    blockers = approval_blockers(packet)
+    action, error = action_from_choice("a", packet)
+
+    assert blockers
+    assert action is None
+    assert error is not None
+    assert "Approval is blocked" in error
+
+
+def test_action_from_choice_allows_request_evidence_when_blocked() -> None:
+    """Blocked hypotheses remain in the negative feedback loop."""
+    packet = {
+        "top_mapping": {
+            "mapping_id": "map-001",
+            "predicate": "skos:exactMatch",
+            "validation_status": "failed",
+        },
+        "all_warnings": [],
+    }
+
+    action, error = action_from_choice("e", packet)
+
+    assert error is None
+    assert action == "request_more_evidence"
 
 
 # ---------------------------------------------------------------------------

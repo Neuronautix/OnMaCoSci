@@ -130,6 +130,62 @@ omcs-run \
   --verbose
 ```
 
+### Run with LLM-assisted hypothesis and review generation
+
+Install the LLM extra and set an Anthropic API key:
+
+```bash
+pip install -e ".[dev,llm]"
+export ANTHROPIC_API_KEY="..."
+```
+
+You can also put the key in a local `.env` file at the repository root.  The
+CLI loads this file automatically and `.env` is ignored by git:
+
+```bash
+ANTHROPIC_API_KEY=sk-ant-api03-your-key-here
+OMCS_LLM_MODEL=claude-haiku-4-5-20251001
+OMCS_DOMAIN_CONTEXT=preclinical mouse metadata
+OMCS_LLM_REVIEW_TOP_K=1
+OMCS_LLM_CANDIDATE_TOP_K=2
+OMCS_LLM_MAX_CANDIDATE_ENTITIES=10
+OMCS_LLM_MAX_REVIEW_HYPOTHESES=10
+OMCS_LLM_CALL_DELAY_SECONDS=1.0
+```
+
+Then enable the LLM-orchestrated path:
+
+```bash
+omcs-run \
+  --source examples/source_openapi/animal_api_sample.json \
+  --ontology examples/ontology_profiles/hcm_mouse_profile.yaml \
+  --output-dir examples/outputs \
+  --llm \
+  --require-llm \
+  --llm-review-top-k 1 \
+  --llm-candidate-top-k 2 \
+  --llm-max-candidate-entities 10 \
+  --llm-max-review-hypotheses 10 \
+  --domain-context "preclinical mouse metadata" \
+  --verbose
+```
+
+With `--llm`, the pipeline uses LLM semantic scoring during candidate
+generation and runs LLM adversarial, ontology-engineer, and domain-scientist
+reviewers before HITL review.  Heuristic review still covers every generated
+hypothesis; by default, each LLM reviewer reviews only the top-ranked
+hypothesis per source entity to avoid provider overload.  Increase
+`--llm-review-top-k` only when needed.  Without `--require-llm`, missing LLM
+configuration falls back to deterministic non-LLM behavior and records the
+fallback modes in the generated `*_review_queue.json`.
+
+Cost control defaults are intentionally conservative:
+
+- at most 10 source entities receive LLM candidate scoring;
+- only the top 2 lexical candidates per scored entity are sent to the LLM;
+- each LLM reviewer sees at most 10 hypotheses;
+- heuristic review still evaluates every hypothesis.
+
 Or directly via Python:
 
 ```bash

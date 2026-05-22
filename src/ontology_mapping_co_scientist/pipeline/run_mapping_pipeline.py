@@ -26,7 +26,9 @@ Parallelism and LLM integration are deferred to Phase 2 of the roadmap.
 from __future__ import annotations
 
 import argparse
+import json
 import logging
+import os
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path
@@ -34,6 +36,7 @@ from pathlib import Path
 from ontology_mapping_co_scientist.agents.source_profiler import SourceProfilerAgent
 from ontology_mapping_co_scientist.agents.ontology_profiler import OntologyProfilerAgent
 from ontology_mapping_co_scientist.agents.candidate_generator import CandidateGeneratorAgent
+from ontology_mapping_co_scientist.env import load_dotenv
 from ontology_mapping_co_scientist.io.exporters import export_to_json, export_to_sssom_tsv
 from ontology_mapping_co_scientist.models.mapping_hypothesis import (
     MappingHypothesis,
@@ -488,6 +491,56 @@ def _build_review_packets(
     return packets
 
 
+def _highest_review_severity(results: list[AdversarialReviewResult]) -> str:
+    severity_rank = {"clean": 0, "low": 1, "medium": 2, "high": 3}
+    highest = max(
+        (result.overall_severity for result in results),
+        key=lambda severity: severity_rank.get(severity, 0),
+        default="clean",
+    )
+    return highest
+
+
+def _merge_review_results(
+    mapping_id: str,
+    results: list[tuple[str, AdversarialReviewResult]],
+) -> AdversarialReviewResult:
+    """Merge review outputs from heuristic and LLM reviewer agents."""
+    flags: list[AdversarialFlag] = []
+    raw_results = [result for _, result in results]
+
+    for agent_name, result in results:
+        for flag in result.flags:
+            flags.append(
+                AdversarialFlag(
+                    flag_type=f"{agent_name}:{flag.flag_type}",
+                    description=f"{agent_name}: {flag.description}",
+                    severity=flag.severity,
+                )
+            )
+
+    overall_severity = _highest_review_severity(raw_results)
+    recommendations = {result.recommendation for result in raw_results}
+    if "reject" in recommendations or overall_severity == "high":
+        recommendation = "reject"
+    elif "review" in recommendations or overall_severity == "medium":
+        recommendation = "review"
+    else:
+        recommendation = "proceed"
+
+    return AdversarialReviewResult(
+        mapping_id=mapping_id,
+        flags=flags,
+        overall_severity=overall_severity,  # type: ignore[arg-type]
+        recommendation=recommendation,
+    )
+
+
+def _agent_has_llm_client(agent: object) -> bool:
+    """Return whether an LLM-backed agent actually has an active client."""
+    return bool(getattr(agent, "llm_client", None) is not None)
+
+
 # ---------------------------------------------------------------------------
 # Public API
 # ---------------------------------------------------------------------------
@@ -500,6 +553,14 @@ def run_pipeline(
     pipeline_run_id: str | None = None,
     verbose: bool = False,
     llm_adversarial_review: bool = False,
+    llm_enabled: bool = False,
+    require_llm: bool = False,
+    llm_model: str = "claude-haiku-4-5-20251001",
+    domain_context: str = "biomedical research",
+    llm_review_top_k: int = 1,
+    llm_candidate_top_k: int = 2,
+    llm_max_candidate_entities: int | None = 10,
+    llm_max_review_hypotheses: int | None = 10,
     ledger_path: str | Path | None = None,
 ) -> dict:
     """Execute the full ontology mapping pipeline.
@@ -580,6 +641,14 @@ def run_pipeline(
     logger.info("Ontology file : %s", ontology_filepath)
     logger.info("Output dir    : %s", output_dir)
 
+    llm_stage_modes: dict[str, str] = {}
+    llm_budget: dict[str, int | None] = {
+        "candidate_top_k": llm_candidate_top_k,
+        "max_candidate_entities": llm_max_candidate_entities,
+        "review_top_k": llm_review_top_k,
+        "max_review_hypotheses": llm_max_review_hypotheses,
+    }
+
     # ------------------------------------------------------------------
     # Stage 1: Source profiling
     # ------------------------------------------------------------------
@@ -610,7 +679,26 @@ def run_pipeline(
     # Stage 3: Candidate generation
     # ------------------------------------------------------------------
     logger.info("[Stage 3/7] Candidate generation ...")
-    candidate_agent = CandidateGeneratorAgent(top_k=5, min_confidence=0.0)
+    if llm_enabled:
+        from ontology_mapping_co_scientist.agents.llm_candidate_generator import (
+            LLMCandidateGeneratorAgent,
+        )
+
+        candidate_agent = LLMCandidateGeneratorAgent.from_env(model=llm_model)
+        candidate_agent.top_k_for_llm = max(1, llm_candidate_top_k)
+        candidate_agent.max_entities_for_llm = llm_max_candidate_entities
+        llm_stage_modes["candidate_generation"] = (
+            "llm" if _agent_has_llm_client(candidate_agent) else "lexical_fallback"
+        )
+        if require_llm and not _agent_has_llm_client(candidate_agent):
+            raise RuntimeError(
+                "LLM candidate generation was requested, but no active LLM client "
+                "is available. Install the llm extra and set ANTHROPIC_API_KEY."
+            )
+    else:
+        candidate_agent = CandidateGeneratorAgent(top_k=5, min_confidence=0.0)
+        llm_stage_modes["candidate_generation"] = "disabled"
+
     hypotheses = candidate_agent.generate_candidates(
         source_entities=source_entities,
         ontology_terms=ontology_terms,
@@ -623,19 +711,112 @@ def run_pipeline(
     # ------------------------------------------------------------------
     logger.info("[Stage 4/7] Adversarial review ...")
     review_results: dict[str, AdversarialReviewResult] = {}
+    llm_reviewed_hypotheses = 0
 
-    if llm_adversarial_review:
+    if llm_enabled:
+        from ontology_mapping_co_scientist.agents.adversarial_reviewer import (
+            AdversarialReviewerAgent,
+        )
         from ontology_mapping_co_scientist.agents.llm_adversarial_reviewer import (
             LLMAdversarialReviewerAgent,
         )
-        _llm_reviewer = LLMAdversarialReviewerAgent.from_env()
+        from ontology_mapping_co_scientist.agents.llm_domain_scientist_reviewer import (
+            LLMDomainScientistReviewerAgent,
+        )
+        from ontology_mapping_co_scientist.agents.llm_ontology_engineer_reviewer import (
+            LLMOntologyEngineerReviewerAgent,
+        )
+
+        heuristic_reviewer = AdversarialReviewerAgent()
+        llm_adversarial = LLMAdversarialReviewerAgent.from_env(model=llm_model)
+        ontology_reviewer = LLMOntologyEngineerReviewerAgent.from_env(model=llm_model)
+        domain_reviewer = LLMDomainScientistReviewerAgent.from_env(
+            model=llm_model,
+            domain_context=domain_context,
+        )
+        llm_stage_modes["adversarial_review"] = (
+            "llm" if _agent_has_llm_client(llm_adversarial) else "heuristic_fallback"
+        )
+        llm_stage_modes["ontology_engineer_review"] = (
+            "llm" if _agent_has_llm_client(ontology_reviewer) else "noop_fallback"
+        )
+        llm_stage_modes["domain_scientist_review"] = (
+            "llm" if _agent_has_llm_client(domain_reviewer) else "noop_fallback"
+        )
+        if require_llm and not all(
+            _agent_has_llm_client(agent)
+            for agent in (llm_adversarial, ontology_reviewer, domain_reviewer)
+        ):
+            raise RuntimeError(
+                "LLM review was requested, but one or more LLM reviewer agents "
+                "do not have an active LLM client. Install the llm extra and set "
+                "ANTHROPIC_API_KEY."
+            )
+
+        # The heuristic critic covers every hypothesis. LLM reviewers are then
+        # applied only to the top N hypotheses per source entity to avoid API
+        # overload and keep expert-model attention on actionable candidates.
+        hypotheses = _rank_hypotheses(hypotheses)
+        llm_review_targets = [
+            h
+            for h in hypotheses
+            if h.rank is not None and h.rank <= max(1, llm_review_top_k)
+        ]
+        if llm_max_review_hypotheses is not None:
+            llm_review_targets = llm_review_targets[:max(0, llm_max_review_hypotheses)]
+        llm_reviewed_hypotheses = len(llm_review_targets)
+        logger.info(
+            "  LLM reviewer scope: %d/%d hypotheses (top %d per source entity).",
+            llm_reviewed_hypotheses,
+            len(hypotheses),
+            max(1, llm_review_top_k),
+        )
+
+        heuristic_results = {
+            result.mapping_id: result
+            for result in heuristic_reviewer.review_all(hypotheses)
+        }
+        llm_adv_results = {
+            result.mapping_id: result
+            for result in llm_adversarial.review_all(llm_review_targets)
+        }
+        ontology_results = {
+            result.mapping_id: result
+            for result in ontology_reviewer.review_all(llm_review_targets)
+        }
+        domain_results = {
+            result.mapping_id: result
+            for result in domain_reviewer.review_all(llm_review_targets)
+        }
+        for h in hypotheses:
+            if h.mapping_id in llm_adv_results:
+                review_results[h.mapping_id] = _merge_review_results(
+                    h.mapping_id,
+                    [
+                        ("heuristic", heuristic_results[h.mapping_id]),
+                        ("llm_adversarial", llm_adv_results[h.mapping_id]),
+                        ("llm_ontology_engineer", ontology_results[h.mapping_id]),
+                        ("llm_domain_scientist", domain_results[h.mapping_id]),
+                    ],
+                )
+            else:
+                review_results[h.mapping_id] = heuristic_results[h.mapping_id]
+    elif llm_adversarial_review:
+        from ontology_mapping_co_scientist.agents.llm_adversarial_reviewer import (
+            LLMAdversarialReviewerAgent,
+        )
+        _llm_reviewer = LLMAdversarialReviewerAgent.from_env(model=llm_model)
+        llm_stage_modes["adversarial_review"] = (
+            "llm" if _agent_has_llm_client(_llm_reviewer) else "heuristic_fallback"
+        )
         logger.info(
             "  LLM adversarial review enabled (mode=%s).",
-            "llm" if _llm_reviewer.llm_client is not None else "heuristic-fallback",
+            llm_stage_modes["adversarial_review"],
         )
         for result in _llm_reviewer.review_all(hypotheses):
             review_results[result.mapping_id] = result
     else:
+        llm_stage_modes["adversarial_review"] = "disabled"
         for h in hypotheses:
             result = _adversarial_review(h)
             review_results[h.mapping_id] = result
@@ -699,6 +880,54 @@ def run_pipeline(
     export_to_json(hypotheses, output_json)
     logger.info("  -> JSON exported: %s", output_json)
 
+    # Export review queue for the interactive HITL CLI.
+    output_review_queue = output_dir / f"{output_prefix}_review_queue.json"
+    review_queue_document = {
+        "metadata": {
+            "pipeline_run_id": pipeline_run_id,
+            "pipeline_version": _PIPELINE_VERSION,
+            "source_filepath": str(source_filepath),
+            "ontology_filepath": str(ontology_filepath),
+            "generated_at": datetime.now(tz=timezone.utc).isoformat(),
+            "total_review_packets": len(review_packets),
+            "feedback_policy": (
+                "No mapping is final until a human records a ledger decision. "
+                "Blocking adversarial or failed validation results cannot be "
+                "approved through the chat review mode; they must be rejected, "
+                "changed, or sent back for more evidence."
+            ),
+            "llm_enabled": llm_enabled,
+            "llm_model": llm_model if llm_enabled or llm_adversarial_review else None,
+            "llm_stage_modes": llm_stage_modes,
+            "domain_context": domain_context if llm_enabled else None,
+            "llm_review_top_k": llm_review_top_k if llm_enabled else None,
+            "llm_reviewed_hypotheses": llm_reviewed_hypotheses,
+            "llm_budget": llm_budget if llm_enabled else None,
+            "llm_candidate_entities_scored": (
+                getattr(candidate_agent, "llm_entities_scored", 0)
+                if llm_enabled else 0
+            ),
+        },
+        "review_packets": [
+            {
+                key: value
+                for key, value in packet.items()
+                if key not in {
+                    "source_entity",
+                    "top_hypothesis",
+                    "all_hypotheses",
+                    "adversarial_result",
+                }
+            }
+            for packet in review_packets
+        ],
+    }
+    output_review_queue.write_text(
+        json.dumps(review_queue_document, indent=2, ensure_ascii=False) + "\n",
+        encoding="utf-8",
+    )
+    logger.info("  -> Review queue exported: %s", output_review_queue)
+
     # Export SSSOM TSV (only non-NO_MAPPING hypotheses)
     exportable = [
         h for h in hypotheses
@@ -746,6 +975,16 @@ def run_pipeline(
         "output_json": str(output_json),
         "output_tsv": str(output_tsv) if output_tsv != Path() else "",
         "output_report": str(output_report),
+        "output_review_queue": str(output_review_queue),
+        "llm_enabled": llm_enabled,
+        "llm_stage_modes": llm_stage_modes,
+        "llm_review_top_k": llm_review_top_k,
+        "llm_reviewed_hypotheses": llm_reviewed_hypotheses,
+        "llm_budget": llm_budget,
+        "llm_candidate_entities_scored": (
+            getattr(candidate_agent, "llm_entities_scored", 0)
+            if llm_enabled else 0
+        ),
         "review_packets": review_packets,
         "hypotheses": hypotheses,
     }
@@ -774,6 +1013,18 @@ def main() -> None:
         python -m ontology_mapping_co_scientist.pipeline.run_mapping_pipeline \\
                --source data/animals.csv ...
     """
+    load_dotenv()
+    default_llm_model = os.environ.get("OMCS_LLM_MODEL", "claude-haiku-4-5-20251001")
+    default_domain_context = os.environ.get("OMCS_DOMAIN_CONTEXT", "biomedical research")
+    default_llm_review_top_k = int(os.environ.get("OMCS_LLM_REVIEW_TOP_K", "1"))
+    default_llm_candidate_top_k = int(os.environ.get("OMCS_LLM_CANDIDATE_TOP_K", "2"))
+    default_llm_max_candidate_entities = int(
+        os.environ.get("OMCS_LLM_MAX_CANDIDATE_ENTITIES", "10")
+    )
+    default_llm_max_review_hypotheses = int(
+        os.environ.get("OMCS_LLM_MAX_REVIEW_HYPOTHESES", "10")
+    )
+
     parser = argparse.ArgumentParser(
         prog="omcs-run",
         description=(
@@ -835,6 +1086,81 @@ def main() -> None:
         ),
     )
     parser.add_argument(
+        "--llm",
+        action="store_true",
+        default=False,
+        help=(
+            "Activate LLM orchestration for candidate semantic scoring plus "
+            "adversarial, ontology-engineer, and domain-scientist review stages. "
+            "Requires the llm extra and ANTHROPIC_API_KEY for real LLM calls."
+        ),
+    )
+    parser.add_argument(
+        "--require-llm",
+        action="store_true",
+        default=False,
+        help=(
+            "Fail instead of falling back when --llm is set but an active LLM "
+            "client cannot be created."
+        ),
+    )
+    parser.add_argument(
+        "--llm-model",
+        default=default_llm_model,
+        metavar="MODEL",
+        help="Claude model ID used by LLM agents.",
+    )
+    parser.add_argument(
+        "--domain-context",
+        default=default_domain_context,
+        metavar="TEXT",
+        help=(
+            "Domain context injected into the LLM domain-scientist reviewer "
+            "when --llm is enabled."
+        ),
+    )
+    parser.add_argument(
+        "--llm-review-top-k",
+        default=default_llm_review_top_k,
+        type=int,
+        metavar="N",
+        help=(
+            "Number of ranked hypotheses per source entity sent to each LLM "
+            "reviewer when --llm is enabled (default: 1). Heuristic review "
+            "still covers every hypothesis."
+        ),
+    )
+    parser.add_argument(
+        "--llm-candidate-top-k",
+        default=default_llm_candidate_top_k,
+        type=int,
+        metavar="N",
+        help=(
+            "Number of lexical candidates per source entity sent to LLM semantic "
+            "scoring (default: 2)."
+        ),
+    )
+    parser.add_argument(
+        "--llm-max-candidate-entities",
+        default=default_llm_max_candidate_entities,
+        type=int,
+        metavar="N",
+        help=(
+            "Maximum number of source entities sent to LLM candidate scoring "
+            "(default: 10)."
+        ),
+    )
+    parser.add_argument(
+        "--llm-max-review-hypotheses",
+        default=default_llm_max_review_hypotheses,
+        type=int,
+        metavar="N",
+        help=(
+            "Maximum number of hypotheses sent to each LLM reviewer "
+            "(default: 10)."
+        ),
+    )
+    parser.add_argument(
         "--ledger",
         default=None,
         metavar="PATH",
@@ -854,6 +1180,14 @@ def main() -> None:
         pipeline_run_id=args.run_id,
         verbose=args.verbose,
         llm_adversarial_review=args.llm_adversarial_review,
+        llm_enabled=args.llm,
+        require_llm=args.require_llm,
+        llm_model=args.llm_model,
+        domain_context=args.domain_context,
+        llm_review_top_k=args.llm_review_top_k,
+        llm_candidate_top_k=args.llm_candidate_top_k,
+        llm_max_candidate_entities=args.llm_max_candidate_entities,
+        llm_max_review_hypotheses=args.llm_max_review_hypotheses,
         ledger_path=args.ledger,
     )
 
@@ -869,12 +1203,28 @@ def main() -> None:
     print(f"  Validation passed   : {result['hypotheses_passed_validation']}")
     print(f"  Validation failed   : {result['hypotheses_failed_validation']}")
     print(f"  Validation warnings : {result['hypotheses_with_warnings']}")
+    print(f"  LLM orchestration    : {'enabled' if result['llm_enabled'] else 'disabled'}")
+    if result["llm_enabled"]:
+        print(
+            "  LLM reviewed         : "
+            f"{result['llm_reviewed_hypotheses']} hypotheses "
+            f"(top {result['llm_review_top_k']} per source)"
+        )
+        print(
+            "  LLM candidate scoring: "
+            f"{result['llm_candidate_entities_scored']} source entities"
+        )
+        print(f"  LLM budget           : {result['llm_budget']}")
+    if result["llm_stage_modes"]:
+        for stage_name, mode in result["llm_stage_modes"].items():
+            print(f"    {stage_name:<25}: {mode}")
     print()
     print("  Output files:")
     print(f"    JSON    : {result['output_json']}")
     if result["output_tsv"]:
         print(f"    TSV     : {result['output_tsv']}")
     print(f"    Report  : {result['output_report']}")
+    print(f"    Review  : {result['output_review_queue']}")
     print("=" * 60)
     print()
     print(

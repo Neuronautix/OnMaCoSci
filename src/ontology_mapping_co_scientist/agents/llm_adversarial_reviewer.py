@@ -29,6 +29,7 @@ from __future__ import annotations
 
 import json
 import logging
+import os
 import time
 
 from ontology_mapping_co_scientist.agents.adversarial_reviewer import (
@@ -36,6 +37,7 @@ from ontology_mapping_co_scientist.agents.adversarial_reviewer import (
     _compute_overall_severity,
     _derive_recommendation,
 )
+from ontology_mapping_co_scientist.env import load_dotenv
 from ontology_mapping_co_scientist.models.mapping_hypothesis import (
     Evidence,
     MappingHypothesis,
@@ -120,12 +122,13 @@ class LLMAdversarialReviewerAgent:
         Returns:
             A fully initialised :class:`LLMAdversarialReviewerAgent`.
         """
+        load_dotenv()
         try:
             import anthropic  # noqa: PLC0415
 
+            if not os.environ.get("ANTHROPIC_API_KEY"):
+                raise ValueError("ANTHROPIC_API_KEY is not set")
             client = anthropic.Anthropic()
-            # Validate key presence by accessing the key attribute (raises if missing)
-            _ = client.api_key
             logger.info(
                 "LLMAdversarialReviewerAgent.from_env: ANTHROPIC_API_KEY found — "
                 "LLM mode activated (model=%s).",

@@ -6,6 +6,7 @@ Usage:
   omcs-review [--ledger PATH] reject <mapping_id> --source <entity_id> [--reviewer NAME] [--note TEXT]
   omcs-review [--ledger PATH] change-predicate <mapping_id> --source <entity_id> --predicate skos:closeMatch [--note TEXT]
   omcs-review [--ledger PATH] request-evidence <mapping_id> --source <entity_id> [--note TEXT]
+  omcs-review [--ledger PATH] chat <review_queue.json> [--reviewer NAME]
   omcs-review [--ledger PATH] status
   omcs-review [--ledger PATH] list [--action approve|reject|...]
 """
@@ -13,17 +14,296 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import json
 import sys
 from pathlib import Path
+from typing import Any
 
 from ontology_mapping_co_scientist.review_ledger.ledger import (
     ReviewLedger,
     add_decision,
-    get_decisions_by_source,
     load_ledger,
 )
 
 _DEFAULT_LEDGER = "mapping_review_ledger.yaml"
+
+_APPROVE = "approve"
+_REJECT = "reject"
+_CHANGE_PREDICATE = "change_predicate"
+_REQUEST_EVIDENCE = "request_more_evidence"
+_CREATE_TERM = "create_new_ontology_term"
+
+
+# ---------------------------------------------------------------------------
+# Interactive review helpers
+# ---------------------------------------------------------------------------
+
+
+def load_review_packets(review_file: str | Path) -> tuple[dict[str, Any], list[dict[str, Any]]]:
+    """Load review packets from a pipeline JSON or review queue JSON file.
+
+    The preferred input is ``*_review_queue.json`` produced by ``omcs-run``.
+    For compatibility, this also accepts orchestrator JSON files containing a
+    top-level ``review_packets`` key and raw mappings JSON with ``mappings``.
+    """
+    review_path = Path(review_file)
+    data = json.loads(review_path.read_text(encoding="utf-8"))
+    if not isinstance(data, dict):
+        raise ValueError("Review file must contain a JSON object.")
+
+    metadata = data.get("metadata", {})
+    if not isinstance(metadata, dict):
+        metadata = {}
+
+    packets = data.get("review_packets")
+    if isinstance(packets, list):
+        return metadata, [p for p in packets if isinstance(p, dict)]
+
+    mappings = data.get("mappings") or data.get("hypotheses")
+    if isinstance(mappings, list):
+        return metadata, _packets_from_mappings(mappings)
+
+    raise ValueError(
+        "Review file must contain 'review_packets', 'mappings', or 'hypotheses'."
+    )
+
+
+def _packets_from_mappings(mappings: list[Any]) -> list[dict[str, Any]]:
+    """Build minimal review packets from raw mapping dictionaries."""
+    groups: dict[str, list[dict[str, Any]]] = {}
+    for mapping in mappings:
+        if not isinstance(mapping, dict):
+            continue
+        source = mapping.get("source_entity") or {}
+        if not isinstance(source, dict):
+            continue
+        source_id = str(source.get("entity_id", ""))
+        if not source_id:
+            continue
+        groups.setdefault(source_id, []).append(mapping)
+
+    packets: list[dict[str, Any]] = []
+    for source_id in sorted(groups):
+        group = sorted(
+            groups[source_id],
+            key=lambda m: (
+                int(m.get("rank") or 9999),
+                -float(m.get("confidence") or 0.0),
+                str(m.get("mapping_id", "")),
+            ),
+        )
+        top = group[0]
+        source = top.get("source_entity") or {}
+        packets.append(
+            {
+                "source_entity_id": source_id,
+                "source_entity_label": source.get("label", source_id),
+                "top_mapping": top,
+                "alternative_mappings": group[1:],
+                "suggested_action": None,
+                "all_warnings": top.get("warnings", []),
+            }
+        )
+    return packets
+
+
+def approval_blockers(packet: dict[str, Any]) -> list[str]:
+    """Return reasons that prevent approval in strict chat mode."""
+    top = packet.get("top_mapping") or {}
+    if not isinstance(top, dict):
+        return ["No top mapping is available for this source entity."]
+
+    blockers: list[str] = []
+    validation_status = str(top.get("validation_status", "")).lower()
+    if validation_status == "failed":
+        blockers.append("automated validation failed")
+
+    if str(top.get("predicate", "")) == "custom:noMapping":
+        blockers.append("the top hypothesis is a no-mapping result")
+
+    for flag in top.get("_adv_flags", []) or []:
+        if isinstance(flag, dict) and flag.get("severity") == "high":
+            blockers.append(f"high-severity adversarial flag: {flag.get('flag_type')}")
+
+    for warning in packet.get("all_warnings", []) or []:
+        warning_text = str(warning)
+        if warning_text.startswith("[HIGH]"):
+            blockers.append(warning_text)
+
+    return blockers
+
+
+def action_from_choice(choice: str, packet: dict[str, Any]) -> tuple[str | None, str | None]:
+    """Translate a chat menu choice to a ledger action.
+
+    Returns ``(action, error)``.  ``action`` is ``None`` for skip/quit or for
+    invalid choices.  Approval is deliberately blocked when the review packet
+    contains strict-mode blockers.
+    """
+    normalized = choice.strip().lower()
+    if normalized in {"a", "approve"}:
+        blockers = approval_blockers(packet)
+        if blockers:
+            return None, "Approval is blocked: " + "; ".join(blockers)
+        return _APPROVE, None
+    if normalized in {"r", "reject"}:
+        return _REJECT, None
+    if normalized in {"e", "evidence", "request-evidence", "request_more_evidence"}:
+        return _REQUEST_EVIDENCE, None
+    if normalized in {"p", "predicate", "change-predicate", "change_predicate"}:
+        return _CHANGE_PREDICATE, None
+    if normalized in {"n", "new-term", "new", "create-term"}:
+        return _CREATE_TERM, None
+    if normalized in {"s", "skip"}:
+        return None, None
+    if normalized in {"q", "quit", "exit"}:
+        return "quit", None
+    return None, "Unknown choice."
+
+
+def _top_mapping(packet: dict[str, Any]) -> dict[str, Any]:
+    top = packet.get("top_mapping")
+    return top if isinstance(top, dict) else {}
+
+
+def _target_label(mapping: dict[str, Any]) -> str:
+    target = mapping.get("target_entity") or {}
+    if not isinstance(target, dict):
+        return "(no target)"
+    term_id = target.get("term_id", "(no term id)")
+    label = target.get("label", "")
+    return f"{term_id} - {label}".strip()
+
+
+def _print_packet(packet: dict[str, Any], index: int, total: int) -> None:
+    top = _top_mapping(packet)
+    source_id = packet.get("source_entity_id", "")
+    source_label = packet.get("source_entity_label", source_id)
+    suggested = packet.get("suggested_action") or {}
+    if not isinstance(suggested, dict):
+        suggested = {}
+
+    print()
+    print("-" * 72)
+    print(f"Review {index}/{total}: {source_label} ({source_id})")
+    print("-" * 72)
+    print(f"Top hypothesis : {top.get('mapping_id', '(none)')}")
+    print(f"Target         : {_target_label(top)}")
+    print(f"Predicate      : {top.get('predicate', '(unknown)')}")
+    print(f"Confidence     : {float(top.get('confidence') or 0.0):.3f}")
+    print(f"Validation     : {top.get('validation_status', '(unknown)')}")
+    if suggested:
+        print(f"Agent suggests : {suggested.get('action')} - {suggested.get('reason', '')}")
+
+    blockers = approval_blockers(packet)
+    if blockers:
+        print("Review gate    : approval blocked")
+        for blocker in blockers[:5]:
+            print(f"  - {blocker}")
+    else:
+        print("Review gate    : approval allowed after human check")
+
+    evidence = top.get("evidence") or []
+    if evidence:
+        print("Evidence:")
+        for item in evidence[:3]:
+            if isinstance(item, dict):
+                score = item.get("score")
+                score_text = f" ({float(score):.3f})" if isinstance(score, (int, float)) else ""
+                print(f"  - {item.get('evidence_type', 'evidence')}{score_text}: {item.get('description', '')}")
+
+    warnings = packet.get("all_warnings") or []
+    if warnings:
+        print("Warnings:")
+        for warning in warnings[:5]:
+            print(f"  - {warning}")
+
+    alternatives = packet.get("alternative_mappings") or []
+    if alternatives:
+        print("Alternatives:")
+        for alt in alternatives[:3]:
+            if isinstance(alt, dict):
+                print(
+                    "  - "
+                    f"{alt.get('mapping_id')} -> {_target_label(alt)} "
+                    f"({alt.get('predicate')}, conf={float(alt.get('confidence') or 0.0):.3f})"
+                )
+
+
+def _cmd_chat(args: argparse.Namespace) -> None:
+    """Run an interactive HITL review session over a review queue."""
+    metadata, packets = load_review_packets(args.review_file)
+    if not packets:
+        print("No review packets found.")
+        return
+
+    ledger = load_ledger(args.ledger)
+    reviewed_sources = {
+        d.source_entity_id
+        for d in ledger.decisions
+        if d.action in {_APPROVE, _REJECT, _CHANGE_PREDICATE, _CREATE_TERM}
+    }
+    pending_packets = [
+        packet for packet in packets
+        if str(packet.get("source_entity_id", "")) not in reviewed_sources
+    ]
+
+    print("=" * 72)
+    print("Ontology Mapping Co-Scientist HITL Review")
+    print("=" * 72)
+    print(f"Review file : {Path(args.review_file).resolve()}")
+    print(f"Ledger      : {Path(args.ledger).resolve()}")
+    print(f"Run ID      : {metadata.get('pipeline_run_id', '(unknown)')}")
+    print(f"Queue       : {len(pending_packets)} pending / {len(packets)} total")
+    print()
+    print("Menu: [a]pprove  [r]eject  request [e]vidence  change [p]redicate")
+    print("      [n]ew term  [s]kip  [q]uit")
+
+    recorded = 0
+    for idx, packet in enumerate(pending_packets, start=1):
+        _print_packet(packet, idx, len(pending_packets))
+        top = _top_mapping(packet)
+        mapping_id = str(top.get("mapping_id", ""))
+        source_id = str(packet.get("source_entity_id", ""))
+        if not mapping_id or not source_id:
+            print("Skipping packet with missing mapping_id or source_entity_id.")
+            continue
+
+        while True:
+            choice = input("Decision> ")
+            action, error = action_from_choice(choice, packet)
+            if error:
+                print(error)
+                continue
+            if action is None:
+                print("Skipped.")
+                break
+            if action == "quit":
+                print(f"Recorded {recorded} decision(s).")
+                return
+
+            predicate_override = None
+            if action == _CHANGE_PREDICATE:
+                predicate_override = input(
+                    "Replacement predicate [skos:closeMatch]> "
+                ).strip() or "skos:closeMatch"
+
+            note = input("Reviewer note> ").strip()
+            add_decision(
+                ledger_path=args.ledger,
+                mapping_id=mapping_id,
+                source_entity_id=source_id,
+                action=action,
+                reviewer=args.reviewer,
+                note=note,
+                predicate_override=predicate_override,
+                pipeline_run_id=metadata.get("pipeline_run_id"),
+            )
+            recorded += 1
+            print(f"Recorded {action} for {mapping_id}.")
+            break
+
+    print(f"Review session complete. Recorded {recorded} decision(s).")
 
 
 # ---------------------------------------------------------------------------
@@ -283,6 +563,23 @@ def _build_parser() -> argparse.ArgumentParser:
         help="Filter decisions by action (e.g. approve, reject).",
     )
 
+    # chat
+    sub_chat = subparsers.add_parser(
+        "chat",
+        help="Interactively review a pipeline review queue and write ledger decisions.",
+    )
+    sub_chat.add_argument(
+        "review_file",
+        metavar="PATH",
+        help="Path to *_review_queue.json, hypotheses.json, or mappings JSON.",
+    )
+    sub_chat.add_argument(
+        "--reviewer",
+        default="unknown",
+        metavar="NAME",
+        help="Name or identifier of the reviewer (default: unknown).",
+    )
+
     return parser
 
 
@@ -304,6 +601,7 @@ def main() -> None:
         "request-evidence": _cmd_request_evidence,
         "status": _cmd_status,
         "list": _cmd_list,
+        "chat": _cmd_chat,
     }
 
     handler = handlers.get(args.command)

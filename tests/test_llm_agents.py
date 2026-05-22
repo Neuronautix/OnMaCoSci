@@ -169,6 +169,7 @@ def test_llm_candidate_generator_fallback():
 
 def test_llm_candidate_generator_from_env_no_key(monkeypatch):
     """from_env() without ANTHROPIC_API_KEY returns a lexical-only agent."""
+    monkeypatch.setenv("OMCS_DISABLE_DOTENV", "1")
     monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
     agent = LLMCandidateGeneratorAgent.from_env()
     assert agent.llm_client is None
@@ -298,6 +299,7 @@ def test_ontology_engineer_reviewer_no_client():
 
 def test_ontology_engineer_reviewer_from_env_no_key(monkeypatch):
     """from_env() without ANTHROPIC_API_KEY returns a no-op agent."""
+    monkeypatch.setenv("OMCS_DISABLE_DOTENV", "1")
     monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
     reviewer = LLMOntologyEngineerReviewerAgent.from_env()
     assert reviewer.llm_client is None
@@ -375,6 +377,7 @@ def test_domain_scientist_reviewer_no_client():
 
 def test_domain_scientist_reviewer_from_env_no_key(monkeypatch):
     """from_env() without ANTHROPIC_API_KEY returns a no-op agent."""
+    monkeypatch.setenv("OMCS_DISABLE_DOTENV", "1")
     monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
     reviewer = LLMDomainScientistReviewerAgent.from_env()
     assert reviewer.llm_client is None

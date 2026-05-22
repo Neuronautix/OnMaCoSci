@@ -145,6 +145,7 @@ def test_no_client_no_fallback_raises():
 def test_from_env_without_api_key(monkeypatch):
     """from_env() without ANTHROPIC_API_KEY returns a heuristic-only agent."""
     # Remove the key from the environment if it happens to be set
+    monkeypatch.setenv("OMCS_DISABLE_DOTENV", "1")
     monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
     agent = LLMAdversarialReviewerAgent.from_env()
     # Should not raise; should silently fall back

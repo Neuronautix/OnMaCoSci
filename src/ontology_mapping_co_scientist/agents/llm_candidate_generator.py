@@ -25,11 +25,13 @@ from __future__ import annotations
 
 import json
 import logging
+import os
 import time
 
 from ontology_mapping_co_scientist.agents.candidate_generator import (
     CandidateGeneratorAgent,
 )
+from ontology_mapping_co_scientist.env import load_dotenv
 from ontology_mapping_co_scientist.models.entities import OntologyTerm, SourceEntity
 from ontology_mapping_co_scientist.models.mapping_hypothesis import (
     Evidence,
@@ -75,6 +77,8 @@ class LLMCandidateGeneratorAgent:
         max_tokens: int = 512,
         fallback_to_lexical: bool = True,
         top_k_for_llm: int = 3,
+        max_entities_for_llm: int | None = None,
+        call_delay_seconds: float = 0.5,
         cost_tracker=None,
     ) -> None:
         self.llm_client = llm_client
@@ -82,7 +86,10 @@ class LLMCandidateGeneratorAgent:
         self.max_tokens = max_tokens
         self.fallback_to_lexical = fallback_to_lexical
         self.top_k_for_llm = top_k_for_llm
+        self.max_entities_for_llm = max_entities_for_llm
+        self.call_delay_seconds = call_delay_seconds
         self.cost_tracker = cost_tracker
+        self.llm_entities_scored = 0
 
         # Always instantiate a lexical generator as the base layer
         self._lexical_generator = CandidateGeneratorAgent(top_k=5)
@@ -117,17 +124,30 @@ class LLMCandidateGeneratorAgent:
         Returns:
             A fully initialised :class:`LLMCandidateGeneratorAgent`.
         """
+        load_dotenv()
         try:
             import anthropic  # noqa: PLC0415
 
+            if not os.environ.get("ANTHROPIC_API_KEY"):
+                raise ValueError("ANTHROPIC_API_KEY is not set")
             client = anthropic.Anthropic()
-            _ = client.api_key  # Validate key presence
+            call_delay_seconds = float(os.environ.get("OMCS_LLM_CALL_DELAY_SECONDS", "0.5"))
+            max_entities_raw = os.environ.get("OMCS_LLM_MAX_CANDIDATE_ENTITIES")
+            max_entities_for_llm = int(max_entities_raw) if max_entities_raw else None
+            top_k_for_llm = int(os.environ.get("OMCS_LLM_CANDIDATE_TOP_K", "3"))
             logger.info(
                 "%s.from_env: ANTHROPIC_API_KEY found — LLM mode activated (model=%s).",
                 _AGENT_NAME,
                 model,
             )
-            return cls(llm_client=client, model=model, cost_tracker=cost_tracker)
+            return cls(
+                llm_client=client,
+                model=model,
+                top_k_for_llm=top_k_for_llm,
+                max_entities_for_llm=max_entities_for_llm,
+                call_delay_seconds=call_delay_seconds,
+                cost_tracker=cost_tracker,
+            )
         except ImportError:
             logger.warning(
                 "%s.from_env: 'anthropic' package not installed. "
@@ -192,7 +212,23 @@ class LLMCandidateGeneratorAgent:
             by_entity.setdefault(h.source_entity.entity_id, []).append(h)
 
         # Step 3 & 4: Score top candidates per entity
-        for entity_id, entity_hypotheses in by_entity.items():
+        scored_entities = 0
+        for index, (entity_id, entity_hypotheses) in enumerate(by_entity.items()):
+            if (
+                self.max_entities_for_llm is not None
+                and scored_entities >= self.max_entities_for_llm
+            ):
+                logger.info(
+                    "%s: LLM candidate budget reached (%d entities); remaining "
+                    "entities use lexical-only evidence.",
+                    _AGENT_NAME,
+                    self.max_entities_for_llm,
+                )
+                break
+
+            if index > 0 and self.call_delay_seconds > 0:
+                time.sleep(self.call_delay_seconds)
+
             # Sort by current confidence descending, take top_k_for_llm
             sorted_hyps = sorted(entity_hypotheses, key=lambda h: h.confidence, reverse=True)
             top_candidates = sorted_hyps[: self.top_k_for_llm]
@@ -206,6 +242,7 @@ class LLMCandidateGeneratorAgent:
             if not llm_scores:
                 continue
 
+            scored_entities += 1
             # Step 5: Merge LLM evidence and recompute confidence
             for h in top_candidates:
                 term_id = h.target_entity.term_id
@@ -226,10 +263,12 @@ class LLMCandidateGeneratorAgent:
                 h.confidence = compute_aggregate_confidence(h.evidence, h.counter_evidence)
 
         logger.info(
-            "%s: LLM scoring complete for %d source entities.",
+            "%s: LLM scoring complete for %d/%d source entities.",
             _AGENT_NAME,
+            scored_entities,
             len(by_entity),
         )
+        self.llm_entities_scored = scored_entities
         return hypotheses
 
     # ------------------------------------------------------------------

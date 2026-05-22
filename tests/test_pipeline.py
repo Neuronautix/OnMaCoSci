@@ -47,6 +47,7 @@ from ontology_mapping_co_scientist.pipeline.run_mapping_pipeline import (
     _adversarial_review,
     _rank_hypotheses,
     _validate_hypothesis,
+    run_pipeline,
 )
 
 
@@ -665,3 +666,47 @@ class TestPipelineExports:
             f"{len(pending)} hypotheses still have PENDING status after validation: "
             f"{[h.mapping_id for h in pending]}"
         )
+
+    def test_pipeline_llm_orchestration_fallback_exports_review_queue(
+        self,
+        tmp_path: Path,
+        tmp_csv_file: Path,
+        tmp_ontology_yaml: Path,
+    ) -> None:
+        """LLM orchestration is explicit even when it falls back without a client."""
+        result = run_pipeline(
+            source_filepath=tmp_csv_file,
+            ontology_filepath=tmp_ontology_yaml,
+            output_dir=tmp_path,
+            pipeline_run_id="run-llm-orchestration-test",
+            llm_enabled=True,
+            domain_context="preclinical mouse metadata",
+            llm_review_top_k=1,
+            llm_candidate_top_k=2,
+            llm_max_candidate_entities=10,
+            llm_max_review_hypotheses=10,
+        )
+
+        assert result["llm_enabled"] is True
+        modes = result["llm_stage_modes"]
+        assert modes["candidate_generation"] in {"llm", "lexical_fallback"}
+        assert modes["adversarial_review"] in {"llm", "heuristic_fallback"}
+        assert modes["ontology_engineer_review"] in {"llm", "noop_fallback"}
+        assert modes["domain_scientist_review"] in {"llm", "noop_fallback"}
+        assert result["llm_review_top_k"] == 1
+        assert result["llm_reviewed_hypotheses"] == result["total_source_entities"]
+        assert result["llm_budget"] == {
+            "candidate_top_k": 2,
+            "max_candidate_entities": 10,
+            "review_top_k": 1,
+            "max_review_hypotheses": 10,
+        }
+
+        review_queue = Path(result["output_review_queue"])
+        assert review_queue.exists()
+        data = json.loads(review_queue.read_text(encoding="utf-8"))
+        assert data["metadata"]["llm_enabled"] is True
+        assert data["metadata"]["domain_context"] == "preclinical mouse metadata"
+        assert "llm_stage_modes" in data["metadata"]
+        assert data["metadata"]["llm_review_top_k"] == 1
+        assert data["metadata"]["llm_budget"]["candidate_top_k"] == 2

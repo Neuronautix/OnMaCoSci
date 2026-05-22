@@ -63,6 +63,8 @@ def _print_result_summary(result: dict, label: str) -> None:
     if result["output_tsv"]:
         print(f"      TSV    : {result['output_tsv']}")
     print(f"      Report : {result['output_report']}")
+    if result.get("output_review_queue"):
+        print(f"      Review : {result['output_review_queue']}")
 
 
 def main() -> None:
@@ -161,7 +163,7 @@ def main() -> None:
         print()
         print("  IMPORTANT: All mappings are HYPOTHESES and require human expert")
         print("  review before use in any production or research context.")
-        print("  Open the *_review_report.md files to start the review process.")
+        print("  Use the *_review_queue.json files with omcs-review chat.")
     else:
         print()
         print("  No runs completed.  Check that the example input files exist:")
