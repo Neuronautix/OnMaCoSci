@@ -1,0 +1,1913 @@
+[
+  {
+    "mapping_id": "oa-csv_animal_id-hcm_AnimalIdentifier",
+    "evidence": [
+      {
+        "evidence_type": "lexical_similarity",
+        "description": "Label 'animal_id' matched 'animal ID' with score 1.000",
+        "score": 1.0,
+        "source": "SemanticCandidateGenerator"
+      }
+    ],
+    "counter_evidence": [
+      {
+        "evidence_type": "auto_exactmatch_prevention",
+        "description": "Lexical score \u22650.90 but exactMatch requires semantic validation",
+        "score": null,
+        "source": "SemanticCandidateGenerator"
+      }
+    ],
+    "confidence": 1.0,
+    "provenance": {
+      "created_by": "SemanticCandidateGenerator",
+      "created_at": "2026-05-22T17:24:18.689234",
+      "method": "lexical_similarity_v1",
+      "pipeline_run_id": "example-oa-001",
+      "extra": {}
+    },
+    "reviewer_notes": [],
+    "human_review_status": "awaiting_review",
+    "validation_status": "passed",
+    "rank": 1,
+    "source_concept": {
+      "entity_id": "csv:animal_id",
+      "label": "animal_id",
+      "description": null,
+      "datatype": "string",
+      "examples": [
+        "A001",
+        "A002",
+        "A003",
+        "A004",
+        "A005"
+      ],
+      "source_file": "/home/user/OnMaCoSci/examples/ontology_align/inputs/animal_fields.csv",
+      "source_type": "csv",
+      "extra_context": {}
+    },
+    "target_ontology_entity": {
+      "term_id": "hcm:AnimalIdentifier",
+      "label": "AnimalIdentifier",
+      "definition": "A unique identifier assigned to an individual animal within a study.",
+      "synonyms": [
+        "animal ID",
+        "subject ID",
+        "animal code"
+      ],
+      "parent_terms": [
+        "hcm:Animal"
+      ],
+      "term_type": "annotation_property",
+      "ontology_id": "hcm",
+      "ontology_source": "/home/user/OnMaCoSci/examples/ontology_align/inputs/hcm_profile.yaml",
+      "extra_context": {}
+    },
+    "ontology_relation": "skos:closeMatch",
+    "source_entity_type": "identifier",
+    "target_entity_type": "annotation_property",
+    "semantic_scope_analysis": "Lexical similarity: 1.000. Requires semantic validation.",
+    "hierarchy_compatibility": "unknown",
+    "domain_range_compatibility": "unknown",
+    "proposed_correction": null,
+    "ontology_extension_required": false,
+    "ontology_extension_proposal": null,
+    "semantic_warnings": [
+      {
+        "warning_type": "lexical_only_high_score",
+        "description": "Score 1.00 is high enough for exactMatch by lexical metrics, but lexical similarity alone is insufficient to establish skos:exactMatch. Semantic review required before upgrading to exactMatch.",
+        "severity": "warning"
+      }
+    ],
+    "warnings": []
+  },
+  {
+    "mapping_id": "oa-csv_animal_id-hcm_Animal",
+    "evidence": [
+      {
+        "evidence_type": "lexical_similarity",
+        "description": "Label 'animal_id' matched 'Animal' with score 0.900",
+        "score": 0.9,
+        "source": "SemanticCandidateGenerator"
+      }
+    ],
+    "counter_evidence": [
+      {
+        "evidence_type": "auto_exactmatch_prevention",
+        "description": "Lexical score \u22650.90 but exactMatch requires semantic validation",
+        "score": null,
+        "source": "SemanticCandidateGenerator"
+      }
+    ],
+    "confidence": 0.9,
+    "provenance": {
+      "created_by": "SemanticCandidateGenerator",
+      "created_at": "2026-05-22T17:24:18.689289",
+      "method": "lexical_similarity_v1",
+      "pipeline_run_id": "example-oa-001",
+      "extra": {}
+    },
+    "reviewer_notes": [],
+    "human_review_status": "awaiting_review",
+    "validation_status": "passed",
+    "rank": 2,
+    "source_concept": {
+      "entity_id": "csv:animal_id",
+      "label": "animal_id",
+      "description": null,
+      "datatype": "string",
+      "examples": [
+        "A001",
+        "A002",
+        "A003",
+        "A004",
+        "A005"
+      ],
+      "source_file": "/home/user/OnMaCoSci/examples/ontology_align/inputs/animal_fields.csv",
+      "source_type": "csv",
+      "extra_context": {}
+    },
+    "target_ontology_entity": {
+      "term_id": "hcm:Animal",
+      "label": "Animal",
+      "definition": "A non-human vertebrate subject used in a preclinical study.",
+      "synonyms": [
+        "Subject",
+        "Mouse",
+        "Rodent"
+      ],
+      "parent_terms": [],
+      "term_type": "class",
+      "ontology_id": "hcm",
+      "ontology_source": "/home/user/OnMaCoSci/examples/ontology_align/inputs/hcm_profile.yaml",
+      "extra_context": {}
+    },
+    "ontology_relation": "skos:closeMatch",
+    "source_entity_type": "identifier",
+    "target_entity_type": "class",
+    "semantic_scope_analysis": "Lexical similarity: 0.900. Requires semantic validation.",
+    "hierarchy_compatibility": "unknown",
+    "domain_range_compatibility": "unknown",
+    "proposed_correction": null,
+    "ontology_extension_required": false,
+    "ontology_extension_proposal": null,
+    "semantic_warnings": [
+      {
+        "warning_type": "lexical_only_high_score",
+        "description": "Score 0.90 is high enough for exactMatch by lexical metrics, but lexical similarity alone is insufficient to establish skos:exactMatch. Semantic review required before upgrading to exactMatch.",
+        "severity": "warning"
+      }
+    ],
+    "warnings": []
+  },
+  {
+    "mapping_id": "oa-csv_animal_id-hcm_HousingCage",
+    "evidence": [
+      {
+        "evidence_type": "lexical_similarity",
+        "description": "Label 'animal_id' matched 'animal cage' with score 0.760",
+        "score": 0.76,
+        "source": "SemanticCandidateGenerator"
+      }
+    ],
+    "counter_evidence": [],
+    "confidence": 0.76,
+    "provenance": {
+      "created_by": "SemanticCandidateGenerator",
+      "created_at": "2026-05-22T17:24:18.689306",
+      "method": "lexical_similarity_v1",
+      "pipeline_run_id": "example-oa-001",
+      "extra": {}
+    },
+    "reviewer_notes": [],
+    "human_review_status": "awaiting_review",
+    "validation_status": "passed",
+    "rank": 3,
+    "source_concept": {
+      "entity_id": "csv:animal_id",
+      "label": "animal_id",
+      "description": null,
+      "datatype": "string",
+      "examples": [
+        "A001",
+        "A002",
+        "A003",
+        "A004",
+        "A005"
+      ],
+      "source_file": "/home/user/OnMaCoSci/examples/ontology_align/inputs/animal_fields.csv",
+      "source_type": "csv",
+      "extra_context": {}
+    },
+    "target_ontology_entity": {
+      "term_id": "hcm:HousingCage",
+      "label": "HousingCage",
+      "definition": "The physical housing unit in which one or more animals are kept during the study.",
+      "synonyms": [
+        "cage",
+        "home cage",
+        "animal cage",
+        "housing unit"
+      ],
+      "parent_terms": [],
+      "term_type": "class",
+      "ontology_id": "hcm",
+      "ontology_source": "/home/user/OnMaCoSci/examples/ontology_align/inputs/hcm_profile.yaml",
+      "extra_context": {}
+    },
+    "ontology_relation": "skos:closeMatch",
+    "source_entity_type": "identifier",
+    "target_entity_type": "class",
+    "semantic_scope_analysis": "Lexical similarity: 0.760. Requires semantic validation.",
+    "hierarchy_compatibility": "unknown",
+    "domain_range_compatibility": "unknown",
+    "proposed_correction": null,
+    "ontology_extension_required": false,
+    "ontology_extension_proposal": null,
+    "semantic_warnings": [],
+    "warnings": []
+  },
+  {
+    "mapping_id": "oa-csv_strain-hcm_MouseStrain",
+    "evidence": [
+      {
+        "evidence_type": "lexical_similarity",
+        "description": "Label 'strain' matched 'strain' with score 1.000",
+        "score": 1.0,
+        "source": "SemanticCandidateGenerator"
+      }
+    ],
+    "counter_evidence": [
+      {
+        "evidence_type": "auto_exactmatch_prevention",
+        "description": "Lexical score \u22650.90 but exactMatch requires semantic validation",
+        "score": null,
+        "source": "SemanticCandidateGenerator"
+      }
+    ],
+    "confidence": 1.0,
+    "provenance": {
+      "created_by": "SemanticCandidateGenerator",
+      "created_at": "2026-05-22T17:24:18.689456",
+      "method": "lexical_similarity_v1",
+      "pipeline_run_id": "example-oa-001",
+      "extra": {}
+    },
+    "reviewer_notes": [],
+    "human_review_status": "awaiting_review",
+    "validation_status": "passed",
+    "rank": 1,
+    "source_concept": {
+      "entity_id": "csv:strain",
+      "label": "strain",
+      "description": null,
+      "datatype": "string",
+      "examples": [
+        "C57BL/6J",
+        "BALB/cJ"
+      ],
+      "source_file": "/home/user/OnMaCoSci/examples/ontology_align/inputs/animal_fields.csv",
+      "source_type": "csv",
+      "extra_context": {}
+    },
+    "target_ontology_entity": {
+      "term_id": "hcm:MouseStrain",
+      "label": "MouseStrain",
+      "definition": "A standardised inbred or outbred mouse line characterised by a stable genetic composition, e.g. C57BL/6J.",
+      "synonyms": [
+        "strain",
+        "mouse line",
+        "inbred line",
+        "mouse background"
+      ],
+      "parent_terms": [
+        "hcm:GeneticBackground"
+      ],
+      "term_type": "class",
+      "ontology_id": "hcm",
+      "ontology_source": "/home/user/OnMaCoSci/examples/ontology_align/inputs/hcm_profile.yaml",
+      "extra_context": {}
+    },
+    "ontology_relation": "skos:closeMatch",
+    "source_entity_type": "attribute",
+    "target_entity_type": "class",
+    "semantic_scope_analysis": "Lexical similarity: 1.000. Requires semantic validation.",
+    "hierarchy_compatibility": "unknown",
+    "domain_range_compatibility": "unknown",
+    "proposed_correction": null,
+    "ontology_extension_required": false,
+    "ontology_extension_proposal": null,
+    "semantic_warnings": [
+      {
+        "warning_type": "lexical_only_high_score",
+        "description": "Score 1.00 is high enough for exactMatch by lexical metrics, but lexical similarity alone is insufficient to establish skos:exactMatch. Semantic review required before upgrading to exactMatch.",
+        "severity": "warning"
+      }
+    ],
+    "warnings": []
+  },
+  {
+    "mapping_id": "oa-csv_strain-hcm_HomeCageMonitoringDevice",
+    "evidence": [
+      {
+        "evidence_type": "lexical_similarity",
+        "description": "Label 'strain' matched 'HomeCageMonitoringDevice' with score 0.600",
+        "score": 0.6000000000000001,
+        "source": "SemanticCandidateGenerator"
+      }
+    ],
+    "counter_evidence": [],
+    "confidence": 0.6000000000000001,
+    "provenance": {
+      "created_by": "SemanticCandidateGenerator",
+      "created_at": "2026-05-22T17:24:18.689478",
+      "method": "lexical_similarity_v1",
+      "pipeline_run_id": "example-oa-001",
+      "extra": {}
+    },
+    "reviewer_notes": [],
+    "human_review_status": "awaiting_review",
+    "validation_status": "passed",
+    "rank": 2,
+    "source_concept": {
+      "entity_id": "csv:strain",
+      "label": "strain",
+      "description": null,
+      "datatype": "string",
+      "examples": [
+        "C57BL/6J",
+        "BALB/cJ"
+      ],
+      "source_file": "/home/user/OnMaCoSci/examples/ontology_align/inputs/animal_fields.csv",
+      "source_type": "csv",
+      "extra_context": {}
+    },
+    "target_ontology_entity": {
+      "term_id": "hcm:HomeCageMonitoringDevice",
+      "label": "HomeCageMonitoringDevice",
+      "definition": "An automated instrument installed in the home cage to continuously record behavioural and physiological parameters.",
+      "synonyms": [
+        "HCM device",
+        "cage monitor",
+        "home cage system",
+        "monitoring device"
+      ],
+      "parent_terms": [],
+      "term_type": "class",
+      "ontology_id": "hcm",
+      "ontology_source": "/home/user/OnMaCoSci/examples/ontology_align/inputs/hcm_profile.yaml",
+      "extra_context": {}
+    },
+    "ontology_relation": "skos:broadMatch",
+    "source_entity_type": "attribute",
+    "target_entity_type": "class",
+    "semantic_scope_analysis": "Lexical similarity: 0.600. Requires semantic validation.",
+    "hierarchy_compatibility": "unknown",
+    "domain_range_compatibility": "unknown",
+    "proposed_correction": null,
+    "ontology_extension_required": false,
+    "ontology_extension_proposal": null,
+    "semantic_warnings": [],
+    "warnings": []
+  },
+  {
+    "mapping_id": "oa-csv_strain-hcm_ExperimentalGroup",
+    "evidence": [
+      {
+        "evidence_type": "lexical_similarity",
+        "description": "Label 'strain' matched 'treatment group' with score 0.540",
+        "score": 0.54,
+        "source": "SemanticCandidateGenerator"
+      }
+    ],
+    "counter_evidence": [],
+    "confidence": 0.54,
+    "provenance": {
+      "created_by": "SemanticCandidateGenerator",
+      "created_at": "2026-05-22T17:24:18.689496",
+      "method": "lexical_similarity_v1",
+      "pipeline_run_id": "example-oa-001",
+      "extra": {}
+    },
+    "reviewer_notes": [],
+    "human_review_status": "awaiting_review",
+    "validation_status": "passed",
+    "rank": 3,
+    "source_concept": {
+      "entity_id": "csv:strain",
+      "label": "strain",
+      "description": null,
+      "datatype": "string",
+      "examples": [
+        "C57BL/6J",
+        "BALB/cJ"
+      ],
+      "source_file": "/home/user/OnMaCoSci/examples/ontology_align/inputs/animal_fields.csv",
+      "source_type": "csv",
+      "extra_context": {}
+    },
+    "target_ontology_entity": {
+      "term_id": "hcm:ExperimentalGroup",
+      "label": "ExperimentalGroup",
+      "definition": "A named group to which an animal is assigned for the purpose of experimental comparison.",
+      "synonyms": [
+        "study group",
+        "treatment group",
+        "cohort",
+        "experimental arm"
+      ],
+      "parent_terms": [],
+      "term_type": "class",
+      "ontology_id": "hcm",
+      "ontology_source": "/home/user/OnMaCoSci/examples/ontology_align/inputs/hcm_profile.yaml",
+      "extra_context": {}
+    },
+    "ontology_relation": "skos:relatedMatch",
+    "source_entity_type": "attribute",
+    "target_entity_type": "class",
+    "semantic_scope_analysis": "Lexical similarity: 0.540. Requires semantic validation.",
+    "hierarchy_compatibility": "unknown",
+    "domain_range_compatibility": "unknown",
+    "proposed_correction": null,
+    "ontology_extension_required": false,
+    "ontology_extension_proposal": null,
+    "semantic_warnings": [],
+    "warnings": []
+  },
+  {
+    "mapping_id": "oa-csv_sex-hcm_BiologicalSex",
+    "evidence": [
+      {
+        "evidence_type": "lexical_similarity",
+        "description": "Label 'sex' matched 'sex' with score 1.000",
+        "score": 1.0,
+        "source": "SemanticCandidateGenerator"
+      }
+    ],
+    "counter_evidence": [
+      {
+        "evidence_type": "auto_exactmatch_prevention",
+        "description": "Lexical score \u22650.90 but exactMatch requires semantic validation",
+        "score": null,
+        "source": "SemanticCandidateGenerator"
+      }
+    ],
+    "confidence": 1.0,
+    "provenance": {
+      "created_by": "SemanticCandidateGenerator",
+      "created_at": "2026-05-22T17:24:18.689634",
+      "method": "lexical_similarity_v1",
+      "pipeline_run_id": "example-oa-001",
+      "extra": {}
+    },
+    "reviewer_notes": [],
+    "human_review_status": "awaiting_review",
+    "validation_status": "passed",
+    "rank": 1,
+    "source_concept": {
+      "entity_id": "csv:sex",
+      "label": "sex",
+      "description": null,
+      "datatype": "string",
+      "examples": [
+        "M",
+        "F"
+      ],
+      "source_file": "/home/user/OnMaCoSci/examples/ontology_align/inputs/animal_fields.csv",
+      "source_type": "csv",
+      "extra_context": {}
+    },
+    "target_ontology_entity": {
+      "term_id": "hcm:BiologicalSex",
+      "label": "BiologicalSex",
+      "definition": "The biological sex of the animal as determined by chromosomal, gonadal, or phenotypic criteria.",
+      "synonyms": [
+        "sex",
+        "gender",
+        "biological gender"
+      ],
+      "parent_terms": [
+        "hcm:Animal"
+      ],
+      "term_type": "class",
+      "ontology_id": "hcm",
+      "ontology_source": "/home/user/OnMaCoSci/examples/ontology_align/inputs/hcm_profile.yaml",
+      "extra_context": {}
+    },
+    "ontology_relation": "skos:closeMatch",
+    "source_entity_type": "attribute",
+    "target_entity_type": "class",
+    "semantic_scope_analysis": "Lexical similarity: 1.000. Requires semantic validation.",
+    "hierarchy_compatibility": "unknown",
+    "domain_range_compatibility": "unknown",
+    "proposed_correction": null,
+    "ontology_extension_required": false,
+    "ontology_extension_proposal": null,
+    "semantic_warnings": [
+      {
+        "warning_type": "lexical_only_high_score",
+        "description": "Score 1.00 is high enough for exactMatch by lexical metrics, but lexical similarity alone is insufficient to establish skos:exactMatch. Semantic review required before upgrading to exactMatch.",
+        "severity": "warning"
+      }
+    ],
+    "warnings": []
+  },
+  {
+    "mapping_id": "oa-csv_sex-hcm_Animal",
+    "evidence": [
+      {
+        "evidence_type": "lexical_similarity",
+        "description": "Label 'sex' matched 'Mouse' with score 0.720",
+        "score": 0.72,
+        "source": "SemanticCandidateGenerator"
+      }
+    ],
+    "counter_evidence": [],
+    "confidence": 0.72,
+    "provenance": {
+      "created_by": "SemanticCandidateGenerator",
+      "created_at": "2026-05-22T17:24:18.689655",
+      "method": "lexical_similarity_v1",
+      "pipeline_run_id": "example-oa-001",
+      "extra": {}
+    },
+    "reviewer_notes": [],
+    "human_review_status": "awaiting_review",
+    "validation_status": "passed",
+    "rank": 2,
+    "source_concept": {
+      "entity_id": "csv:sex",
+      "label": "sex",
+      "description": null,
+      "datatype": "string",
+      "examples": [
+        "M",
+        "F"
+      ],
+      "source_file": "/home/user/OnMaCoSci/examples/ontology_align/inputs/animal_fields.csv",
+      "source_type": "csv",
+      "extra_context": {}
+    },
+    "target_ontology_entity": {
+      "term_id": "hcm:Animal",
+      "label": "Animal",
+      "definition": "A non-human vertebrate subject used in a preclinical study.",
+      "synonyms": [
+        "Subject",
+        "Mouse",
+        "Rodent"
+      ],
+      "parent_terms": [],
+      "term_type": "class",
+      "ontology_id": "hcm",
+      "ontology_source": "/home/user/OnMaCoSci/examples/ontology_align/inputs/hcm_profile.yaml",
+      "extra_context": {}
+    },
+    "ontology_relation": "skos:broadMatch",
+    "source_entity_type": "attribute",
+    "target_entity_type": "class",
+    "semantic_scope_analysis": "Lexical similarity: 0.720. Requires semantic validation.",
+    "hierarchy_compatibility": "unknown",
+    "domain_range_compatibility": "unknown",
+    "proposed_correction": null,
+    "ontology_extension_required": false,
+    "ontology_extension_proposal": null,
+    "semantic_warnings": [],
+    "warnings": []
+  },
+  {
+    "mapping_id": "oa-csv_sex-hcm_ExperimentalGroup",
+    "evidence": [
+      {
+        "evidence_type": "lexical_similarity",
+        "description": "Label 'sex' matched 'ExperimentalGroup' with score 0.720",
+        "score": 0.72,
+        "source": "SemanticCandidateGenerator"
+      }
+    ],
+    "counter_evidence": [],
+    "confidence": 0.72,
+    "provenance": {
+      "created_by": "SemanticCandidateGenerator",
+      "created_at": "2026-05-22T17:24:18.689675",
+      "method": "lexical_similarity_v1",
+      "pipeline_run_id": "example-oa-001",
+      "extra": {}
+    },
+    "reviewer_notes": [],
+    "human_review_status": "awaiting_review",
+    "validation_status": "passed",
+    "rank": 3,
+    "source_concept": {
+      "entity_id": "csv:sex",
+      "label": "sex",
+      "description": null,
+      "datatype": "string",
+      "examples": [
+        "M",
+        "F"
+      ],
+      "source_file": "/home/user/OnMaCoSci/examples/ontology_align/inputs/animal_fields.csv",
+      "source_type": "csv",
+      "extra_context": {}
+    },
+    "target_ontology_entity": {
+      "term_id": "hcm:ExperimentalGroup",
+      "label": "ExperimentalGroup",
+      "definition": "A named group to which an animal is assigned for the purpose of experimental comparison.",
+      "synonyms": [
+        "study group",
+        "treatment group",
+        "cohort",
+        "experimental arm"
+      ],
+      "parent_terms": [],
+      "term_type": "class",
+      "ontology_id": "hcm",
+      "ontology_source": "/home/user/OnMaCoSci/examples/ontology_align/inputs/hcm_profile.yaml",
+      "extra_context": {}
+    },
+    "ontology_relation": "skos:broadMatch",
+    "source_entity_type": "attribute",
+    "target_entity_type": "class",
+    "semantic_scope_analysis": "Lexical similarity: 0.720. Requires semantic validation.",
+    "hierarchy_compatibility": "unknown",
+    "domain_range_compatibility": "unknown",
+    "proposed_correction": null,
+    "ontology_extension_required": false,
+    "ontology_extension_proposal": null,
+    "semantic_warnings": [],
+    "warnings": []
+  },
+  {
+    "mapping_id": "oa-csv_genotype-hcm_Genotype",
+    "evidence": [
+      {
+        "evidence_type": "lexical_similarity",
+        "description": "Label 'genotype' matched 'Genotype' with score 1.000",
+        "score": 1.0,
+        "source": "SemanticCandidateGenerator"
+      }
+    ],
+    "counter_evidence": [
+      {
+        "evidence_type": "auto_exactmatch_prevention",
+        "description": "Lexical score \u22650.90 but exactMatch requires semantic validation",
+        "score": null,
+        "source": "SemanticCandidateGenerator"
+      }
+    ],
+    "confidence": 1.0,
+    "provenance": {
+      "created_by": "SemanticCandidateGenerator",
+      "created_at": "2026-05-22T17:24:18.689807",
+      "method": "lexical_similarity_v1",
+      "pipeline_run_id": "example-oa-001",
+      "extra": {}
+    },
+    "reviewer_notes": [],
+    "human_review_status": "awaiting_review",
+    "validation_status": "passed",
+    "rank": 1,
+    "source_concept": {
+      "entity_id": "csv:genotype",
+      "label": "genotype",
+      "description": null,
+      "datatype": "string",
+      "examples": [
+        "WT",
+        "KO",
+        "HET"
+      ],
+      "source_file": "/home/user/OnMaCoSci/examples/ontology_align/inputs/animal_fields.csv",
+      "source_type": "csv",
+      "extra_context": {}
+    },
+    "target_ontology_entity": {
+      "term_id": "hcm:Genotype",
+      "label": "Genotype",
+      "definition": "The specific allelic composition at one or more genomic loci relevant to the study, e.g. WT, KO, HET.",
+      "synonyms": [
+        "genomic genotype",
+        "allelic status",
+        "genetic modification status"
+      ],
+      "parent_terms": [
+        "hcm:GeneticBackground"
+      ],
+      "term_type": "class",
+      "ontology_id": "hcm",
+      "ontology_source": "/home/user/OnMaCoSci/examples/ontology_align/inputs/hcm_profile.yaml",
+      "extra_context": {}
+    },
+    "ontology_relation": "skos:closeMatch",
+    "source_entity_type": "attribute",
+    "target_entity_type": "class",
+    "semantic_scope_analysis": "Lexical similarity: 1.000. Requires semantic validation.",
+    "hierarchy_compatibility": "unknown",
+    "domain_range_compatibility": "unknown",
+    "proposed_correction": null,
+    "ontology_extension_required": false,
+    "ontology_extension_proposal": null,
+    "semantic_warnings": [
+      {
+        "warning_type": "lexical_only_high_score",
+        "description": "Score 1.00 is high enough for exactMatch by lexical metrics, but lexical similarity alone is insufficient to establish skos:exactMatch. Semantic review required before upgrading to exactMatch.",
+        "severity": "warning"
+      }
+    ],
+    "warnings": []
+  },
+  {
+    "mapping_id": "oa-csv_genotype-hcm_GeneticBackground",
+    "evidence": [
+      {
+        "evidence_type": "lexical_similarity",
+        "description": "Label 'genotype' matched 'GeneticBackground' with score 0.600",
+        "score": 0.6000000000000001,
+        "source": "SemanticCandidateGenerator"
+      }
+    ],
+    "counter_evidence": [],
+    "confidence": 0.6000000000000001,
+    "provenance": {
+      "created_by": "SemanticCandidateGenerator",
+      "created_at": "2026-05-22T17:24:18.689825",
+      "method": "lexical_similarity_v1",
+      "pipeline_run_id": "example-oa-001",
+      "extra": {}
+    },
+    "reviewer_notes": [],
+    "human_review_status": "awaiting_review",
+    "validation_status": "passed",
+    "rank": 2,
+    "source_concept": {
+      "entity_id": "csv:genotype",
+      "label": "genotype",
+      "description": null,
+      "datatype": "string",
+      "examples": [
+        "WT",
+        "KO",
+        "HET"
+      ],
+      "source_file": "/home/user/OnMaCoSci/examples/ontology_align/inputs/animal_fields.csv",
+      "source_type": "csv",
+      "extra_context": {}
+    },
+    "target_ontology_entity": {
+      "term_id": "hcm:GeneticBackground",
+      "label": "GeneticBackground",
+      "definition": "The genetic constitution of an animal, encompassing strain, breeding history, and inherited genetic modifications.",
+      "synonyms": [
+        "genetic makeup",
+        "genomic background",
+        "genetic lineage"
+      ],
+      "parent_terms": [
+        "hcm:Animal"
+      ],
+      "term_type": "class",
+      "ontology_id": "hcm",
+      "ontology_source": "/home/user/OnMaCoSci/examples/ontology_align/inputs/hcm_profile.yaml",
+      "extra_context": {}
+    },
+    "ontology_relation": "skos:broadMatch",
+    "source_entity_type": "attribute",
+    "target_entity_type": "class",
+    "semantic_scope_analysis": "Lexical similarity: 0.600. Requires semantic validation.",
+    "hierarchy_compatibility": "unknown",
+    "domain_range_compatibility": "unknown",
+    "proposed_correction": null,
+    "ontology_extension_required": false,
+    "ontology_extension_proposal": null,
+    "semantic_warnings": [],
+    "warnings": []
+  },
+  {
+    "mapping_id": "oa-csv_genotype-hcm_HousingCage",
+    "evidence": [
+      {
+        "evidence_type": "lexical_similarity",
+        "description": "Label 'genotype' matched 'cage' with score 0.600",
+        "score": 0.6000000000000001,
+        "source": "SemanticCandidateGenerator"
+      }
+    ],
+    "counter_evidence": [],
+    "confidence": 0.6000000000000001,
+    "provenance": {
+      "created_by": "SemanticCandidateGenerator",
+      "created_at": "2026-05-22T17:24:18.689839",
+      "method": "lexical_similarity_v1",
+      "pipeline_run_id": "example-oa-001",
+      "extra": {}
+    },
+    "reviewer_notes": [],
+    "human_review_status": "awaiting_review",
+    "validation_status": "passed",
+    "rank": 3,
+    "source_concept": {
+      "entity_id": "csv:genotype",
+      "label": "genotype",
+      "description": null,
+      "datatype": "string",
+      "examples": [
+        "WT",
+        "KO",
+        "HET"
+      ],
+      "source_file": "/home/user/OnMaCoSci/examples/ontology_align/inputs/animal_fields.csv",
+      "source_type": "csv",
+      "extra_context": {}
+    },
+    "target_ontology_entity": {
+      "term_id": "hcm:HousingCage",
+      "label": "HousingCage",
+      "definition": "The physical housing unit in which one or more animals are kept during the study.",
+      "synonyms": [
+        "cage",
+        "home cage",
+        "animal cage",
+        "housing unit"
+      ],
+      "parent_terms": [],
+      "term_type": "class",
+      "ontology_id": "hcm",
+      "ontology_source": "/home/user/OnMaCoSci/examples/ontology_align/inputs/hcm_profile.yaml",
+      "extra_context": {}
+    },
+    "ontology_relation": "skos:broadMatch",
+    "source_entity_type": "attribute",
+    "target_entity_type": "class",
+    "semantic_scope_analysis": "Lexical similarity: 0.600. Requires semantic validation.",
+    "hierarchy_compatibility": "unknown",
+    "domain_range_compatibility": "unknown",
+    "proposed_correction": null,
+    "ontology_extension_required": false,
+    "ontology_extension_proposal": null,
+    "semantic_warnings": [],
+    "warnings": []
+  },
+  {
+    "mapping_id": "oa-csv_cage_id-hcm_HousingCage",
+    "evidence": [
+      {
+        "evidence_type": "lexical_similarity",
+        "description": "Label 'cage_id' matched 'cage' with score 0.900",
+        "score": 0.9,
+        "source": "SemanticCandidateGenerator"
+      }
+    ],
+    "counter_evidence": [
+      {
+        "evidence_type": "auto_exactmatch_prevention",
+        "description": "Lexical score \u22650.90 but exactMatch requires semantic validation",
+        "score": null,
+        "source": "SemanticCandidateGenerator"
+      }
+    ],
+    "confidence": 0.9,
+    "provenance": {
+      "created_by": "SemanticCandidateGenerator",
+      "created_at": "2026-05-22T17:24:18.689970",
+      "method": "lexical_similarity_v1",
+      "pipeline_run_id": "example-oa-001",
+      "extra": {}
+    },
+    "reviewer_notes": [],
+    "human_review_status": "awaiting_review",
+    "validation_status": "passed",
+    "rank": 1,
+    "source_concept": {
+      "entity_id": "csv:cage_id",
+      "label": "cage_id",
+      "description": null,
+      "datatype": "string",
+      "examples": [
+        "C-12",
+        "C-13",
+        "C-14"
+      ],
+      "source_file": "/home/user/OnMaCoSci/examples/ontology_align/inputs/animal_fields.csv",
+      "source_type": "csv",
+      "extra_context": {}
+    },
+    "target_ontology_entity": {
+      "term_id": "hcm:HousingCage",
+      "label": "HousingCage",
+      "definition": "The physical housing unit in which one or more animals are kept during the study.",
+      "synonyms": [
+        "cage",
+        "home cage",
+        "animal cage",
+        "housing unit"
+      ],
+      "parent_terms": [],
+      "term_type": "class",
+      "ontology_id": "hcm",
+      "ontology_source": "/home/user/OnMaCoSci/examples/ontology_align/inputs/hcm_profile.yaml",
+      "extra_context": {}
+    },
+    "ontology_relation": "skos:closeMatch",
+    "source_entity_type": "identifier",
+    "target_entity_type": "class",
+    "semantic_scope_analysis": "Lexical similarity: 0.900. Requires semantic validation.",
+    "hierarchy_compatibility": "unknown",
+    "domain_range_compatibility": "unknown",
+    "proposed_correction": null,
+    "ontology_extension_required": false,
+    "ontology_extension_proposal": null,
+    "semantic_warnings": [
+      {
+        "warning_type": "lexical_only_high_score",
+        "description": "Score 0.90 is high enough for exactMatch by lexical metrics, but lexical similarity alone is insufficient to establish skos:exactMatch. Semantic review required before upgrading to exactMatch.",
+        "severity": "warning"
+      }
+    ],
+    "warnings": []
+  },
+  {
+    "mapping_id": "oa-csv_cage_id-hcm_HomeCageMonitoringDevice",
+    "evidence": [
+      {
+        "evidence_type": "lexical_similarity",
+        "description": "Label 'cage_id' matched 'cage monitor' with score 0.855",
+        "score": 0.855,
+        "source": "SemanticCandidateGenerator"
+      }
+    ],
+    "counter_evidence": [],
+    "confidence": 0.855,
+    "provenance": {
+      "created_by": "SemanticCandidateGenerator",
+      "created_at": "2026-05-22T17:24:18.689984",
+      "method": "lexical_similarity_v1",
+      "pipeline_run_id": "example-oa-001",
+      "extra": {}
+    },
+    "reviewer_notes": [],
+    "human_review_status": "awaiting_review",
+    "validation_status": "passed",
+    "rank": 2,
+    "source_concept": {
+      "entity_id": "csv:cage_id",
+      "label": "cage_id",
+      "description": null,
+      "datatype": "string",
+      "examples": [
+        "C-12",
+        "C-13",
+        "C-14"
+      ],
+      "source_file": "/home/user/OnMaCoSci/examples/ontology_align/inputs/animal_fields.csv",
+      "source_type": "csv",
+      "extra_context": {}
+    },
+    "target_ontology_entity": {
+      "term_id": "hcm:HomeCageMonitoringDevice",
+      "label": "HomeCageMonitoringDevice",
+      "definition": "An automated instrument installed in the home cage to continuously record behavioural and physiological parameters.",
+      "synonyms": [
+        "HCM device",
+        "cage monitor",
+        "home cage system",
+        "monitoring device"
+      ],
+      "parent_terms": [],
+      "term_type": "class",
+      "ontology_id": "hcm",
+      "ontology_source": "/home/user/OnMaCoSci/examples/ontology_align/inputs/hcm_profile.yaml",
+      "extra_context": {}
+    },
+    "ontology_relation": "skos:closeMatch",
+    "source_entity_type": "identifier",
+    "target_entity_type": "class",
+    "semantic_scope_analysis": "Lexical similarity: 0.855. Requires semantic validation.",
+    "hierarchy_compatibility": "unknown",
+    "domain_range_compatibility": "unknown",
+    "proposed_correction": null,
+    "ontology_extension_required": false,
+    "ontology_extension_proposal": null,
+    "semantic_warnings": [],
+    "warnings": []
+  },
+  {
+    "mapping_id": "oa-csv_cage_id-hcm_GeneticBackground",
+    "evidence": [
+      {
+        "evidence_type": "lexical_similarity",
+        "description": "Label 'cage_id' matched 'genetic lineage' with score 0.540",
+        "score": 0.54,
+        "source": "SemanticCandidateGenerator"
+      }
+    ],
+    "counter_evidence": [],
+    "confidence": 0.54,
+    "provenance": {
+      "created_by": "SemanticCandidateGenerator",
+      "created_at": "2026-05-22T17:24:18.689996",
+      "method": "lexical_similarity_v1",
+      "pipeline_run_id": "example-oa-001",
+      "extra": {}
+    },
+    "reviewer_notes": [],
+    "human_review_status": "awaiting_review",
+    "validation_status": "passed",
+    "rank": 3,
+    "source_concept": {
+      "entity_id": "csv:cage_id",
+      "label": "cage_id",
+      "description": null,
+      "datatype": "string",
+      "examples": [
+        "C-12",
+        "C-13",
+        "C-14"
+      ],
+      "source_file": "/home/user/OnMaCoSci/examples/ontology_align/inputs/animal_fields.csv",
+      "source_type": "csv",
+      "extra_context": {}
+    },
+    "target_ontology_entity": {
+      "term_id": "hcm:GeneticBackground",
+      "label": "GeneticBackground",
+      "definition": "The genetic constitution of an animal, encompassing strain, breeding history, and inherited genetic modifications.",
+      "synonyms": [
+        "genetic makeup",
+        "genomic background",
+        "genetic lineage"
+      ],
+      "parent_terms": [
+        "hcm:Animal"
+      ],
+      "term_type": "class",
+      "ontology_id": "hcm",
+      "ontology_source": "/home/user/OnMaCoSci/examples/ontology_align/inputs/hcm_profile.yaml",
+      "extra_context": {}
+    },
+    "ontology_relation": "skos:relatedMatch",
+    "source_entity_type": "identifier",
+    "target_entity_type": "class",
+    "semantic_scope_analysis": "Lexical similarity: 0.540. Requires semantic validation.",
+    "hierarchy_compatibility": "unknown",
+    "domain_range_compatibility": "unknown",
+    "proposed_correction": null,
+    "ontology_extension_required": false,
+    "ontology_extension_proposal": null,
+    "semantic_warnings": [],
+    "warnings": []
+  },
+  {
+    "mapping_id": "oa-csv_body_weight-hcm_BodyWeightMeasurement",
+    "evidence": [
+      {
+        "evidence_type": "lexical_similarity",
+        "description": "Label 'body_weight' matched 'body weight' with score 1.000",
+        "score": 1.0,
+        "source": "SemanticCandidateGenerator"
+      }
+    ],
+    "counter_evidence": [
+      {
+        "evidence_type": "auto_exactmatch_prevention",
+        "description": "Lexical score \u22650.90 but exactMatch requires semantic validation",
+        "score": null,
+        "source": "SemanticCandidateGenerator"
+      }
+    ],
+    "confidence": 1.0,
+    "provenance": {
+      "created_by": "SemanticCandidateGenerator",
+      "created_at": "2026-05-22T17:24:18.690153",
+      "method": "lexical_similarity_v1",
+      "pipeline_run_id": "example-oa-001",
+      "extra": {}
+    },
+    "reviewer_notes": [],
+    "human_review_status": "awaiting_review",
+    "validation_status": "passed",
+    "rank": 1,
+    "source_concept": {
+      "entity_id": "csv:body_weight",
+      "label": "body_weight",
+      "description": null,
+      "datatype": "number",
+      "examples": [
+        "24.3",
+        "21.1",
+        "26.8",
+        "22.9",
+        "25.1"
+      ],
+      "source_file": "/home/user/OnMaCoSci/examples/ontology_align/inputs/animal_fields.csv",
+      "source_type": "csv",
+      "extra_context": {}
+    },
+    "target_ontology_entity": {
+      "term_id": "hcm:BodyWeightMeasurement",
+      "label": "BodyWeightMeasurement",
+      "definition": "A quantitative measurement of an animal's total body mass, typically recorded in grams.",
+      "synonyms": [
+        "body weight",
+        "weight",
+        "mass",
+        "body mass"
+      ],
+      "parent_terms": [],
+      "term_type": "class",
+      "ontology_id": "hcm",
+      "ontology_source": "/home/user/OnMaCoSci/examples/ontology_align/inputs/hcm_profile.yaml",
+      "extra_context": {}
+    },
+    "ontology_relation": "skos:closeMatch",
+    "source_entity_type": "measurement",
+    "target_entity_type": "class",
+    "semantic_scope_analysis": "Lexical similarity: 1.000. Requires semantic validation.",
+    "hierarchy_compatibility": "unknown",
+    "domain_range_compatibility": "unknown",
+    "proposed_correction": null,
+    "ontology_extension_required": false,
+    "ontology_extension_proposal": null,
+    "semantic_warnings": [
+      {
+        "warning_type": "lexical_only_high_score",
+        "description": "Score 1.00 is high enough for exactMatch by lexical metrics, but lexical similarity alone is insufficient to establish skos:exactMatch. Semantic review required before upgrading to exactMatch.",
+        "severity": "warning"
+      }
+    ],
+    "warnings": []
+  },
+  {
+    "mapping_id": "oa-csv_body_weight-hcm_Animal",
+    "evidence": [
+      {
+        "evidence_type": "lexical_similarity",
+        "description": "Label 'body_weight' matched 'Rodent' with score 0.471",
+        "score": 0.4705882352941176,
+        "source": "SemanticCandidateGenerator"
+      }
+    ],
+    "counter_evidence": [],
+    "confidence": 0.4705882352941176,
+    "provenance": {
+      "created_by": "SemanticCandidateGenerator",
+      "created_at": "2026-05-22T17:24:18.690172",
+      "method": "lexical_similarity_v1",
+      "pipeline_run_id": "example-oa-001",
+      "extra": {}
+    },
+    "reviewer_notes": [],
+    "human_review_status": "awaiting_review",
+    "validation_status": "passed",
+    "rank": 2,
+    "source_concept": {
+      "entity_id": "csv:body_weight",
+      "label": "body_weight",
+      "description": null,
+      "datatype": "number",
+      "examples": [
+        "24.3",
+        "21.1",
+        "26.8",
+        "22.9",
+        "25.1"
+      ],
+      "source_file": "/home/user/OnMaCoSci/examples/ontology_align/inputs/animal_fields.csv",
+      "source_type": "csv",
+      "extra_context": {}
+    },
+    "target_ontology_entity": {
+      "term_id": "hcm:Animal",
+      "label": "Animal",
+      "definition": "A non-human vertebrate subject used in a preclinical study.",
+      "synonyms": [
+        "Subject",
+        "Mouse",
+        "Rodent"
+      ],
+      "parent_terms": [],
+      "term_type": "class",
+      "ontology_id": "hcm",
+      "ontology_source": "/home/user/OnMaCoSci/examples/ontology_align/inputs/hcm_profile.yaml",
+      "extra_context": {}
+    },
+    "ontology_relation": "skos:relatedMatch",
+    "source_entity_type": "measurement",
+    "target_entity_type": "class",
+    "semantic_scope_analysis": "Lexical similarity: 0.471. Requires semantic validation.",
+    "hierarchy_compatibility": "unknown",
+    "domain_range_compatibility": "unknown",
+    "proposed_correction": null,
+    "ontology_extension_required": false,
+    "ontology_extension_proposal": null,
+    "semantic_warnings": [],
+    "warnings": []
+  },
+  {
+    "mapping_id": "oa-csv_body_weight-hcm_ExperimentalGroup",
+    "evidence": [
+      {
+        "evidence_type": "lexical_similarity",
+        "description": "Label 'body_weight' matched 'cohort' with score 0.450",
+        "score": 0.45,
+        "source": "SemanticCandidateGenerator"
+      }
+    ],
+    "counter_evidence": [],
+    "confidence": 0.45,
+    "provenance": {
+      "created_by": "SemanticCandidateGenerator",
+      "created_at": "2026-05-22T17:24:18.690185",
+      "method": "lexical_similarity_v1",
+      "pipeline_run_id": "example-oa-001",
+      "extra": {}
+    },
+    "reviewer_notes": [],
+    "human_review_status": "awaiting_review",
+    "validation_status": "passed",
+    "rank": 3,
+    "source_concept": {
+      "entity_id": "csv:body_weight",
+      "label": "body_weight",
+      "description": null,
+      "datatype": "number",
+      "examples": [
+        "24.3",
+        "21.1",
+        "26.8",
+        "22.9",
+        "25.1"
+      ],
+      "source_file": "/home/user/OnMaCoSci/examples/ontology_align/inputs/animal_fields.csv",
+      "source_type": "csv",
+      "extra_context": {}
+    },
+    "target_ontology_entity": {
+      "term_id": "hcm:ExperimentalGroup",
+      "label": "ExperimentalGroup",
+      "definition": "A named group to which an animal is assigned for the purpose of experimental comparison.",
+      "synonyms": [
+        "study group",
+        "treatment group",
+        "cohort",
+        "experimental arm"
+      ],
+      "parent_terms": [],
+      "term_type": "class",
+      "ontology_id": "hcm",
+      "ontology_source": "/home/user/OnMaCoSci/examples/ontology_align/inputs/hcm_profile.yaml",
+      "extra_context": {}
+    },
+    "ontology_relation": "skos:relatedMatch",
+    "source_entity_type": "measurement",
+    "target_entity_type": "class",
+    "semantic_scope_analysis": "Lexical similarity: 0.450. Requires semantic validation.",
+    "hierarchy_compatibility": "unknown",
+    "domain_range_compatibility": "unknown",
+    "proposed_correction": null,
+    "ontology_extension_required": false,
+    "ontology_extension_proposal": null,
+    "semantic_warnings": [],
+    "warnings": []
+  },
+  {
+    "mapping_id": "oa-csv_experimental_group-hcm_ExperimentalGroup",
+    "evidence": [
+      {
+        "evidence_type": "lexical_similarity",
+        "description": "Label 'experimental_group' matched 'ExperimentalGroup' with score 0.971",
+        "score": 0.9714285714285714,
+        "source": "SemanticCandidateGenerator"
+      }
+    ],
+    "counter_evidence": [
+      {
+        "evidence_type": "auto_exactmatch_prevention",
+        "description": "Lexical score \u22650.90 but exactMatch requires semantic validation",
+        "score": null,
+        "source": "SemanticCandidateGenerator"
+      }
+    ],
+    "confidence": 0.9714285714285714,
+    "provenance": {
+      "created_by": "SemanticCandidateGenerator",
+      "created_at": "2026-05-22T17:24:18.690323",
+      "method": "lexical_similarity_v1",
+      "pipeline_run_id": "example-oa-001",
+      "extra": {}
+    },
+    "reviewer_notes": [],
+    "human_review_status": "awaiting_review",
+    "validation_status": "passed",
+    "rank": 1,
+    "source_concept": {
+      "entity_id": "csv:experimental_group",
+      "label": "experimental_group",
+      "description": null,
+      "datatype": "string",
+      "examples": [
+        "Control",
+        "Treatment"
+      ],
+      "source_file": "/home/user/OnMaCoSci/examples/ontology_align/inputs/animal_fields.csv",
+      "source_type": "csv",
+      "extra_context": {}
+    },
+    "target_ontology_entity": {
+      "term_id": "hcm:ExperimentalGroup",
+      "label": "ExperimentalGroup",
+      "definition": "A named group to which an animal is assigned for the purpose of experimental comparison.",
+      "synonyms": [
+        "study group",
+        "treatment group",
+        "cohort",
+        "experimental arm"
+      ],
+      "parent_terms": [],
+      "term_type": "class",
+      "ontology_id": "hcm",
+      "ontology_source": "/home/user/OnMaCoSci/examples/ontology_align/inputs/hcm_profile.yaml",
+      "extra_context": {}
+    },
+    "ontology_relation": "skos:closeMatch",
+    "source_entity_type": "field",
+    "target_entity_type": "class",
+    "semantic_scope_analysis": "Lexical similarity: 0.971. Requires semantic validation.",
+    "hierarchy_compatibility": "unknown",
+    "domain_range_compatibility": "unknown",
+    "proposed_correction": null,
+    "ontology_extension_required": false,
+    "ontology_extension_proposal": null,
+    "semantic_warnings": [
+      {
+        "warning_type": "lexical_only_high_score",
+        "description": "Score 0.97 is high enough for exactMatch by lexical metrics, but lexical similarity alone is insufficient to establish skos:exactMatch. Semantic review required before upgrading to exactMatch.",
+        "severity": "warning"
+      }
+    ],
+    "warnings": []
+  },
+  {
+    "mapping_id": "oa-csv_experimental_group-hcm_BiologicalSex",
+    "evidence": [
+      {
+        "evidence_type": "lexical_similarity",
+        "description": "Label 'experimental_group' matched 'sex' with score 0.720",
+        "score": 0.72,
+        "source": "SemanticCandidateGenerator"
+      }
+    ],
+    "counter_evidence": [],
+    "confidence": 0.72,
+    "provenance": {
+      "created_by": "SemanticCandidateGenerator",
+      "created_at": "2026-05-22T17:24:18.690339",
+      "method": "lexical_similarity_v1",
+      "pipeline_run_id": "example-oa-001",
+      "extra": {}
+    },
+    "reviewer_notes": [],
+    "human_review_status": "awaiting_review",
+    "validation_status": "passed",
+    "rank": 2,
+    "source_concept": {
+      "entity_id": "csv:experimental_group",
+      "label": "experimental_group",
+      "description": null,
+      "datatype": "string",
+      "examples": [
+        "Control",
+        "Treatment"
+      ],
+      "source_file": "/home/user/OnMaCoSci/examples/ontology_align/inputs/animal_fields.csv",
+      "source_type": "csv",
+      "extra_context": {}
+    },
+    "target_ontology_entity": {
+      "term_id": "hcm:BiologicalSex",
+      "label": "BiologicalSex",
+      "definition": "The biological sex of the animal as determined by chromosomal, gonadal, or phenotypic criteria.",
+      "synonyms": [
+        "sex",
+        "gender",
+        "biological gender"
+      ],
+      "parent_terms": [
+        "hcm:Animal"
+      ],
+      "term_type": "class",
+      "ontology_id": "hcm",
+      "ontology_source": "/home/user/OnMaCoSci/examples/ontology_align/inputs/hcm_profile.yaml",
+      "extra_context": {}
+    },
+    "ontology_relation": "skos:broadMatch",
+    "source_entity_type": "field",
+    "target_entity_type": "class",
+    "semantic_scope_analysis": "Lexical similarity: 0.720. Requires semantic validation.",
+    "hierarchy_compatibility": "unknown",
+    "domain_range_compatibility": "unknown",
+    "proposed_correction": null,
+    "ontology_extension_required": false,
+    "ontology_extension_proposal": null,
+    "semantic_warnings": [],
+    "warnings": []
+  },
+  {
+    "mapping_id": "oa-csv_experimental_group-hcm_Animal",
+    "evidence": [
+      {
+        "evidence_type": "lexical_similarity",
+        "description": "Label 'experimental_group' matched 'Rodent' with score 0.600",
+        "score": 0.6000000000000001,
+        "source": "SemanticCandidateGenerator"
+      }
+    ],
+    "counter_evidence": [],
+    "confidence": 0.6000000000000001,
+    "provenance": {
+      "created_by": "SemanticCandidateGenerator",
+      "created_at": "2026-05-22T17:24:18.690353",
+      "method": "lexical_similarity_v1",
+      "pipeline_run_id": "example-oa-001",
+      "extra": {}
+    },
+    "reviewer_notes": [],
+    "human_review_status": "awaiting_review",
+    "validation_status": "passed",
+    "rank": 3,
+    "source_concept": {
+      "entity_id": "csv:experimental_group",
+      "label": "experimental_group",
+      "description": null,
+      "datatype": "string",
+      "examples": [
+        "Control",
+        "Treatment"
+      ],
+      "source_file": "/home/user/OnMaCoSci/examples/ontology_align/inputs/animal_fields.csv",
+      "source_type": "csv",
+      "extra_context": {}
+    },
+    "target_ontology_entity": {
+      "term_id": "hcm:Animal",
+      "label": "Animal",
+      "definition": "A non-human vertebrate subject used in a preclinical study.",
+      "synonyms": [
+        "Subject",
+        "Mouse",
+        "Rodent"
+      ],
+      "parent_terms": [],
+      "term_type": "class",
+      "ontology_id": "hcm",
+      "ontology_source": "/home/user/OnMaCoSci/examples/ontology_align/inputs/hcm_profile.yaml",
+      "extra_context": {}
+    },
+    "ontology_relation": "skos:broadMatch",
+    "source_entity_type": "field",
+    "target_entity_type": "class",
+    "semantic_scope_analysis": "Lexical similarity: 0.600. Requires semantic validation.",
+    "hierarchy_compatibility": "unknown",
+    "domain_range_compatibility": "unknown",
+    "proposed_correction": null,
+    "ontology_extension_required": false,
+    "ontology_extension_proposal": null,
+    "semantic_warnings": [],
+    "warnings": []
+  },
+  {
+    "mapping_id": "oa-csv_home_cage_monitoring_device-hcm_HomeCageMonitoringDevice",
+    "evidence": [
+      {
+        "evidence_type": "lexical_similarity",
+        "description": "Label 'home_cage_monitoring_device' matched 'HomeCageMonitoringDevice' with score 0.941",
+        "score": 0.9411764705882352,
+        "source": "SemanticCandidateGenerator"
+      }
+    ],
+    "counter_evidence": [
+      {
+        "evidence_type": "auto_exactmatch_prevention",
+        "description": "Lexical score \u22650.90 but exactMatch requires semantic validation",
+        "score": null,
+        "source": "SemanticCandidateGenerator"
+      }
+    ],
+    "confidence": 0.9411764705882352,
+    "provenance": {
+      "created_by": "SemanticCandidateGenerator",
+      "created_at": "2026-05-22T17:24:18.690551",
+      "method": "lexical_similarity_v1",
+      "pipeline_run_id": "example-oa-001",
+      "extra": {}
+    },
+    "reviewer_notes": [],
+    "human_review_status": "awaiting_review",
+    "validation_status": "passed",
+    "rank": 1,
+    "source_concept": {
+      "entity_id": "csv:home_cage_monitoring_device",
+      "label": "home_cage_monitoring_device",
+      "description": null,
+      "datatype": "string",
+      "examples": [
+        "HCM-400",
+        "HCM-401"
+      ],
+      "source_file": "/home/user/OnMaCoSci/examples/ontology_align/inputs/animal_fields.csv",
+      "source_type": "csv",
+      "extra_context": {}
+    },
+    "target_ontology_entity": {
+      "term_id": "hcm:HomeCageMonitoringDevice",
+      "label": "HomeCageMonitoringDevice",
+      "definition": "An automated instrument installed in the home cage to continuously record behavioural and physiological parameters.",
+      "synonyms": [
+        "HCM device",
+        "cage monitor",
+        "home cage system",
+        "monitoring device"
+      ],
+      "parent_terms": [],
+      "term_type": "class",
+      "ontology_id": "hcm",
+      "ontology_source": "/home/user/OnMaCoSci/examples/ontology_align/inputs/hcm_profile.yaml",
+      "extra_context": {}
+    },
+    "ontology_relation": "skos:closeMatch",
+    "source_entity_type": "field",
+    "target_entity_type": "class",
+    "semantic_scope_analysis": "Lexical similarity: 0.941. Requires semantic validation.",
+    "hierarchy_compatibility": "unknown",
+    "domain_range_compatibility": "unknown",
+    "proposed_correction": null,
+    "ontology_extension_required": false,
+    "ontology_extension_proposal": null,
+    "semantic_warnings": [
+      {
+        "warning_type": "lexical_only_high_score",
+        "description": "Score 0.94 is high enough for exactMatch by lexical metrics, but lexical similarity alone is insufficient to establish skos:exactMatch. Semantic review required before upgrading to exactMatch.",
+        "severity": "warning"
+      }
+    ],
+    "warnings": []
+  },
+  {
+    "mapping_id": "oa-csv_home_cage_monitoring_device-hcm_HousingCage",
+    "evidence": [
+      {
+        "evidence_type": "lexical_similarity",
+        "description": "Label 'home_cage_monitoring_device' matched 'cage' with score 0.900",
+        "score": 0.9,
+        "source": "SemanticCandidateGenerator"
+      }
+    ],
+    "counter_evidence": [
+      {
+        "evidence_type": "auto_exactmatch_prevention",
+        "description": "Lexical score \u22650.90 but exactMatch requires semantic validation",
+        "score": null,
+        "source": "SemanticCandidateGenerator"
+      }
+    ],
+    "confidence": 0.9,
+    "provenance": {
+      "created_by": "SemanticCandidateGenerator",
+      "created_at": "2026-05-22T17:24:18.690571",
+      "method": "lexical_similarity_v1",
+      "pipeline_run_id": "example-oa-001",
+      "extra": {}
+    },
+    "reviewer_notes": [],
+    "human_review_status": "awaiting_review",
+    "validation_status": "passed",
+    "rank": 2,
+    "source_concept": {
+      "entity_id": "csv:home_cage_monitoring_device",
+      "label": "home_cage_monitoring_device",
+      "description": null,
+      "datatype": "string",
+      "examples": [
+        "HCM-400",
+        "HCM-401"
+      ],
+      "source_file": "/home/user/OnMaCoSci/examples/ontology_align/inputs/animal_fields.csv",
+      "source_type": "csv",
+      "extra_context": {}
+    },
+    "target_ontology_entity": {
+      "term_id": "hcm:HousingCage",
+      "label": "HousingCage",
+      "definition": "The physical housing unit in which one or more animals are kept during the study.",
+      "synonyms": [
+        "cage",
+        "home cage",
+        "animal cage",
+        "housing unit"
+      ],
+      "parent_terms": [],
+      "term_type": "class",
+      "ontology_id": "hcm",
+      "ontology_source": "/home/user/OnMaCoSci/examples/ontology_align/inputs/hcm_profile.yaml",
+      "extra_context": {}
+    },
+    "ontology_relation": "skos:closeMatch",
+    "source_entity_type": "field",
+    "target_entity_type": "class",
+    "semantic_scope_analysis": "Lexical similarity: 0.900. Requires semantic validation.",
+    "hierarchy_compatibility": "unknown",
+    "domain_range_compatibility": "unknown",
+    "proposed_correction": null,
+    "ontology_extension_required": false,
+    "ontology_extension_proposal": null,
+    "semantic_warnings": [
+      {
+        "warning_type": "lexical_only_high_score",
+        "description": "Score 0.90 is high enough for exactMatch by lexical metrics, but lexical similarity alone is insufficient to establish skos:exactMatch. Semantic review required before upgrading to exactMatch.",
+        "severity": "warning"
+      }
+    ],
+    "warnings": []
+  },
+  {
+    "mapping_id": "oa-csv_home_cage_monitoring_device-hcm_MouseStrain",
+    "evidence": [
+      {
+        "evidence_type": "lexical_similarity",
+        "description": "Label 'home_cage_monitoring_device' matched 'strain' with score 0.600",
+        "score": 0.6000000000000001,
+        "source": "SemanticCandidateGenerator"
+      }
+    ],
+    "counter_evidence": [],
+    "confidence": 0.6000000000000001,
+    "provenance": {
+      "created_by": "SemanticCandidateGenerator",
+      "created_at": "2026-05-22T17:24:18.690584",
+      "method": "lexical_similarity_v1",
+      "pipeline_run_id": "example-oa-001",
+      "extra": {}
+    },
+    "reviewer_notes": [],
+    "human_review_status": "awaiting_review",
+    "validation_status": "passed",
+    "rank": 3,
+    "source_concept": {
+      "entity_id": "csv:home_cage_monitoring_device",
+      "label": "home_cage_monitoring_device",
+      "description": null,
+      "datatype": "string",
+      "examples": [
+        "HCM-400",
+        "HCM-401"
+      ],
+      "source_file": "/home/user/OnMaCoSci/examples/ontology_align/inputs/animal_fields.csv",
+      "source_type": "csv",
+      "extra_context": {}
+    },
+    "target_ontology_entity": {
+      "term_id": "hcm:MouseStrain",
+      "label": "MouseStrain",
+      "definition": "A standardised inbred or outbred mouse line characterised by a stable genetic composition, e.g. C57BL/6J.",
+      "synonyms": [
+        "strain",
+        "mouse line",
+        "inbred line",
+        "mouse background"
+      ],
+      "parent_terms": [
+        "hcm:GeneticBackground"
+      ],
+      "term_type": "class",
+      "ontology_id": "hcm",
+      "ontology_source": "/home/user/OnMaCoSci/examples/ontology_align/inputs/hcm_profile.yaml",
+      "extra_context": {}
+    },
+    "ontology_relation": "skos:broadMatch",
+    "source_entity_type": "field",
+    "target_entity_type": "class",
+    "semantic_scope_analysis": "Lexical similarity: 0.600. Requires semantic validation.",
+    "hierarchy_compatibility": "unknown",
+    "domain_range_compatibility": "unknown",
+    "proposed_correction": null,
+    "ontology_extension_required": false,
+    "ontology_extension_proposal": null,
+    "semantic_warnings": [],
+    "warnings": []
+  },
+  {
+    "mapping_id": "oa-csv_locomotor_activity_index-hcm_ActivityMeasurement",
+    "evidence": [
+      {
+        "evidence_type": "lexical_similarity",
+        "description": "Label 'locomotor_activity_index' matched 'locomotor activity' with score 0.950",
+        "score": 0.95,
+        "source": "SemanticCandidateGenerator"
+      }
+    ],
+    "counter_evidence": [
+      {
+        "evidence_type": "auto_exactmatch_prevention",
+        "description": "Lexical score \u22650.90 but exactMatch requires semantic validation",
+        "score": null,
+        "source": "SemanticCandidateGenerator"
+      }
+    ],
+    "confidence": 0.95,
+    "provenance": {
+      "created_by": "SemanticCandidateGenerator",
+      "created_at": "2026-05-22T17:24:18.690764",
+      "method": "lexical_similarity_v1",
+      "pipeline_run_id": "example-oa-001",
+      "extra": {}
+    },
+    "reviewer_notes": [],
+    "human_review_status": "awaiting_review",
+    "validation_status": "passed",
+    "rank": 1,
+    "source_concept": {
+      "entity_id": "csv:locomotor_activity_index",
+      "label": "locomotor_activity_index",
+      "description": null,
+      "datatype": "number",
+      "examples": [
+        "142.7",
+        "138.2",
+        "98.4",
+        "105.1",
+        "161.3"
+      ],
+      "source_file": "/home/user/OnMaCoSci/examples/ontology_align/inputs/animal_fields.csv",
+      "source_type": "csv",
+      "extra_context": {}
+    },
+    "target_ontology_entity": {
+      "term_id": "hcm:ActivityMeasurement",
+      "label": "ActivityMeasurement",
+      "definition": "A quantitative recording of an animal's locomotor or exploratory activity over a defined time window.",
+      "synonyms": [
+        "locomotor activity",
+        "activity index",
+        "movement score",
+        "activity count"
+      ],
+      "parent_terms": [],
+      "term_type": "class",
+      "ontology_id": "hcm",
+      "ontology_source": "/home/user/OnMaCoSci/examples/ontology_align/inputs/hcm_profile.yaml",
+      "extra_context": {}
+    },
+    "ontology_relation": "skos:closeMatch",
+    "source_entity_type": "measurement",
+    "target_entity_type": "class",
+    "semantic_scope_analysis": "Lexical similarity: 0.950. Requires semantic validation.",
+    "hierarchy_compatibility": "unknown",
+    "domain_range_compatibility": "unknown",
+    "proposed_correction": null,
+    "ontology_extension_required": false,
+    "ontology_extension_proposal": null,
+    "semantic_warnings": [
+      {
+        "warning_type": "lexical_only_high_score",
+        "description": "Score 0.95 is high enough for exactMatch by lexical metrics, but lexical similarity alone is insufficient to establish skos:exactMatch. Semantic review required before upgrading to exactMatch.",
+        "severity": "warning"
+      }
+    ],
+    "warnings": []
+  },
+  {
+    "mapping_id": "oa-csv_locomotor_activity_index-hcm_BiologicalSex",
+    "evidence": [
+      {
+        "evidence_type": "lexical_similarity",
+        "description": "Label 'locomotor_activity_index' matched 'sex' with score 0.720",
+        "score": 0.72,
+        "source": "SemanticCandidateGenerator"
+      }
+    ],
+    "counter_evidence": [],
+    "confidence": 0.72,
+    "provenance": {
+      "created_by": "SemanticCandidateGenerator",
+      "created_at": "2026-05-22T17:24:18.690780",
+      "method": "lexical_similarity_v1",
+      "pipeline_run_id": "example-oa-001",
+      "extra": {}
+    },
+    "reviewer_notes": [],
+    "human_review_status": "awaiting_review",
+    "validation_status": "passed",
+    "rank": 2,
+    "source_concept": {
+      "entity_id": "csv:locomotor_activity_index",
+      "label": "locomotor_activity_index",
+      "description": null,
+      "datatype": "number",
+      "examples": [
+        "142.7",
+        "138.2",
+        "98.4",
+        "105.1",
+        "161.3"
+      ],
+      "source_file": "/home/user/OnMaCoSci/examples/ontology_align/inputs/animal_fields.csv",
+      "source_type": "csv",
+      "extra_context": {}
+    },
+    "target_ontology_entity": {
+      "term_id": "hcm:BiologicalSex",
+      "label": "BiologicalSex",
+      "definition": "The biological sex of the animal as determined by chromosomal, gonadal, or phenotypic criteria.",
+      "synonyms": [
+        "sex",
+        "gender",
+        "biological gender"
+      ],
+      "parent_terms": [
+        "hcm:Animal"
+      ],
+      "term_type": "class",
+      "ontology_id": "hcm",
+      "ontology_source": "/home/user/OnMaCoSci/examples/ontology_align/inputs/hcm_profile.yaml",
+      "extra_context": {}
+    },
+    "ontology_relation": "skos:broadMatch",
+    "source_entity_type": "measurement",
+    "target_entity_type": "class",
+    "semantic_scope_analysis": "Lexical similarity: 0.720. Requires semantic validation.",
+    "hierarchy_compatibility": "unknown",
+    "domain_range_compatibility": "unknown",
+    "proposed_correction": null,
+    "ontology_extension_required": false,
+    "ontology_extension_proposal": null,
+    "semantic_warnings": [],
+    "warnings": []
+  },
+  {
+    "mapping_id": "oa-csv_locomotor_activity_index-hcm_ExperimentalGroup",
+    "evidence": [
+      {
+        "evidence_type": "lexical_similarity",
+        "description": "Label 'locomotor_activity_index' matched 'cohort' with score 0.600",
+        "score": 0.6000000000000001,
+        "source": "SemanticCandidateGenerator"
+      }
+    ],
+    "counter_evidence": [],
+    "confidence": 0.6000000000000001,
+    "provenance": {
+      "created_by": "SemanticCandidateGenerator",
+      "created_at": "2026-05-22T17:24:18.690793",
+      "method": "lexical_similarity_v1",
+      "pipeline_run_id": "example-oa-001",
+      "extra": {}
+    },
+    "reviewer_notes": [],
+    "human_review_status": "awaiting_review",
+    "validation_status": "passed",
+    "rank": 3,
+    "source_concept": {
+      "entity_id": "csv:locomotor_activity_index",
+      "label": "locomotor_activity_index",
+      "description": null,
+      "datatype": "number",
+      "examples": [
+        "142.7",
+        "138.2",
+        "98.4",
+        "105.1",
+        "161.3"
+      ],
+      "source_file": "/home/user/OnMaCoSci/examples/ontology_align/inputs/animal_fields.csv",
+      "source_type": "csv",
+      "extra_context": {}
+    },
+    "target_ontology_entity": {
+      "term_id": "hcm:ExperimentalGroup",
+      "label": "ExperimentalGroup",
+      "definition": "A named group to which an animal is assigned for the purpose of experimental comparison.",
+      "synonyms": [
+        "study group",
+        "treatment group",
+        "cohort",
+        "experimental arm"
+      ],
+      "parent_terms": [],
+      "term_type": "class",
+      "ontology_id": "hcm",
+      "ontology_source": "/home/user/OnMaCoSci/examples/ontology_align/inputs/hcm_profile.yaml",
+      "extra_context": {}
+    },
+    "ontology_relation": "skos:broadMatch",
+    "source_entity_type": "measurement",
+    "target_entity_type": "class",
+    "semantic_scope_analysis": "Lexical similarity: 0.600. Requires semantic validation.",
+    "hierarchy_compatibility": "unknown",
+    "domain_range_compatibility": "unknown",
+    "proposed_correction": null,
+    "ontology_extension_required": false,
+    "ontology_extension_proposal": null,
+    "semantic_warnings": [],
+    "warnings": []
+  }
+]

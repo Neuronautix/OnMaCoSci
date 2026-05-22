@@ -1,0 +1,207 @@
+human_review_required: []
+mappings:
+- confidence: 0.6
+  datatype:
+    from: string
+    to: string
+  operation: nested_path
+  source_path: MouseID
+  target_path: animal.biologicalAttributes.sex
+- confidence: 0.4154
+  datatype:
+    from: string
+    to: string
+  operation: nested_path
+  source_path: MouseID
+  target_path: housing.cageIdentifier
+- confidence: 0.36
+  datatype:
+    from: string
+    to: string
+  operation: nested_path
+  source_path: MouseID
+  target_path: measurements.activity.date
+- confidence: 1.0
+  datatype:
+    from: string
+    to: string
+  operation: nested_path
+  source_path: Strain
+  target_path: animal.biologicalAttributes.strain
+- confidence: 0.5
+  datatype:
+    from: string
+    to: string
+  operation: nested_path
+  source_path: Strain
+  target_path: animal.externalId
+- confidence: 0.45
+  datatype:
+    from: string
+    to: string
+  operation: nested_path
+  source_path: Strain
+  target_path: animal.biologicalAttributes.sex
+- confidence: 1.0
+  datatype:
+    from: string
+    to: string
+  operation: nested_path
+  source_path: Sex
+  target_path: animal.biologicalAttributes.sex
+- confidence: 0.72
+  datatype:
+    from: string
+    to: string
+  operation: nested_path
+  source_path: Sex
+  target_path: animal.externalId
+- confidence: 0.72
+  datatype:
+    from: string
+    to: string
+  operation: nested_path
+  source_path: Sex
+  target_path: study.experimentalGroup
+- confidence: 0.4275
+  datatype:
+    from: number
+    to: string
+  operation: nested_path
+  source_path: Weight_g
+  target_path: housing.cageIdentifier
+  unit:
+    from: g
+    to: null
+  warnings:
+  - 'Datatype mismatch: source=number, target=string. Conversion required.'
+- confidence: 0.36
+  datatype:
+    from: number
+    to: string
+  operation: nested_path
+  source_path: Weight_g
+  target_path: animal.biologicalAttributes.sex
+  unit:
+    from: g
+    to: null
+  warnings:
+  - 'Datatype mismatch: source=number, target=string. Conversion required.'
+- confidence: 0.342
+  datatype:
+    from: number
+    to: string
+  operation: nested_path
+  source_path: Weight_g
+  target_path: measurements.activity.date
+  unit:
+    from: g
+    to: null
+  warnings:
+  - 'Datatype mismatch: source=number, target=string. Conversion required.'
+- confidence: 0.9
+  datatype:
+    from: string
+    to: string
+  operation: nested_path
+  source_path: Cage
+  target_path: housing.cageIdentifier
+- confidence: 0.5
+  datatype:
+    from: string
+    to: string
+  operation: nested_path
+  source_path: Cage
+  target_path: measurements.activity.date
+- confidence: 0.45
+  datatype:
+    from: string
+    to: string
+  operation: nested_path
+  source_path: Cage
+  target_path: study.experimentalGroup
+- confidence: 0.9
+  datatype:
+    from: string
+    to: string
+  operation: nested_path
+  source_path: Group
+  target_path: study.experimentalGroup
+- confidence: 0.3
+  datatype:
+    from: string
+    to: string
+  operation: nested_path
+  source_path: Group
+  target_path: housing.cageIdentifier
+- confidence: 0.6
+  datatype:
+    from: string
+    to: string
+  operation: nested_path
+  source_path: DeviceSerial
+  target_path: animal.biologicalAttributes.sex
+- confidence: 0.6
+  datatype:
+    from: string
+    to: string
+  operation: nested_path
+  source_path: DeviceSerial
+  target_path: measurements.activity.date
+- confidence: 0.4545
+  datatype:
+    from: string
+    to: string
+  operation: nested_path
+  source_path: DeviceSerial
+  target_path: animal.externalId
+- confidence: 0.5143
+  datatype:
+    from: integer
+    to: string
+  operation: nested_path
+  source_path: ActivityCount
+  target_path: measurements.activity.date
+  warnings:
+  - 'Datatype mismatch: source=integer, target=string. Conversion required.'
+- confidence: 0.36
+  datatype:
+    from: integer
+    to: string
+  operation: nested_path
+  source_path: ActivityCount
+  target_path: animal.biologicalAttributes.strain
+  warnings:
+  - 'Datatype mismatch: source=integer, target=string. Conversion required.'
+- confidence: 0.9
+  datatype:
+    from: string
+    to: string
+  operation: nested_path
+  source_path: RecordingDate
+  target_path: measurements.activity.date
+- confidence: 0.45
+  datatype:
+    from: string
+    to: string
+  operation: nested_path
+  source_path: RecordingDate
+  target_path: animal.biologicalAttributes.strain
+- confidence: 0.45
+  datatype:
+    from: string
+    to: string
+  operation: nested_path
+  source_path: RecordingDate
+  target_path: animal.biologicalAttributes.sex
+- confidence: 0.8
+  constant_value: g
+  operation: constant_assignment
+  source_path: null
+  target_path: measurements.bodyWeight.unit
+pipeline_run_id: example-sa-001
+unmapped_fields:
+- confidence: 0.2962962962962963
+  reason: No suitable target field found
+  source_path: ActivityCount
+version: '1.0'

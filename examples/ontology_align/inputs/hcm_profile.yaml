@@ -1,0 +1,92 @@
+ontology_id: hcm
+ontology_label: "Home Cage Monitoring Ontology (Mouse Preclinical)"
+ontology_source: "https://example.org/hcm"
+
+terms:
+  - term_id: "hcm:Animal"
+    label: "Animal"
+    definition: "A non-human vertebrate subject used in a preclinical study."
+    synonyms: ["Subject", "Mouse", "Rodent"]
+    parent_terms: []
+    term_type: "class"
+    ontology_id: "hcm"
+
+  - term_id: "hcm:AnimalIdentifier"
+    label: "AnimalIdentifier"
+    definition: "A unique identifier assigned to an individual animal within a study."
+    synonyms: ["animal ID", "subject ID", "animal code"]
+    parent_terms: ["hcm:Animal"]
+    term_type: "annotation_property"
+    ontology_id: "hcm"
+
+  - term_id: "hcm:GeneticBackground"
+    label: "GeneticBackground"
+    definition: "The genetic constitution of an animal, encompassing strain, breeding history, and inherited genetic modifications."
+    synonyms: ["genetic makeup", "genomic background", "genetic lineage"]
+    parent_terms: ["hcm:Animal"]
+    term_type: "class"
+    ontology_id: "hcm"
+
+  - term_id: "hcm:MouseStrain"
+    label: "MouseStrain"
+    definition: "A standardised inbred or outbred mouse line characterised by a stable genetic composition, e.g. C57BL/6J."
+    synonyms: ["strain", "mouse line", "inbred line", "mouse background"]
+    parent_terms: ["hcm:GeneticBackground"]
+    term_type: "class"
+    ontology_id: "hcm"
+
+  - term_id: "hcm:Genotype"
+    label: "Genotype"
+    definition: "The specific allelic composition at one or more genomic loci relevant to the study, e.g. WT, KO, HET."
+    synonyms: ["genomic genotype", "allelic status", "genetic modification status"]
+    parent_terms: ["hcm:GeneticBackground"]
+    term_type: "class"
+    ontology_id: "hcm"
+
+  - term_id: "hcm:BiologicalSex"
+    label: "BiologicalSex"
+    definition: "The biological sex of the animal as determined by chromosomal, gonadal, or phenotypic criteria."
+    synonyms: ["sex", "gender", "biological gender"]
+    parent_terms: ["hcm:Animal"]
+    term_type: "class"
+    ontology_id: "hcm"
+
+  - term_id: "hcm:HousingCage"
+    label: "HousingCage"
+    definition: "The physical housing unit in which one or more animals are kept during the study."
+    synonyms: ["cage", "home cage", "animal cage", "housing unit"]
+    parent_terms: []
+    term_type: "class"
+    ontology_id: "hcm"
+
+  - term_id: "hcm:BodyWeightMeasurement"
+    label: "BodyWeightMeasurement"
+    definition: "A quantitative measurement of an animal's total body mass, typically recorded in grams."
+    synonyms: ["body weight", "weight", "mass", "body mass"]
+    parent_terms: []
+    term_type: "class"
+    ontology_id: "hcm"
+
+  - term_id: "hcm:ExperimentalGroup"
+    label: "ExperimentalGroup"
+    definition: "A named group to which an animal is assigned for the purpose of experimental comparison."
+    synonyms: ["study group", "treatment group", "cohort", "experimental arm"]
+    parent_terms: []
+    term_type: "class"
+    ontology_id: "hcm"
+
+  - term_id: "hcm:HomeCageMonitoringDevice"
+    label: "HomeCageMonitoringDevice"
+    definition: "An automated instrument installed in the home cage to continuously record behavioural and physiological parameters."
+    synonyms: ["HCM device", "cage monitor", "home cage system", "monitoring device"]
+    parent_terms: []
+    term_type: "class"
+    ontology_id: "hcm"
+
+  - term_id: "hcm:ActivityMeasurement"
+    label: "ActivityMeasurement"
+    definition: "A quantitative recording of an animal's locomotor or exploratory activity over a defined time window."
+    synonyms: ["locomotor activity", "activity index", "movement score", "activity count"]
+    parent_terms: []
+    term_type: "class"
+    ontology_id: "hcm"

@@ -1,0 +1,7 @@
+animal_id,strain,sex,genotype,cage_id,body_weight,experimental_group,home_cage_monitoring_device,locomotor_activity_index
+A001,C57BL/6J,M,WT,C-12,24.3,Control,HCM-400,142.7
+A002,C57BL/6J,F,WT,C-12,21.1,Control,HCM-400,138.2
+A003,BALB/cJ,M,KO,C-13,26.8,Treatment,HCM-400,98.4
+A004,BALB/cJ,F,KO,C-13,22.9,Treatment,HCM-400,105.1
+A005,C57BL/6J,M,HET,C-14,25.1,Control,HCM-401,161.3
+A006,C57BL/6J,F,HET,C-14,20.7,Treatment,HCM-401,133.8

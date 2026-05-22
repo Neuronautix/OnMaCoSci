@@ -1,0 +1,1726 @@
+[
+  {
+    "mapping_id": "sa-MouseID-animal_biologicalAttributes_sex",
+    "evidence": [
+      {
+        "evidence_type": "lexical_similarity",
+        "description": "Field 'MouseID' matched 'sex' with score 0.600",
+        "score": 0.6000000000000001,
+        "source": "FieldCandidateGenerator"
+      }
+    ],
+    "counter_evidence": [],
+    "confidence": 0.6000000000000001,
+    "provenance": {
+      "created_by": "FieldCandidateGenerator",
+      "created_at": "2026-05-22T17:25:00.966955",
+      "method": "lexical_field_matching_v1",
+      "pipeline_run_id": "example-sa-001",
+      "extra": {}
+    },
+    "reviewer_notes": [],
+    "human_review_status": "awaiting_review",
+    "validation_status": "passed",
+    "rank": 1,
+    "warnings": [],
+    "source_path": "MouseID",
+    "target_path": "animal.biologicalAttributes.sex",
+    "mapping_operation": "nested_path",
+    "source_datatype": "string",
+    "target_datatype": "string",
+    "cardinality_relation": {
+      "source_cardinality": "0..1",
+      "target_cardinality": "0..1",
+      "note": null
+    },
+    "transformation_required": false,
+    "transformation_expression": null,
+    "unit_conversion": null,
+    "enumeration_mapping": {},
+    "missing_value_policy": null,
+    "information_loss": false,
+    "information_loss_description": null,
+    "executable_test_status": "not_tested",
+    "transformation_rule": {
+      "rule_id": "rule-4ccd3ab2",
+      "source_path": "MouseID",
+      "target_path": "animal.biologicalAttributes.sex",
+      "operation": "nested_path",
+      "constant_value": null,
+      "datatype_from": "string",
+      "datatype_to": "string",
+      "unit_from": null,
+      "unit_to": null,
+      "unit_conversion_factor": null,
+      "enumeration_map": {},
+      "expression": null,
+      "condition": null,
+      "lookup_table": null,
+      "notes": null,
+      "information_loss": false,
+      "information_loss_description": null
+    }
+  },
+  {
+    "mapping_id": "sa-MouseID-housing_cageIdentifier",
+    "evidence": [
+      {
+        "evidence_type": "lexical_similarity",
+        "description": "Field 'MouseID' matched 'cageIdentifier' with score 0.415",
+        "score": 0.4153846153846154,
+        "source": "FieldCandidateGenerator"
+      }
+    ],
+    "counter_evidence": [],
+    "confidence": 0.4153846153846154,
+    "provenance": {
+      "created_by": "FieldCandidateGenerator",
+      "created_at": "2026-05-22T17:25:00.967021",
+      "method": "lexical_field_matching_v1",
+      "pipeline_run_id": "example-sa-001",
+      "extra": {}
+    },
+    "reviewer_notes": [],
+    "human_review_status": "awaiting_review",
+    "validation_status": "passed",
+    "rank": 2,
+    "warnings": [],
+    "source_path": "MouseID",
+    "target_path": "housing.cageIdentifier",
+    "mapping_operation": "nested_path",
+    "source_datatype": "string",
+    "target_datatype": "string",
+    "cardinality_relation": {
+      "source_cardinality": "0..1",
+      "target_cardinality": "0..1",
+      "note": null
+    },
+    "transformation_required": false,
+    "transformation_expression": null,
+    "unit_conversion": null,
+    "enumeration_mapping": {},
+    "missing_value_policy": null,
+    "information_loss": false,
+    "information_loss_description": null,
+    "executable_test_status": "not_tested",
+    "transformation_rule": {
+      "rule_id": "rule-b221954c",
+      "source_path": "MouseID",
+      "target_path": "housing.cageIdentifier",
+      "operation": "nested_path",
+      "constant_value": null,
+      "datatype_from": "string",
+      "datatype_to": "string",
+      "unit_from": null,
+      "unit_to": null,
+      "unit_conversion_factor": null,
+      "enumeration_map": {},
+      "expression": null,
+      "condition": null,
+      "lookup_table": null,
+      "notes": null,
+      "information_loss": false,
+      "information_loss_description": null
+    }
+  },
+  {
+    "mapping_id": "sa-MouseID-measurements_activity_date",
+    "evidence": [
+      {
+        "evidence_type": "lexical_similarity",
+        "description": "Field 'MouseID' matched 'date' with score 0.360",
+        "score": 0.36,
+        "source": "FieldCandidateGenerator"
+      }
+    ],
+    "counter_evidence": [],
+    "confidence": 0.36,
+    "provenance": {
+      "created_by": "FieldCandidateGenerator",
+      "created_at": "2026-05-22T17:25:00.967057",
+      "method": "lexical_field_matching_v1",
+      "pipeline_run_id": "example-sa-001",
+      "extra": {}
+    },
+    "reviewer_notes": [],
+    "human_review_status": "awaiting_review",
+    "validation_status": "passed",
+    "rank": 3,
+    "warnings": [],
+    "source_path": "MouseID",
+    "target_path": "measurements.activity.date",
+    "mapping_operation": "nested_path",
+    "source_datatype": "string",
+    "target_datatype": "string",
+    "cardinality_relation": {
+      "source_cardinality": "0..1",
+      "target_cardinality": "0..1",
+      "note": null
+    },
+    "transformation_required": false,
+    "transformation_expression": null,
+    "unit_conversion": null,
+    "enumeration_mapping": {},
+    "missing_value_policy": null,
+    "information_loss": false,
+    "information_loss_description": null,
+    "executable_test_status": "not_tested",
+    "transformation_rule": {
+      "rule_id": "rule-55aadd3b",
+      "source_path": "MouseID",
+      "target_path": "measurements.activity.date",
+      "operation": "nested_path",
+      "constant_value": null,
+      "datatype_from": "string",
+      "datatype_to": "string",
+      "unit_from": null,
+      "unit_to": null,
+      "unit_conversion_factor": null,
+      "enumeration_map": {},
+      "expression": null,
+      "condition": null,
+      "lookup_table": null,
+      "notes": null,
+      "information_loss": false,
+      "information_loss_description": null
+    }
+  },
+  {
+    "mapping_id": "sa-Strain-animal_biologicalAttributes_strain",
+    "evidence": [
+      {
+        "evidence_type": "lexical_similarity",
+        "description": "Field 'Strain' matched 'strain' with score 1.000",
+        "score": 1.0,
+        "source": "FieldCandidateGenerator"
+      }
+    ],
+    "counter_evidence": [],
+    "confidence": 1.0,
+    "provenance": {
+      "created_by": "FieldCandidateGenerator",
+      "created_at": "2026-05-22T17:25:00.967143",
+      "method": "lexical_field_matching_v1",
+      "pipeline_run_id": "example-sa-001",
+      "extra": {}
+    },
+    "reviewer_notes": [],
+    "human_review_status": "awaiting_review",
+    "validation_status": "passed",
+    "rank": 1,
+    "warnings": [],
+    "source_path": "Strain",
+    "target_path": "animal.biologicalAttributes.strain",
+    "mapping_operation": "nested_path",
+    "source_datatype": "string",
+    "target_datatype": "string",
+    "cardinality_relation": {
+      "source_cardinality": "0..1",
+      "target_cardinality": "0..1",
+      "note": null
+    },
+    "transformation_required": false,
+    "transformation_expression": null,
+    "unit_conversion": null,
+    "enumeration_mapping": {},
+    "missing_value_policy": null,
+    "information_loss": false,
+    "information_loss_description": null,
+    "executable_test_status": "not_tested",
+    "transformation_rule": {
+      "rule_id": "rule-b5670f0d",
+      "source_path": "Strain",
+      "target_path": "animal.biologicalAttributes.strain",
+      "operation": "nested_path",
+      "constant_value": null,
+      "datatype_from": "string",
+      "datatype_to": "string",
+      "unit_from": null,
+      "unit_to": null,
+      "unit_conversion_factor": null,
+      "enumeration_map": {},
+      "expression": null,
+      "condition": null,
+      "lookup_table": null,
+      "notes": null,
+      "information_loss": false,
+      "information_loss_description": null
+    }
+  },
+  {
+    "mapping_id": "sa-Strain-animal_externalId",
+    "evidence": [
+      {
+        "evidence_type": "lexical_similarity",
+        "description": "Field 'Strain' matched 'externalId' with score 0.500",
+        "score": 0.5,
+        "source": "FieldCandidateGenerator"
+      }
+    ],
+    "counter_evidence": [],
+    "confidence": 0.5,
+    "provenance": {
+      "created_by": "FieldCandidateGenerator",
+      "created_at": "2026-05-22T17:25:00.967170",
+      "method": "lexical_field_matching_v1",
+      "pipeline_run_id": "example-sa-001",
+      "extra": {}
+    },
+    "reviewer_notes": [],
+    "human_review_status": "awaiting_review",
+    "validation_status": "passed",
+    "rank": 2,
+    "warnings": [],
+    "source_path": "Strain",
+    "target_path": "animal.externalId",
+    "mapping_operation": "nested_path",
+    "source_datatype": "string",
+    "target_datatype": "string",
+    "cardinality_relation": {
+      "source_cardinality": "0..1",
+      "target_cardinality": "0..1",
+      "note": null
+    },
+    "transformation_required": false,
+    "transformation_expression": null,
+    "unit_conversion": null,
+    "enumeration_mapping": {},
+    "missing_value_policy": null,
+    "information_loss": false,
+    "information_loss_description": null,
+    "executable_test_status": "not_tested",
+    "transformation_rule": {
+      "rule_id": "rule-d7ebd547",
+      "source_path": "Strain",
+      "target_path": "animal.externalId",
+      "operation": "nested_path",
+      "constant_value": null,
+      "datatype_from": "string",
+      "datatype_to": "string",
+      "unit_from": null,
+      "unit_to": null,
+      "unit_conversion_factor": null,
+      "enumeration_map": {},
+      "expression": null,
+      "condition": null,
+      "lookup_table": null,
+      "notes": null,
+      "information_loss": false,
+      "information_loss_description": null
+    }
+  },
+  {
+    "mapping_id": "sa-Strain-animal_biologicalAttributes_sex",
+    "evidence": [
+      {
+        "evidence_type": "lexical_similarity",
+        "description": "Field 'Strain' matched 'sex' with score 0.450",
+        "score": 0.45,
+        "source": "FieldCandidateGenerator"
+      }
+    ],
+    "counter_evidence": [],
+    "confidence": 0.45,
+    "provenance": {
+      "created_by": "FieldCandidateGenerator",
+      "created_at": "2026-05-22T17:25:00.967194",
+      "method": "lexical_field_matching_v1",
+      "pipeline_run_id": "example-sa-001",
+      "extra": {}
+    },
+    "reviewer_notes": [],
+    "human_review_status": "awaiting_review",
+    "validation_status": "passed",
+    "rank": 3,
+    "warnings": [],
+    "source_path": "Strain",
+    "target_path": "animal.biologicalAttributes.sex",
+    "mapping_operation": "nested_path",
+    "source_datatype": "string",
+    "target_datatype": "string",
+    "cardinality_relation": {
+      "source_cardinality": "0..1",
+      "target_cardinality": "0..1",
+      "note": null
+    },
+    "transformation_required": false,
+    "transformation_expression": null,
+    "unit_conversion": null,
+    "enumeration_mapping": {},
+    "missing_value_policy": null,
+    "information_loss": false,
+    "information_loss_description": null,
+    "executable_test_status": "not_tested",
+    "transformation_rule": {
+      "rule_id": "rule-5c28c461",
+      "source_path": "Strain",
+      "target_path": "animal.biologicalAttributes.sex",
+      "operation": "nested_path",
+      "constant_value": null,
+      "datatype_from": "string",
+      "datatype_to": "string",
+      "unit_from": null,
+      "unit_to": null,
+      "unit_conversion_factor": null,
+      "enumeration_map": {},
+      "expression": null,
+      "condition": null,
+      "lookup_table": null,
+      "notes": null,
+      "information_loss": false,
+      "information_loss_description": null
+    }
+  },
+  {
+    "mapping_id": "sa-Sex-animal_biologicalAttributes_sex",
+    "evidence": [
+      {
+        "evidence_type": "lexical_similarity",
+        "description": "Field 'Sex' matched 'sex' with score 1.000",
+        "score": 1.0,
+        "source": "FieldCandidateGenerator"
+      }
+    ],
+    "counter_evidence": [],
+    "confidence": 1.0,
+    "provenance": {
+      "created_by": "FieldCandidateGenerator",
+      "created_at": "2026-05-22T17:25:00.967258",
+      "method": "lexical_field_matching_v1",
+      "pipeline_run_id": "example-sa-001",
+      "extra": {}
+    },
+    "reviewer_notes": [],
+    "human_review_status": "awaiting_review",
+    "validation_status": "passed",
+    "rank": 1,
+    "warnings": [],
+    "source_path": "Sex",
+    "target_path": "animal.biologicalAttributes.sex",
+    "mapping_operation": "nested_path",
+    "source_datatype": "string",
+    "target_datatype": "string",
+    "cardinality_relation": {
+      "source_cardinality": "0..1",
+      "target_cardinality": "0..1",
+      "note": null
+    },
+    "transformation_required": false,
+    "transformation_expression": null,
+    "unit_conversion": null,
+    "enumeration_mapping": {},
+    "missing_value_policy": null,
+    "information_loss": false,
+    "information_loss_description": null,
+    "executable_test_status": "not_tested",
+    "transformation_rule": {
+      "rule_id": "rule-880e6335",
+      "source_path": "Sex",
+      "target_path": "animal.biologicalAttributes.sex",
+      "operation": "nested_path",
+      "constant_value": null,
+      "datatype_from": "string",
+      "datatype_to": "string",
+      "unit_from": null,
+      "unit_to": null,
+      "unit_conversion_factor": null,
+      "enumeration_map": {},
+      "expression": null,
+      "condition": null,
+      "lookup_table": null,
+      "notes": null,
+      "information_loss": false,
+      "information_loss_description": null
+    }
+  },
+  {
+    "mapping_id": "sa-Sex-animal_externalId",
+    "evidence": [
+      {
+        "evidence_type": "lexical_similarity",
+        "description": "Field 'Sex' matched 'externalId' with score 0.720",
+        "score": 0.72,
+        "source": "FieldCandidateGenerator"
+      }
+    ],
+    "counter_evidence": [],
+    "confidence": 0.72,
+    "provenance": {
+      "created_by": "FieldCandidateGenerator",
+      "created_at": "2026-05-22T17:25:00.967291",
+      "method": "lexical_field_matching_v1",
+      "pipeline_run_id": "example-sa-001",
+      "extra": {}
+    },
+    "reviewer_notes": [],
+    "human_review_status": "awaiting_review",
+    "validation_status": "passed",
+    "rank": 2,
+    "warnings": [],
+    "source_path": "Sex",
+    "target_path": "animal.externalId",
+    "mapping_operation": "nested_path",
+    "source_datatype": "string",
+    "target_datatype": "string",
+    "cardinality_relation": {
+      "source_cardinality": "0..1",
+      "target_cardinality": "0..1",
+      "note": null
+    },
+    "transformation_required": false,
+    "transformation_expression": null,
+    "unit_conversion": null,
+    "enumeration_mapping": {},
+    "missing_value_policy": null,
+    "information_loss": false,
+    "information_loss_description": null,
+    "executable_test_status": "not_tested",
+    "transformation_rule": {
+      "rule_id": "rule-56fe2ace",
+      "source_path": "Sex",
+      "target_path": "animal.externalId",
+      "operation": "nested_path",
+      "constant_value": null,
+      "datatype_from": "string",
+      "datatype_to": "string",
+      "unit_from": null,
+      "unit_to": null,
+      "unit_conversion_factor": null,
+      "enumeration_map": {},
+      "expression": null,
+      "condition": null,
+      "lookup_table": null,
+      "notes": null,
+      "information_loss": false,
+      "information_loss_description": null
+    }
+  },
+  {
+    "mapping_id": "sa-Sex-study_experimentalGroup",
+    "evidence": [
+      {
+        "evidence_type": "lexical_similarity",
+        "description": "Field 'Sex' matched 'experimentalGroup' with score 0.720",
+        "score": 0.72,
+        "source": "FieldCandidateGenerator"
+      }
+    ],
+    "counter_evidence": [],
+    "confidence": 0.72,
+    "provenance": {
+      "created_by": "FieldCandidateGenerator",
+      "created_at": "2026-05-22T17:25:00.967318",
+      "method": "lexical_field_matching_v1",
+      "pipeline_run_id": "example-sa-001",
+      "extra": {}
+    },
+    "reviewer_notes": [],
+    "human_review_status": "awaiting_review",
+    "validation_status": "passed",
+    "rank": 3,
+    "warnings": [],
+    "source_path": "Sex",
+    "target_path": "study.experimentalGroup",
+    "mapping_operation": "nested_path",
+    "source_datatype": "string",
+    "target_datatype": "string",
+    "cardinality_relation": {
+      "source_cardinality": "0..1",
+      "target_cardinality": "0..1",
+      "note": null
+    },
+    "transformation_required": false,
+    "transformation_expression": null,
+    "unit_conversion": null,
+    "enumeration_mapping": {},
+    "missing_value_policy": null,
+    "information_loss": false,
+    "information_loss_description": null,
+    "executable_test_status": "not_tested",
+    "transformation_rule": {
+      "rule_id": "rule-ff4784c7",
+      "source_path": "Sex",
+      "target_path": "study.experimentalGroup",
+      "operation": "nested_path",
+      "constant_value": null,
+      "datatype_from": "string",
+      "datatype_to": "string",
+      "unit_from": null,
+      "unit_to": null,
+      "unit_conversion_factor": null,
+      "enumeration_map": {},
+      "expression": null,
+      "condition": null,
+      "lookup_table": null,
+      "notes": null,
+      "information_loss": false,
+      "information_loss_description": null
+    }
+  },
+  {
+    "mapping_id": "sa-Weight_g-housing_cageIdentifier",
+    "evidence": [
+      {
+        "evidence_type": "lexical_similarity",
+        "description": "Field 'Weight g' matched 'cageIdentifier' with score 0.427",
+        "score": 0.4275,
+        "source": "FieldCandidateGenerator"
+      }
+    ],
+    "counter_evidence": [
+      {
+        "evidence_type": "datatype_mismatch",
+        "description": "Datatype mismatch: source=number, target=string. Conversion required.",
+        "score": null,
+        "source": "FieldCandidateGenerator"
+      }
+    ],
+    "confidence": 0.4275,
+    "provenance": {
+      "created_by": "FieldCandidateGenerator",
+      "created_at": "2026-05-22T17:25:00.967395",
+      "method": "lexical_field_matching_v1",
+      "pipeline_run_id": "example-sa-001",
+      "extra": {}
+    },
+    "reviewer_notes": [],
+    "human_review_status": "awaiting_review",
+    "validation_status": "passed",
+    "rank": 1,
+    "warnings": [
+      "Datatype mismatch: source=number, target=string. Conversion required."
+    ],
+    "source_path": "Weight_g",
+    "target_path": "housing.cageIdentifier",
+    "mapping_operation": "nested_path",
+    "source_datatype": "number",
+    "target_datatype": "string",
+    "cardinality_relation": {
+      "source_cardinality": "0..1",
+      "target_cardinality": "0..1",
+      "note": null
+    },
+    "transformation_required": false,
+    "transformation_expression": null,
+    "unit_conversion": null,
+    "enumeration_mapping": {},
+    "missing_value_policy": null,
+    "information_loss": false,
+    "information_loss_description": null,
+    "executable_test_status": "not_tested",
+    "transformation_rule": {
+      "rule_id": "rule-af5b2e57",
+      "source_path": "Weight_g",
+      "target_path": "housing.cageIdentifier",
+      "operation": "nested_path",
+      "constant_value": null,
+      "datatype_from": "number",
+      "datatype_to": "string",
+      "unit_from": "g",
+      "unit_to": null,
+      "unit_conversion_factor": null,
+      "enumeration_map": {},
+      "expression": null,
+      "condition": null,
+      "lookup_table": null,
+      "notes": null,
+      "information_loss": false,
+      "information_loss_description": null
+    }
+  },
+  {
+    "mapping_id": "sa-Weight_g-animal_biologicalAttributes_sex",
+    "evidence": [
+      {
+        "evidence_type": "lexical_similarity",
+        "description": "Field 'Weight g' matched 'sex' with score 0.360",
+        "score": 0.36,
+        "source": "FieldCandidateGenerator"
+      }
+    ],
+    "counter_evidence": [
+      {
+        "evidence_type": "datatype_mismatch",
+        "description": "Datatype mismatch: source=number, target=string. Conversion required.",
+        "score": null,
+        "source": "FieldCandidateGenerator"
+      }
+    ],
+    "confidence": 0.36,
+    "provenance": {
+      "created_by": "FieldCandidateGenerator",
+      "created_at": "2026-05-22T17:25:00.967607",
+      "method": "lexical_field_matching_v1",
+      "pipeline_run_id": "example-sa-001",
+      "extra": {}
+    },
+    "reviewer_notes": [],
+    "human_review_status": "awaiting_review",
+    "validation_status": "passed",
+    "rank": 2,
+    "warnings": [
+      "Datatype mismatch: source=number, target=string. Conversion required."
+    ],
+    "source_path": "Weight_g",
+    "target_path": "animal.biologicalAttributes.sex",
+    "mapping_operation": "nested_path",
+    "source_datatype": "number",
+    "target_datatype": "string",
+    "cardinality_relation": {
+      "source_cardinality": "0..1",
+      "target_cardinality": "0..1",
+      "note": null
+    },
+    "transformation_required": false,
+    "transformation_expression": null,
+    "unit_conversion": null,
+    "enumeration_mapping": {},
+    "missing_value_policy": null,
+    "information_loss": false,
+    "information_loss_description": null,
+    "executable_test_status": "not_tested",
+    "transformation_rule": {
+      "rule_id": "rule-8ba8964a",
+      "source_path": "Weight_g",
+      "target_path": "animal.biologicalAttributes.sex",
+      "operation": "nested_path",
+      "constant_value": null,
+      "datatype_from": "number",
+      "datatype_to": "string",
+      "unit_from": "g",
+      "unit_to": null,
+      "unit_conversion_factor": null,
+      "enumeration_map": {},
+      "expression": null,
+      "condition": null,
+      "lookup_table": null,
+      "notes": null,
+      "information_loss": false,
+      "information_loss_description": null
+    }
+  },
+  {
+    "mapping_id": "sa-Weight_g-measurements_activity_date",
+    "evidence": [
+      {
+        "evidence_type": "lexical_similarity",
+        "description": "Field 'Weight g' matched 'date' with score 0.342",
+        "score": 0.342,
+        "source": "FieldCandidateGenerator"
+      }
+    ],
+    "counter_evidence": [
+      {
+        "evidence_type": "datatype_mismatch",
+        "description": "Datatype mismatch: source=number, target=string. Conversion required.",
+        "score": null,
+        "source": "FieldCandidateGenerator"
+      }
+    ],
+    "confidence": 0.342,
+    "provenance": {
+      "created_by": "FieldCandidateGenerator",
+      "created_at": "2026-05-22T17:25:00.967647",
+      "method": "lexical_field_matching_v1",
+      "pipeline_run_id": "example-sa-001",
+      "extra": {}
+    },
+    "reviewer_notes": [],
+    "human_review_status": "awaiting_review",
+    "validation_status": "passed",
+    "rank": 3,
+    "warnings": [
+      "Datatype mismatch: source=number, target=string. Conversion required."
+    ],
+    "source_path": "Weight_g",
+    "target_path": "measurements.activity.date",
+    "mapping_operation": "nested_path",
+    "source_datatype": "number",
+    "target_datatype": "string",
+    "cardinality_relation": {
+      "source_cardinality": "0..1",
+      "target_cardinality": "0..1",
+      "note": null
+    },
+    "transformation_required": false,
+    "transformation_expression": null,
+    "unit_conversion": null,
+    "enumeration_mapping": {},
+    "missing_value_policy": null,
+    "information_loss": false,
+    "information_loss_description": null,
+    "executable_test_status": "not_tested",
+    "transformation_rule": {
+      "rule_id": "rule-7447a98d",
+      "source_path": "Weight_g",
+      "target_path": "measurements.activity.date",
+      "operation": "nested_path",
+      "constant_value": null,
+      "datatype_from": "number",
+      "datatype_to": "string",
+      "unit_from": "g",
+      "unit_to": null,
+      "unit_conversion_factor": null,
+      "enumeration_map": {},
+      "expression": null,
+      "condition": null,
+      "lookup_table": null,
+      "notes": null,
+      "information_loss": false,
+      "information_loss_description": null
+    }
+  },
+  {
+    "mapping_id": "sa-Cage-housing_cageIdentifier",
+    "evidence": [
+      {
+        "evidence_type": "lexical_similarity",
+        "description": "Field 'Cage' matched 'cageIdentifier' with score 0.900",
+        "score": 0.9,
+        "source": "FieldCandidateGenerator"
+      }
+    ],
+    "counter_evidence": [],
+    "confidence": 0.9,
+    "provenance": {
+      "created_by": "FieldCandidateGenerator",
+      "created_at": "2026-05-22T17:25:00.967750",
+      "method": "lexical_field_matching_v1",
+      "pipeline_run_id": "example-sa-001",
+      "extra": {}
+    },
+    "reviewer_notes": [],
+    "human_review_status": "awaiting_review",
+    "validation_status": "passed",
+    "rank": 1,
+    "warnings": [],
+    "source_path": "Cage",
+    "target_path": "housing.cageIdentifier",
+    "mapping_operation": "nested_path",
+    "source_datatype": "string",
+    "target_datatype": "string",
+    "cardinality_relation": {
+      "source_cardinality": "0..1",
+      "target_cardinality": "0..1",
+      "note": null
+    },
+    "transformation_required": false,
+    "transformation_expression": null,
+    "unit_conversion": null,
+    "enumeration_mapping": {},
+    "missing_value_policy": null,
+    "information_loss": false,
+    "information_loss_description": null,
+    "executable_test_status": "not_tested",
+    "transformation_rule": {
+      "rule_id": "rule-6c4531e5",
+      "source_path": "Cage",
+      "target_path": "housing.cageIdentifier",
+      "operation": "nested_path",
+      "constant_value": null,
+      "datatype_from": "string",
+      "datatype_to": "string",
+      "unit_from": null,
+      "unit_to": null,
+      "unit_conversion_factor": null,
+      "enumeration_map": {},
+      "expression": null,
+      "condition": null,
+      "lookup_table": null,
+      "notes": null,
+      "information_loss": false,
+      "information_loss_description": null
+    }
+  },
+  {
+    "mapping_id": "sa-Cage-measurements_activity_date",
+    "evidence": [
+      {
+        "evidence_type": "lexical_similarity",
+        "description": "Field 'Cage' matched 'date' with score 0.500",
+        "score": 0.5,
+        "source": "FieldCandidateGenerator"
+      }
+    ],
+    "counter_evidence": [],
+    "confidence": 0.5,
+    "provenance": {
+      "created_by": "FieldCandidateGenerator",
+      "created_at": "2026-05-22T17:25:00.967781",
+      "method": "lexical_field_matching_v1",
+      "pipeline_run_id": "example-sa-001",
+      "extra": {}
+    },
+    "reviewer_notes": [],
+    "human_review_status": "awaiting_review",
+    "validation_status": "passed",
+    "rank": 2,
+    "warnings": [],
+    "source_path": "Cage",
+    "target_path": "measurements.activity.date",
+    "mapping_operation": "nested_path",
+    "source_datatype": "string",
+    "target_datatype": "string",
+    "cardinality_relation": {
+      "source_cardinality": "0..1",
+      "target_cardinality": "0..1",
+      "note": null
+    },
+    "transformation_required": false,
+    "transformation_expression": null,
+    "unit_conversion": null,
+    "enumeration_mapping": {},
+    "missing_value_policy": null,
+    "information_loss": false,
+    "information_loss_description": null,
+    "executable_test_status": "not_tested",
+    "transformation_rule": {
+      "rule_id": "rule-4d02e86b",
+      "source_path": "Cage",
+      "target_path": "measurements.activity.date",
+      "operation": "nested_path",
+      "constant_value": null,
+      "datatype_from": "string",
+      "datatype_to": "string",
+      "unit_from": null,
+      "unit_to": null,
+      "unit_conversion_factor": null,
+      "enumeration_map": {},
+      "expression": null,
+      "condition": null,
+      "lookup_table": null,
+      "notes": null,
+      "information_loss": false,
+      "information_loss_description": null
+    }
+  },
+  {
+    "mapping_id": "sa-Cage-study_experimentalGroup",
+    "evidence": [
+      {
+        "evidence_type": "lexical_similarity",
+        "description": "Field 'Cage' matched 'experimentalGroup' with score 0.450",
+        "score": 0.45,
+        "source": "FieldCandidateGenerator"
+      }
+    ],
+    "counter_evidence": [],
+    "confidence": 0.45,
+    "provenance": {
+      "created_by": "FieldCandidateGenerator",
+      "created_at": "2026-05-22T17:25:00.967806",
+      "method": "lexical_field_matching_v1",
+      "pipeline_run_id": "example-sa-001",
+      "extra": {}
+    },
+    "reviewer_notes": [],
+    "human_review_status": "awaiting_review",
+    "validation_status": "passed",
+    "rank": 3,
+    "warnings": [],
+    "source_path": "Cage",
+    "target_path": "study.experimentalGroup",
+    "mapping_operation": "nested_path",
+    "source_datatype": "string",
+    "target_datatype": "string",
+    "cardinality_relation": {
+      "source_cardinality": "0..1",
+      "target_cardinality": "0..1",
+      "note": null
+    },
+    "transformation_required": false,
+    "transformation_expression": null,
+    "unit_conversion": null,
+    "enumeration_mapping": {},
+    "missing_value_policy": null,
+    "information_loss": false,
+    "information_loss_description": null,
+    "executable_test_status": "not_tested",
+    "transformation_rule": {
+      "rule_id": "rule-08032c6a",
+      "source_path": "Cage",
+      "target_path": "study.experimentalGroup",
+      "operation": "nested_path",
+      "constant_value": null,
+      "datatype_from": "string",
+      "datatype_to": "string",
+      "unit_from": null,
+      "unit_to": null,
+      "unit_conversion_factor": null,
+      "enumeration_map": {},
+      "expression": null,
+      "condition": null,
+      "lookup_table": null,
+      "notes": null,
+      "information_loss": false,
+      "information_loss_description": null
+    }
+  },
+  {
+    "mapping_id": "sa-Group-study_experimentalGroup",
+    "evidence": [
+      {
+        "evidence_type": "lexical_similarity",
+        "description": "Field 'Group' matched 'experimentalGroup' with score 0.900",
+        "score": 0.9,
+        "source": "FieldCandidateGenerator"
+      }
+    ],
+    "counter_evidence": [],
+    "confidence": 0.9,
+    "provenance": {
+      "created_by": "FieldCandidateGenerator",
+      "created_at": "2026-05-22T17:25:00.967878",
+      "method": "lexical_field_matching_v1",
+      "pipeline_run_id": "example-sa-001",
+      "extra": {}
+    },
+    "reviewer_notes": [],
+    "human_review_status": "awaiting_review",
+    "validation_status": "passed",
+    "rank": 1,
+    "warnings": [],
+    "source_path": "Group",
+    "target_path": "study.experimentalGroup",
+    "mapping_operation": "nested_path",
+    "source_datatype": "string",
+    "target_datatype": "string",
+    "cardinality_relation": {
+      "source_cardinality": "0..1",
+      "target_cardinality": "0..1",
+      "note": null
+    },
+    "transformation_required": false,
+    "transformation_expression": null,
+    "unit_conversion": null,
+    "enumeration_mapping": {},
+    "missing_value_policy": null,
+    "information_loss": false,
+    "information_loss_description": null,
+    "executable_test_status": "not_tested",
+    "transformation_rule": {
+      "rule_id": "rule-f0722036",
+      "source_path": "Group",
+      "target_path": "study.experimentalGroup",
+      "operation": "nested_path",
+      "constant_value": null,
+      "datatype_from": "string",
+      "datatype_to": "string",
+      "unit_from": null,
+      "unit_to": null,
+      "unit_conversion_factor": null,
+      "enumeration_map": {},
+      "expression": null,
+      "condition": null,
+      "lookup_table": null,
+      "notes": null,
+      "information_loss": false,
+      "information_loss_description": null
+    }
+  },
+  {
+    "mapping_id": "sa-Group-housing_cageIdentifier",
+    "evidence": [
+      {
+        "evidence_type": "lexical_similarity",
+        "description": "Field 'Group' matched 'cageIdentifier' with score 0.300",
+        "score": 0.30000000000000004,
+        "source": "FieldCandidateGenerator"
+      }
+    ],
+    "counter_evidence": [],
+    "confidence": 0.30000000000000004,
+    "provenance": {
+      "created_by": "FieldCandidateGenerator",
+      "created_at": "2026-05-22T17:25:00.967905",
+      "method": "lexical_field_matching_v1",
+      "pipeline_run_id": "example-sa-001",
+      "extra": {}
+    },
+    "reviewer_notes": [],
+    "human_review_status": "awaiting_review",
+    "validation_status": "passed",
+    "rank": 2,
+    "warnings": [],
+    "source_path": "Group",
+    "target_path": "housing.cageIdentifier",
+    "mapping_operation": "nested_path",
+    "source_datatype": "string",
+    "target_datatype": "string",
+    "cardinality_relation": {
+      "source_cardinality": "0..1",
+      "target_cardinality": "0..1",
+      "note": null
+    },
+    "transformation_required": false,
+    "transformation_expression": null,
+    "unit_conversion": null,
+    "enumeration_mapping": {},
+    "missing_value_policy": null,
+    "information_loss": false,
+    "information_loss_description": null,
+    "executable_test_status": "not_tested",
+    "transformation_rule": {
+      "rule_id": "rule-8788c295",
+      "source_path": "Group",
+      "target_path": "housing.cageIdentifier",
+      "operation": "nested_path",
+      "constant_value": null,
+      "datatype_from": "string",
+      "datatype_to": "string",
+      "unit_from": null,
+      "unit_to": null,
+      "unit_conversion_factor": null,
+      "enumeration_map": {},
+      "expression": null,
+      "condition": null,
+      "lookup_table": null,
+      "notes": null,
+      "information_loss": false,
+      "information_loss_description": null
+    }
+  },
+  {
+    "mapping_id": "sa-DeviceSerial-animal_biologicalAttributes_sex",
+    "evidence": [
+      {
+        "evidence_type": "lexical_similarity",
+        "description": "Field 'DeviceSerial' matched 'sex' with score 0.600",
+        "score": 0.6000000000000001,
+        "source": "FieldCandidateGenerator"
+      }
+    ],
+    "counter_evidence": [],
+    "confidence": 0.6000000000000001,
+    "provenance": {
+      "created_by": "FieldCandidateGenerator",
+      "created_at": "2026-05-22T17:25:00.967991",
+      "method": "lexical_field_matching_v1",
+      "pipeline_run_id": "example-sa-001",
+      "extra": {}
+    },
+    "reviewer_notes": [],
+    "human_review_status": "awaiting_review",
+    "validation_status": "passed",
+    "rank": 1,
+    "warnings": [],
+    "source_path": "DeviceSerial",
+    "target_path": "animal.biologicalAttributes.sex",
+    "mapping_operation": "nested_path",
+    "source_datatype": "string",
+    "target_datatype": "string",
+    "cardinality_relation": {
+      "source_cardinality": "0..1",
+      "target_cardinality": "0..1",
+      "note": null
+    },
+    "transformation_required": false,
+    "transformation_expression": null,
+    "unit_conversion": null,
+    "enumeration_mapping": {},
+    "missing_value_policy": null,
+    "information_loss": false,
+    "information_loss_description": null,
+    "executable_test_status": "not_tested",
+    "transformation_rule": {
+      "rule_id": "rule-c0429ade",
+      "source_path": "DeviceSerial",
+      "target_path": "animal.biologicalAttributes.sex",
+      "operation": "nested_path",
+      "constant_value": null,
+      "datatype_from": "string",
+      "datatype_to": "string",
+      "unit_from": null,
+      "unit_to": null,
+      "unit_conversion_factor": null,
+      "enumeration_map": {},
+      "expression": null,
+      "condition": null,
+      "lookup_table": null,
+      "notes": null,
+      "information_loss": false,
+      "information_loss_description": null
+    }
+  },
+  {
+    "mapping_id": "sa-DeviceSerial-measurements_activity_date",
+    "evidence": [
+      {
+        "evidence_type": "lexical_similarity",
+        "description": "Field 'DeviceSerial' matched 'date' with score 0.600",
+        "score": 0.6000000000000001,
+        "source": "FieldCandidateGenerator"
+      }
+    ],
+    "counter_evidence": [],
+    "confidence": 0.6000000000000001,
+    "provenance": {
+      "created_by": "FieldCandidateGenerator",
+      "created_at": "2026-05-22T17:25:00.968017",
+      "method": "lexical_field_matching_v1",
+      "pipeline_run_id": "example-sa-001",
+      "extra": {}
+    },
+    "reviewer_notes": [],
+    "human_review_status": "awaiting_review",
+    "validation_status": "passed",
+    "rank": 2,
+    "warnings": [],
+    "source_path": "DeviceSerial",
+    "target_path": "measurements.activity.date",
+    "mapping_operation": "nested_path",
+    "source_datatype": "string",
+    "target_datatype": "string",
+    "cardinality_relation": {
+      "source_cardinality": "0..1",
+      "target_cardinality": "0..1",
+      "note": null
+    },
+    "transformation_required": false,
+    "transformation_expression": null,
+    "unit_conversion": null,
+    "enumeration_mapping": {},
+    "missing_value_policy": null,
+    "information_loss": false,
+    "information_loss_description": null,
+    "executable_test_status": "not_tested",
+    "transformation_rule": {
+      "rule_id": "rule-9a85b40c",
+      "source_path": "DeviceSerial",
+      "target_path": "measurements.activity.date",
+      "operation": "nested_path",
+      "constant_value": null,
+      "datatype_from": "string",
+      "datatype_to": "string",
+      "unit_from": null,
+      "unit_to": null,
+      "unit_conversion_factor": null,
+      "enumeration_map": {},
+      "expression": null,
+      "condition": null,
+      "lookup_table": null,
+      "notes": null,
+      "information_loss": false,
+      "information_loss_description": null
+    }
+  },
+  {
+    "mapping_id": "sa-DeviceSerial-animal_externalId",
+    "evidence": [
+      {
+        "evidence_type": "lexical_similarity",
+        "description": "Field 'DeviceSerial' matched 'externalId' with score 0.455",
+        "score": 0.4545454545454546,
+        "source": "FieldCandidateGenerator"
+      }
+    ],
+    "counter_evidence": [],
+    "confidence": 0.4545454545454546,
+    "provenance": {
+      "created_by": "FieldCandidateGenerator",
+      "created_at": "2026-05-22T17:25:00.968037",
+      "method": "lexical_field_matching_v1",
+      "pipeline_run_id": "example-sa-001",
+      "extra": {}
+    },
+    "reviewer_notes": [],
+    "human_review_status": "awaiting_review",
+    "validation_status": "passed",
+    "rank": 3,
+    "warnings": [],
+    "source_path": "DeviceSerial",
+    "target_path": "animal.externalId",
+    "mapping_operation": "nested_path",
+    "source_datatype": "string",
+    "target_datatype": "string",
+    "cardinality_relation": {
+      "source_cardinality": "0..1",
+      "target_cardinality": "0..1",
+      "note": null
+    },
+    "transformation_required": false,
+    "transformation_expression": null,
+    "unit_conversion": null,
+    "enumeration_mapping": {},
+    "missing_value_policy": null,
+    "information_loss": false,
+    "information_loss_description": null,
+    "executable_test_status": "not_tested",
+    "transformation_rule": {
+      "rule_id": "rule-5056fbdb",
+      "source_path": "DeviceSerial",
+      "target_path": "animal.externalId",
+      "operation": "nested_path",
+      "constant_value": null,
+      "datatype_from": "string",
+      "datatype_to": "string",
+      "unit_from": null,
+      "unit_to": null,
+      "unit_conversion_factor": null,
+      "enumeration_map": {},
+      "expression": null,
+      "condition": null,
+      "lookup_table": null,
+      "notes": null,
+      "information_loss": false,
+      "information_loss_description": null
+    }
+  },
+  {
+    "mapping_id": "sa-ActivityCount-measurements_activity_date",
+    "evidence": [
+      {
+        "evidence_type": "lexical_similarity",
+        "description": "Field 'ActivityCount' matched 'date' with score 0.514",
+        "score": 0.5142857142857142,
+        "source": "FieldCandidateGenerator"
+      }
+    ],
+    "counter_evidence": [
+      {
+        "evidence_type": "datatype_mismatch",
+        "description": "Datatype mismatch: source=integer, target=string. Conversion required.",
+        "score": null,
+        "source": "FieldCandidateGenerator"
+      }
+    ],
+    "confidence": 0.5142857142857142,
+    "provenance": {
+      "created_by": "FieldCandidateGenerator",
+      "created_at": "2026-05-22T17:25:00.968111",
+      "method": "lexical_field_matching_v1",
+      "pipeline_run_id": "example-sa-001",
+      "extra": {}
+    },
+    "reviewer_notes": [],
+    "human_review_status": "awaiting_review",
+    "validation_status": "passed",
+    "rank": 1,
+    "warnings": [
+      "Datatype mismatch: source=integer, target=string. Conversion required."
+    ],
+    "source_path": "ActivityCount",
+    "target_path": "measurements.activity.date",
+    "mapping_operation": "nested_path",
+    "source_datatype": "integer",
+    "target_datatype": "string",
+    "cardinality_relation": {
+      "source_cardinality": "0..1",
+      "target_cardinality": "0..1",
+      "note": null
+    },
+    "transformation_required": false,
+    "transformation_expression": null,
+    "unit_conversion": null,
+    "enumeration_mapping": {},
+    "missing_value_policy": null,
+    "information_loss": false,
+    "information_loss_description": null,
+    "executable_test_status": "not_tested",
+    "transformation_rule": {
+      "rule_id": "rule-e9363450",
+      "source_path": "ActivityCount",
+      "target_path": "measurements.activity.date",
+      "operation": "nested_path",
+      "constant_value": null,
+      "datatype_from": "integer",
+      "datatype_to": "string",
+      "unit_from": null,
+      "unit_to": null,
+      "unit_conversion_factor": null,
+      "enumeration_map": {},
+      "expression": null,
+      "condition": null,
+      "lookup_table": null,
+      "notes": null,
+      "information_loss": false,
+      "information_loss_description": null
+    }
+  },
+  {
+    "mapping_id": "sa-ActivityCount-animal_biologicalAttributes_strain",
+    "evidence": [
+      {
+        "evidence_type": "lexical_similarity",
+        "description": "Field 'ActivityCount' matched 'strain' with score 0.360",
+        "score": 0.36,
+        "source": "FieldCandidateGenerator"
+      }
+    ],
+    "counter_evidence": [
+      {
+        "evidence_type": "datatype_mismatch",
+        "description": "Datatype mismatch: source=integer, target=string. Conversion required.",
+        "score": null,
+        "source": "FieldCandidateGenerator"
+      }
+    ],
+    "confidence": 0.36,
+    "provenance": {
+      "created_by": "FieldCandidateGenerator",
+      "created_at": "2026-05-22T17:25:00.968158",
+      "method": "lexical_field_matching_v1",
+      "pipeline_run_id": "example-sa-001",
+      "extra": {}
+    },
+    "reviewer_notes": [],
+    "human_review_status": "awaiting_review",
+    "validation_status": "passed",
+    "rank": 2,
+    "warnings": [
+      "Datatype mismatch: source=integer, target=string. Conversion required."
+    ],
+    "source_path": "ActivityCount",
+    "target_path": "animal.biologicalAttributes.strain",
+    "mapping_operation": "nested_path",
+    "source_datatype": "integer",
+    "target_datatype": "string",
+    "cardinality_relation": {
+      "source_cardinality": "0..1",
+      "target_cardinality": "0..1",
+      "note": null
+    },
+    "transformation_required": false,
+    "transformation_expression": null,
+    "unit_conversion": null,
+    "enumeration_mapping": {},
+    "missing_value_policy": null,
+    "information_loss": false,
+    "information_loss_description": null,
+    "executable_test_status": "not_tested",
+    "transformation_rule": {
+      "rule_id": "rule-5e7daeca",
+      "source_path": "ActivityCount",
+      "target_path": "animal.biologicalAttributes.strain",
+      "operation": "nested_path",
+      "constant_value": null,
+      "datatype_from": "integer",
+      "datatype_to": "string",
+      "unit_from": null,
+      "unit_to": null,
+      "unit_conversion_factor": null,
+      "enumeration_map": {},
+      "expression": null,
+      "condition": null,
+      "lookup_table": null,
+      "notes": null,
+      "information_loss": false,
+      "information_loss_description": null
+    }
+  },
+  {
+    "mapping_id": "sa-ActivityCount-housing_cageIdentifier",
+    "evidence": [
+      {
+        "evidence_type": "lexical_similarity",
+        "description": "Field 'ActivityCount' matched 'cageIdentifier' with score 0.296",
+        "score": 0.2962962962962963,
+        "source": "FieldCandidateGenerator"
+      }
+    ],
+    "counter_evidence": [
+      {
+        "evidence_type": "datatype_mismatch",
+        "description": "Datatype mismatch: source=integer, target=string. Conversion required.",
+        "score": null,
+        "source": "FieldCandidateGenerator"
+      }
+    ],
+    "confidence": 0.2962962962962963,
+    "provenance": {
+      "created_by": "FieldCandidateGenerator",
+      "created_at": "2026-05-22T17:25:00.968183",
+      "method": "lexical_field_matching_v1",
+      "pipeline_run_id": "example-sa-001",
+      "extra": {}
+    },
+    "reviewer_notes": [],
+    "human_review_status": "awaiting_review",
+    "validation_status": "passed",
+    "rank": 3,
+    "warnings": [
+      "Datatype mismatch: source=integer, target=string. Conversion required."
+    ],
+    "source_path": "ActivityCount",
+    "target_path": "housing.cageIdentifier",
+    "mapping_operation": "unmapped",
+    "source_datatype": "integer",
+    "target_datatype": "string",
+    "cardinality_relation": {
+      "source_cardinality": "0..1",
+      "target_cardinality": "0..1",
+      "note": null
+    },
+    "transformation_required": true,
+    "transformation_expression": null,
+    "unit_conversion": null,
+    "enumeration_mapping": {},
+    "missing_value_policy": null,
+    "information_loss": false,
+    "information_loss_description": null,
+    "executable_test_status": "not_tested",
+    "transformation_rule": {
+      "rule_id": "rule-e318f000",
+      "source_path": "ActivityCount",
+      "target_path": "housing.cageIdentifier",
+      "operation": "unmapped",
+      "constant_value": null,
+      "datatype_from": "integer",
+      "datatype_to": "string",
+      "unit_from": null,
+      "unit_to": null,
+      "unit_conversion_factor": null,
+      "enumeration_map": {},
+      "expression": null,
+      "condition": null,
+      "lookup_table": null,
+      "notes": null,
+      "information_loss": false,
+      "information_loss_description": null
+    }
+  },
+  {
+    "mapping_id": "sa-RecordingDate-measurements_activity_date",
+    "evidence": [
+      {
+        "evidence_type": "lexical_similarity",
+        "description": "Field 'RecordingDate' matched 'date' with score 0.900",
+        "score": 0.9,
+        "source": "FieldCandidateGenerator"
+      }
+    ],
+    "counter_evidence": [],
+    "confidence": 0.9,
+    "provenance": {
+      "created_by": "FieldCandidateGenerator",
+      "created_at": "2026-05-22T17:25:00.968246",
+      "method": "lexical_field_matching_v1",
+      "pipeline_run_id": "example-sa-001",
+      "extra": {}
+    },
+    "reviewer_notes": [],
+    "human_review_status": "awaiting_review",
+    "validation_status": "passed",
+    "rank": 1,
+    "warnings": [],
+    "source_path": "RecordingDate",
+    "target_path": "measurements.activity.date",
+    "mapping_operation": "nested_path",
+    "source_datatype": "string",
+    "target_datatype": "string",
+    "cardinality_relation": {
+      "source_cardinality": "0..1",
+      "target_cardinality": "0..1",
+      "note": null
+    },
+    "transformation_required": false,
+    "transformation_expression": null,
+    "unit_conversion": null,
+    "enumeration_mapping": {},
+    "missing_value_policy": null,
+    "information_loss": false,
+    "information_loss_description": null,
+    "executable_test_status": "not_tested",
+    "transformation_rule": {
+      "rule_id": "rule-deee6d71",
+      "source_path": "RecordingDate",
+      "target_path": "measurements.activity.date",
+      "operation": "nested_path",
+      "constant_value": null,
+      "datatype_from": "string",
+      "datatype_to": "string",
+      "unit_from": null,
+      "unit_to": null,
+      "unit_conversion_factor": null,
+      "enumeration_map": {},
+      "expression": null,
+      "condition": null,
+      "lookup_table": null,
+      "notes": null,
+      "information_loss": false,
+      "information_loss_description": null
+    }
+  },
+  {
+    "mapping_id": "sa-RecordingDate-animal_biologicalAttributes_strain",
+    "evidence": [
+      {
+        "evidence_type": "lexical_similarity",
+        "description": "Field 'RecordingDate' matched 'strain' with score 0.450",
+        "score": 0.45,
+        "source": "FieldCandidateGenerator"
+      }
+    ],
+    "counter_evidence": [],
+    "confidence": 0.45,
+    "provenance": {
+      "created_by": "FieldCandidateGenerator",
+      "created_at": "2026-05-22T17:25:00.968274",
+      "method": "lexical_field_matching_v1",
+      "pipeline_run_id": "example-sa-001",
+      "extra": {}
+    },
+    "reviewer_notes": [],
+    "human_review_status": "awaiting_review",
+    "validation_status": "passed",
+    "rank": 2,
+    "warnings": [],
+    "source_path": "RecordingDate",
+    "target_path": "animal.biologicalAttributes.strain",
+    "mapping_operation": "nested_path",
+    "source_datatype": "string",
+    "target_datatype": "string",
+    "cardinality_relation": {
+      "source_cardinality": "0..1",
+      "target_cardinality": "0..1",
+      "note": null
+    },
+    "transformation_required": false,
+    "transformation_expression": null,
+    "unit_conversion": null,
+    "enumeration_mapping": {},
+    "missing_value_policy": null,
+    "information_loss": false,
+    "information_loss_description": null,
+    "executable_test_status": "not_tested",
+    "transformation_rule": {
+      "rule_id": "rule-ceb17f12",
+      "source_path": "RecordingDate",
+      "target_path": "animal.biologicalAttributes.strain",
+      "operation": "nested_path",
+      "constant_value": null,
+      "datatype_from": "string",
+      "datatype_to": "string",
+      "unit_from": null,
+      "unit_to": null,
+      "unit_conversion_factor": null,
+      "enumeration_map": {},
+      "expression": null,
+      "condition": null,
+      "lookup_table": null,
+      "notes": null,
+      "information_loss": false,
+      "information_loss_description": null
+    }
+  },
+  {
+    "mapping_id": "sa-RecordingDate-animal_biologicalAttributes_sex",
+    "evidence": [
+      {
+        "evidence_type": "lexical_similarity",
+        "description": "Field 'RecordingDate' matched 'sex' with score 0.450",
+        "score": 0.45,
+        "source": "FieldCandidateGenerator"
+      }
+    ],
+    "counter_evidence": [],
+    "confidence": 0.45,
+    "provenance": {
+      "created_by": "FieldCandidateGenerator",
+      "created_at": "2026-05-22T17:25:00.968297",
+      "method": "lexical_field_matching_v1",
+      "pipeline_run_id": "example-sa-001",
+      "extra": {}
+    },
+    "reviewer_notes": [],
+    "human_review_status": "awaiting_review",
+    "validation_status": "passed",
+    "rank": 3,
+    "warnings": [],
+    "source_path": "RecordingDate",
+    "target_path": "animal.biologicalAttributes.sex",
+    "mapping_operation": "nested_path",
+    "source_datatype": "string",
+    "target_datatype": "string",
+    "cardinality_relation": {
+      "source_cardinality": "0..1",
+      "target_cardinality": "0..1",
+      "note": null
+    },
+    "transformation_required": false,
+    "transformation_expression": null,
+    "unit_conversion": null,
+    "enumeration_mapping": {},
+    "missing_value_policy": null,
+    "information_loss": false,
+    "information_loss_description": null,
+    "executable_test_status": "not_tested",
+    "transformation_rule": {
+      "rule_id": "rule-f4db98cc",
+      "source_path": "RecordingDate",
+      "target_path": "animal.biologicalAttributes.sex",
+      "operation": "nested_path",
+      "constant_value": null,
+      "datatype_from": "string",
+      "datatype_to": "string",
+      "unit_from": null,
+      "unit_to": null,
+      "unit_conversion_factor": null,
+      "enumeration_map": {},
+      "expression": null,
+      "condition": null,
+      "lookup_table": null,
+      "notes": null,
+      "information_loss": false,
+      "information_loss_description": null
+    }
+  },
+  {
+    "mapping_id": "sa-const-measurements_bodyWeight_unit-Weight_g",
+    "evidence": [
+      {
+        "evidence_type": "unit_inference",
+        "description": "Unit 'g' inferred from source column name 'Weight_g'",
+        "score": 0.8,
+        "source": "FieldCandidateGenerator"
+      }
+    ],
+    "counter_evidence": [],
+    "confidence": 0.8,
+    "provenance": {
+      "created_by": "FieldCandidateGenerator",
+      "created_at": "2026-05-22T17:25:00.968334",
+      "method": "unit_constant_inference_v1",
+      "pipeline_run_id": "example-sa-001",
+      "extra": {}
+    },
+    "reviewer_notes": [],
+    "human_review_status": "awaiting_review",
+    "validation_status": "passed",
+    "rank": null,
+    "warnings": [],
+    "source_path": null,
+    "target_path": "measurements.bodyWeight.unit",
+    "mapping_operation": "constant_assignment",
+    "source_datatype": null,
+    "target_datatype": "string",
+    "cardinality_relation": null,
+    "transformation_required": false,
+    "transformation_expression": null,
+    "unit_conversion": null,
+    "enumeration_mapping": {},
+    "missing_value_policy": null,
+    "information_loss": false,
+    "information_loss_description": null,
+    "executable_test_status": "not_tested",
+    "transformation_rule": {
+      "rule_id": "rule-ce6cb8d7",
+      "source_path": null,
+      "target_path": "measurements.bodyWeight.unit",
+      "operation": "constant_assignment",
+      "constant_value": "g",
+      "datatype_from": null,
+      "datatype_to": null,
+      "unit_from": null,
+      "unit_to": null,
+      "unit_conversion_factor": null,
+      "enumeration_map": {},
+      "expression": null,
+      "condition": null,
+      "lookup_table": null,
+      "notes": "Unit 'g' inferred from source column name 'Weight_g'",
+      "information_loss": false,
+      "information_loss_description": null
+    }
+  }
+]

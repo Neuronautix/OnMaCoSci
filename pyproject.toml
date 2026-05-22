@@ -3,16 +3,16 @@ requires = ["setuptools>=68.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "ontology-mapping-co-scientist"
-version = "0.1.0"
-description = "An AI co-scientist system for automated ontology mapping of source entities to ontology terms."
+name = "mapping-co-scientist"
+version = "0.2.0"
+description = "Shared agentic core for ontology alignment and schema mapping, with two separate CLI tools."
 readme = "README.md"
 license = { text = "MIT" }
 requires-python = ">=3.11"
 authors = [
-    { name = "Ontology Mapping Co-Scientist Contributors" },
+    { name = "Mapping Co-Scientist Contributors" },
 ]
-keywords = ["ontology", "mapping", "bioinformatics", "AI", "co-scientist"]
+keywords = ["ontology", "mapping", "schema", "alignment", "bioinformatics", "AI", "co-scientist"]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Science/Research",
@@ -39,8 +39,16 @@ dev = [
 llm = [
     "anthropic>=0.40",
 ]
+rdf = [
+    "rdflib>=7.0",
+    "pyshacl>=0.25",
+]
 
 [project.scripts]
+# New split CLIs
+ontology-align = "mapping_co_scientist.ontology_align.cli:main"
+schema-align = "mapping_co_scientist.schema_align.cli:main"
+# Legacy CLIs (preserved for backwards compatibility)
 omcs-run = "ontology_mapping_co_scientist.pipeline.run_mapping_pipeline:main"
 omcs-review = "ontology_mapping_co_scientist.review_ledger.cli:main"
 
