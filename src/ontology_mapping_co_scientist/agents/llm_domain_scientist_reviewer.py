@@ -82,6 +82,10 @@ class LLMDomainScientistReviewerAgent:
         self.max_tokens = max_tokens
         self.domain_context = domain_context
         self.cost_tracker = cost_tracker
+        self.llm_disabled_reason: str | None = None
+        self.llm_attempted_reviews = 0
+        self.llm_successful_reviews = 0
+        self.fallback_reviews = 0
 
         if llm_client is None:
             logger.info(
@@ -116,7 +120,8 @@ class LLMDomainScientistReviewerAgent:
 
             if not os.environ.get("ANTHROPIC_API_KEY"):
                 raise ValueError("ANTHROPIC_API_KEY is not set")
-            client = anthropic.Anthropic()
+            max_retries = int(os.environ.get("OMCS_LLM_MAX_RETRIES", "0"))
+            client = anthropic.Anthropic(max_retries=max_retries)
             logger.info(
                 "%s.from_env: ANTHROPIC_API_KEY found — LLM mode activated (model=%s).",
                 _AGENT_NAME,
@@ -165,6 +170,20 @@ class LLMDomainScientistReviewerAgent:
             An :class:`AdversarialReviewResult` with flags and recommendation.
         """
         if self.llm_client is None:
+            self.fallback_reviews += 1
+            return AdversarialReviewResult(
+                mapping_id=hypothesis.mapping_id,
+                flags=[],
+                overall_severity="clean",
+                recommendation="proceed",
+            )
+        if self.llm_disabled_reason is not None:
+            logger.warning(
+                "%s: LLM disabled; returning clean fallback (%s).",
+                _AGENT_NAME,
+                self.llm_disabled_reason,
+            )
+            self.fallback_reviews += 1
             return AdversarialReviewResult(
                 mapping_id=hypothesis.mapping_id,
                 flags=[],
@@ -192,16 +211,45 @@ class LLMDomainScientistReviewerAgent:
         use_llm = self.llm_client is not None
 
         for i, hypothesis in enumerate(hypotheses):
+            if use_llm and self.llm_disabled_reason is not None:
+                logger.warning(
+                    "%s: stopping LLM review loop after circuit breaker opened (%s).",
+                    _AGENT_NAME,
+                    self.llm_disabled_reason,
+                )
+                self.fallback_reviews += len(hypotheses[i:])
+                results.extend(
+                    AdversarialReviewResult(
+                        mapping_id=h.mapping_id,
+                        flags=[],
+                        overall_severity="clean",
+                        recommendation="proceed",
+                    )
+                    for h in hypotheses[i:]
+                )
+                break
             if use_llm and i > 0:
                 time.sleep(0.1)
             results.append(self.review_hypothesis(hypothesis))
 
-        logger.info(
-            "%s: %d hypotheses reviewed, %d with high severity.",
-            _AGENT_NAME,
-            len(hypotheses),
-            sum(1 for r in results if r.overall_severity == "high"),
-        )
+        if use_llm:
+            logger.info(
+                "%s: %d hypotheses reviewed, %d with high severity "
+                "(llm_attempted=%d, llm_success=%d, fallback=%d).",
+                _AGENT_NAME,
+                len(hypotheses),
+                sum(1 for r in results if r.overall_severity == "high"),
+                self.llm_attempted_reviews,
+                self.llm_successful_reviews,
+                self.fallback_reviews,
+            )
+        else:
+            logger.info(
+                "%s: %d hypotheses reviewed, %d with high severity (no-op fallback).",
+                _AGENT_NAME,
+                len(hypotheses),
+                sum(1 for r in results if r.overall_severity == "high"),
+            )
         return results
 
     # ------------------------------------------------------------------
@@ -375,6 +423,7 @@ class LLMDomainScientistReviewerAgent:
             An :class:`AdversarialReviewResult`.
         """
         prompt = self._build_prompt(hypothesis)
+        self.llm_attempted_reviews += 1
         try:
             response = self.llm_client.messages.create(
                 model=self.model,
@@ -402,7 +451,12 @@ class LLMDomainScientistReviewerAgent:
             hypothesis.provenance.extra["domain_scientist_prompt_hash"] = prompt_hash
 
             result = self._parse_response(response_text, hypothesis.mapping_id)
+            self.llm_successful_reviews += 1
         except Exception as exc:  # noqa: BLE001
+            if _is_provider_overloaded(exc):
+                self.llm_disabled_reason = (
+                    "provider overloaded; stopped further domain-review calls"
+                )
             logger.warning(
                 "%s: API error for mapping %s (%s: %s). Returning clean result.",
                 _AGENT_NAME,
@@ -410,6 +464,7 @@ class LLMDomainScientistReviewerAgent:
                 type(exc).__name__,
                 exc,
             )
+            self.fallback_reviews += 1
             return AdversarialReviewResult(
                 mapping_id=hypothesis.mapping_id,
                 flags=[
@@ -431,3 +486,8 @@ class LLMDomainScientistReviewerAgent:
             result.recommendation,
         )
         return result
+
+
+def _is_provider_overloaded(exc: Exception) -> bool:
+    status_code = getattr(exc, "status_code", None)
+    return status_code == 529 or type(exc).__name__ == "OverloadedError"

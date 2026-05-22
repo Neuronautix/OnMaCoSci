@@ -83,11 +83,16 @@ class LLMAdversarialReviewerAgent:
         self.llm_client = llm_client
         self.model = model
         self.max_tokens = max_tokens
-        self._fallback: AdversarialReviewerAgent | None = None
+        self._fallback: AdversarialReviewerAgent | None = (
+            AdversarialReviewerAgent() if fallback_to_heuristic else None
+        )
+        self.llm_disabled_reason: str | None = None
+        self.llm_attempted_reviews = 0
+        self.llm_successful_reviews = 0
+        self.fallback_reviews = 0
 
         if llm_client is None:
             if fallback_to_heuristic:
-                self._fallback = AdversarialReviewerAgent()
                 logger.info(
                     "LLMAdversarialReviewerAgent: no LLM client provided — "
                     "using heuristic AdversarialReviewerAgent fallback."
@@ -128,7 +133,8 @@ class LLMAdversarialReviewerAgent:
 
             if not os.environ.get("ANTHROPIC_API_KEY"):
                 raise ValueError("ANTHROPIC_API_KEY is not set")
-            client = anthropic.Anthropic()
+            max_retries = int(os.environ.get("OMCS_LLM_MAX_RETRIES", "0"))
+            client = anthropic.Anthropic(max_retries=max_retries)
             logger.info(
                 "LLMAdversarialReviewerAgent.from_env: ANTHROPIC_API_KEY found — "
                 "LLM mode activated (model=%s).",
@@ -169,6 +175,15 @@ class LLMAdversarialReviewerAgent:
         """
         if self.llm_client is None:
             assert self._fallback is not None
+            self.fallback_reviews += 1
+            return self._fallback.review_hypothesis(hypothesis)
+        if self.llm_disabled_reason is not None:
+            logger.warning(
+                "LLMAdversarialReviewerAgent: LLM disabled; using heuristic fallback (%s).",
+                self.llm_disabled_reason,
+            )
+            assert self._fallback is not None
+            self.fallback_reviews += 1
             return self._fallback.review_hypothesis(hypothesis)
         return self._llm_review(hypothesis)
 
@@ -191,19 +206,42 @@ class LLMAdversarialReviewerAgent:
         use_llm = self.llm_client is not None
 
         for i, hypothesis in enumerate(hypotheses):
+            if use_llm and self.llm_disabled_reason is not None:
+                logger.warning(
+                    "LLMAdversarialReviewerAgent: stopping LLM review loop after "
+                    "circuit breaker opened (%s).",
+                    self.llm_disabled_reason,
+                )
+                self.fallback_reviews += len(hypotheses[i:])
+                results.extend(
+                    self._fallback.review_hypothesis(h)
+                    for h in hypotheses[i:]
+                    if self._fallback is not None
+                )
+                break
             if use_llm and i > 0:
                 time.sleep(0.1)
             results.append(self.review_hypothesis(hypothesis))
 
         high_count = sum(1 for r in results if r.overall_severity == "high")
-        mode = "LLM" if use_llm else "heuristic"
-        logger.info(
-            "LLMAdversarialReviewerAgent (%s): %d hypotheses reviewed, "
-            "%d with high severity.",
-            mode,
-            len(hypotheses),
-            high_count,
-        )
+        if use_llm:
+            logger.info(
+                "LLMAdversarialReviewerAgent: %d hypotheses reviewed, "
+                "%d with high severity (llm_attempted=%d, llm_success=%d, "
+                "fallback=%d).",
+                len(hypotheses),
+                high_count,
+                self.llm_attempted_reviews,
+                self.llm_successful_reviews,
+                self.fallback_reviews,
+            )
+        else:
+            logger.info(
+                "LLMAdversarialReviewerAgent: %d hypotheses reviewed, "
+                "%d with high severity (heuristic fallback).",
+                len(hypotheses),
+                high_count,
+            )
         return results
 
     def apply_flags_to_hypotheses(
@@ -403,6 +441,7 @@ class LLMAdversarialReviewerAgent:
             An :class:`AdversarialReviewResult`.
         """
         prompt = self._build_prompt(hypothesis)
+        self.llm_attempted_reviews += 1
         try:
             response = self.llm_client.messages.create(
                 model=self.model,
@@ -411,7 +450,12 @@ class LLMAdversarialReviewerAgent:
             )
             response_text = response.content[0].text
             result = self._parse_llm_response(response_text, hypothesis.mapping_id)
+            self.llm_successful_reviews += 1
         except Exception as exc:  # noqa: BLE001
+            if _is_provider_overloaded(exc):
+                self.llm_disabled_reason = (
+                    "provider overloaded; stopped further adversarial-review calls"
+                )
             logger.warning(
                 "LLMAdversarialReviewerAgent: API error for mapping %s (%s: %s). "
                 "Falling back to heuristic reviewer.",
@@ -420,6 +464,7 @@ class LLMAdversarialReviewerAgent:
                 exc,
             )
             if self._fallback is not None:
+                self.fallback_reviews += 1
                 return self._fallback.review_hypothesis(hypothesis)
             # No fallback available — return a minimal error result
             error_flag = AdversarialFlag(
@@ -447,3 +492,8 @@ class LLMAdversarialReviewerAgent:
             result.recommendation,
         )
         return result
+
+
+def _is_provider_overloaded(exc: Exception) -> bool:
+    status_code = getattr(exc, "status_code", None)
+    return status_code == 529 or type(exc).__name__ == "OverloadedError"

@@ -286,6 +286,9 @@ def test_review_all_with_mock_llm():
 
     assert len(results) == 3
     assert mock_client.messages.create.call_count == 3
+    assert agent.llm_attempted_reviews == 3
+    assert agent.llm_successful_reviews == 3
+    assert agent.fallback_reviews == 0
     for result in results:
         assert len(result.flags) == 1
         assert result.flags[0].flag_type == "test_flag"
@@ -360,6 +363,9 @@ def test_llm_review_calls_api_and_parses():
 
     assert isinstance(result, AdversarialReviewResult)
     assert result.mapping_id == hypothesis.mapping_id
+    assert agent.llm_attempted_reviews == 1
+    assert agent.llm_successful_reviews == 1
+    assert agent.fallback_reviews == 0
     assert len(result.flags) == 1
     assert result.flags[0].flag_type == "predicate_too_strong"
     assert result.overall_severity == "high"
@@ -379,6 +385,9 @@ def test_llm_api_error_falls_back_to_heuristic():
 
     assert isinstance(result, AdversarialReviewResult)
     assert result.mapping_id == hypothesis.mapping_id
+    assert agent.llm_attempted_reviews == 1
+    assert agent.llm_successful_reviews == 0
+    assert agent.fallback_reviews == 1
 
 
 def test_apply_flags_to_hypotheses():

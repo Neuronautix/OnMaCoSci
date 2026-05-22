@@ -147,6 +147,18 @@ def _make_mock_client_with_response(response_text: str):
     return DynamicMockClient()
 
 
+class _OverloadedMessages:
+    @staticmethod
+    def create(**kwargs):
+        exc = RuntimeError("provider overloaded")
+        exc.status_code = 529
+        raise exc
+
+
+class _OverloadedClient:
+    messages = _OverloadedMessages()
+
+
 # ---------------------------------------------------------------------------
 # L2: LLMCandidateGeneratorAgent tests
 # ---------------------------------------------------------------------------
@@ -212,6 +224,20 @@ def test_llm_candidate_generator_with_mock_client():
     )
     assert llm_ev.score == pytest.approx(0.90, abs=1e-6)
     assert "body weight is semantically equivalent to mass" in llm_ev.description
+
+
+def test_llm_candidate_generator_stops_after_provider_overload():
+    """Provider overload disables remaining LLM candidate calls."""
+    agent = LLMCandidateGeneratorAgent(llm_client=_OverloadedClient())
+
+    hypotheses = agent.generate_candidates(
+        [_make_source_entity()],
+        [_make_ontology_term(term_id="PATO:0000125", label="mass")],
+    )
+
+    assert hypotheses
+    assert agent.llm_disabled_reason is not None
+    assert "provider overloaded" in agent.llm_disabled_reason
 
 
 def test_llm_candidate_generator_parse_scores_valid():
@@ -331,6 +357,9 @@ def test_ontology_engineer_reviewer_with_mock():
     assert result.flags[0].severity == "medium"
     assert result.overall_severity == "medium"
     assert result.recommendation == "review"
+    assert reviewer.llm_attempted_reviews == 1
+    assert reviewer.llm_successful_reviews == 1
+    assert reviewer.fallback_reviews == 0
 
 
 def test_ontology_engineer_reviewer_review_all():
@@ -412,6 +441,9 @@ def test_domain_scientist_reviewer_with_mock():
     assert result.flags[0].severity == "high"
     assert result.overall_severity == "high"
     assert result.recommendation == "reject"
+    assert reviewer.llm_attempted_reviews == 1
+    assert reviewer.llm_successful_reviews == 1
+    assert reviewer.fallback_reviews == 0
 
 
 def test_domain_scientist_reviewer_domain_context_in_prompt():

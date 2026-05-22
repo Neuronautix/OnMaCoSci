@@ -90,6 +90,7 @@ class LLMCandidateGeneratorAgent:
         self.call_delay_seconds = call_delay_seconds
         self.cost_tracker = cost_tracker
         self.llm_entities_scored = 0
+        self.llm_disabled_reason: str | None = None
 
         # Always instantiate a lexical generator as the base layer
         self._lexical_generator = CandidateGeneratorAgent(top_k=5)
@@ -130,7 +131,8 @@ class LLMCandidateGeneratorAgent:
 
             if not os.environ.get("ANTHROPIC_API_KEY"):
                 raise ValueError("ANTHROPIC_API_KEY is not set")
-            client = anthropic.Anthropic()
+            max_retries = int(os.environ.get("OMCS_LLM_MAX_RETRIES", "0"))
+            client = anthropic.Anthropic(max_retries=max_retries)
             call_delay_seconds = float(os.environ.get("OMCS_LLM_CALL_DELAY_SECONDS", "0.5"))
             max_entities_raw = os.environ.get("OMCS_LLM_MAX_CANDIDATE_ENTITIES")
             max_entities_for_llm = int(max_entities_raw) if max_entities_raw else None
@@ -214,6 +216,14 @@ class LLMCandidateGeneratorAgent:
         # Step 3 & 4: Score top candidates per entity
         scored_entities = 0
         for index, (entity_id, entity_hypotheses) in enumerate(by_entity.items()):
+            if self.llm_disabled_reason is not None:
+                logger.warning(
+                    "%s: LLM candidate scoring disabled for remaining entities: %s",
+                    _AGENT_NAME,
+                    self.llm_disabled_reason,
+                )
+                break
+
             if (
                 self.max_entities_for_llm is not None
                 and scored_entities >= self.max_entities_for_llm
@@ -448,6 +458,10 @@ class LLMCandidateGeneratorAgent:
             return self._parse_scoring_response(response_text, candidates)
 
         except Exception as exc:  # noqa: BLE001
+            if _is_provider_overloaded(exc):
+                self.llm_disabled_reason = (
+                    "provider overloaded; stopped further candidate-scoring calls"
+                )
             logger.warning(
                 "%s: API error scoring candidates for entity '%s' (%s: %s).",
                 _AGENT_NAME,
@@ -456,3 +470,9 @@ class LLMCandidateGeneratorAgent:
                 exc,
             )
             return {}
+
+
+def _is_provider_overloaded(exc: Exception) -> bool:
+    """Return whether an LLM exception indicates provider overload."""
+    status_code = getattr(exc, "status_code", None)
+    return status_code == 529 or type(exc).__name__ == "OverloadedError"

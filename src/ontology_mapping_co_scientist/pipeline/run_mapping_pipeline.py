@@ -642,6 +642,8 @@ def run_pipeline(
     logger.info("Output dir    : %s", output_dir)
 
     llm_stage_modes: dict[str, str] = {}
+    llm_disabled_reasons: dict[str, str] = {}
+    llm_call_stats: dict[str, dict[str, int]] = {}
     llm_budget: dict[str, int | None] = {
         "candidate_top_k": llm_candidate_top_k,
         "max_candidate_entities": llm_max_candidate_entities,
@@ -690,6 +692,8 @@ def run_pipeline(
         llm_stage_modes["candidate_generation"] = (
             "llm" if _agent_has_llm_client(candidate_agent) else "lexical_fallback"
         )
+        if llm_max_candidate_entities == 0:
+            llm_stage_modes["candidate_generation"] = "budget_skipped"
         if require_llm and not _agent_has_llm_client(candidate_agent):
             raise RuntimeError(
                 "LLM candidate generation was requested, but no active LLM client "
@@ -704,6 +708,13 @@ def run_pipeline(
         ontology_terms=ontology_terms,
         pipeline_run_id=pipeline_run_id,
     )
+    if llm_enabled and getattr(candidate_agent, "llm_disabled_reason", None):
+        llm_disabled_reasons["candidate_generation"] = candidate_agent.llm_disabled_reason
+        llm_stage_modes["candidate_generation"] = "disabled_overloaded"
+    if llm_enabled:
+        llm_call_stats["candidate_generation"] = {
+            "entities_scored": getattr(candidate_agent, "llm_entities_scored", 0),
+        }
     logger.info("  -> %d hypotheses generated", len(hypotheses))
 
     # ------------------------------------------------------------------
@@ -788,6 +799,20 @@ def run_pipeline(
             result.mapping_id: result
             for result in domain_reviewer.review_all(llm_review_targets)
         }
+        for stage_name, reviewer_agent in (
+            ("adversarial_review", llm_adversarial),
+            ("ontology_engineer_review", ontology_reviewer),
+            ("domain_scientist_review", domain_reviewer),
+        ):
+            llm_call_stats[stage_name] = {
+                "attempted": getattr(reviewer_agent, "llm_attempted_reviews", 0),
+                "succeeded": getattr(reviewer_agent, "llm_successful_reviews", 0),
+                "fallback": getattr(reviewer_agent, "fallback_reviews", 0),
+            }
+            reason = getattr(reviewer_agent, "llm_disabled_reason", None)
+            if reason:
+                llm_disabled_reasons[stage_name] = reason
+                llm_stage_modes[stage_name] = "disabled_overloaded"
         for h in hypotheses:
             if h.mapping_id in llm_adv_results:
                 review_results[h.mapping_id] = _merge_review_results(
@@ -899,6 +924,8 @@ def run_pipeline(
             "llm_enabled": llm_enabled,
             "llm_model": llm_model if llm_enabled or llm_adversarial_review else None,
             "llm_stage_modes": llm_stage_modes,
+            "llm_disabled_reasons": llm_disabled_reasons,
+            "llm_call_stats": llm_call_stats,
             "domain_context": domain_context if llm_enabled else None,
             "llm_review_top_k": llm_review_top_k if llm_enabled else None,
             "llm_reviewed_hypotheses": llm_reviewed_hypotheses,
@@ -978,6 +1005,8 @@ def run_pipeline(
         "output_review_queue": str(output_review_queue),
         "llm_enabled": llm_enabled,
         "llm_stage_modes": llm_stage_modes,
+        "llm_disabled_reasons": llm_disabled_reasons,
+        "llm_call_stats": llm_call_stats,
         "llm_review_top_k": llm_review_top_k,
         "llm_reviewed_hypotheses": llm_reviewed_hypotheses,
         "llm_budget": llm_budget,
@@ -1206,7 +1235,7 @@ def main() -> None:
     print(f"  LLM orchestration    : {'enabled' if result['llm_enabled'] else 'disabled'}")
     if result["llm_enabled"]:
         print(
-            "  LLM reviewed         : "
+            "  LLM review targets   : "
             f"{result['llm_reviewed_hypotheses']} hypotheses "
             f"(top {result['llm_review_top_k']} per source)"
         )
@@ -1215,6 +1244,10 @@ def main() -> None:
             f"{result['llm_candidate_entities_scored']} source entities"
         )
         print(f"  LLM budget           : {result['llm_budget']}")
+        if result["llm_call_stats"]:
+            print(f"  LLM call stats       : {result['llm_call_stats']}")
+        if result["llm_disabled_reasons"]:
+            print(f"  LLM disabled reasons : {result['llm_disabled_reasons']}")
     if result["llm_stage_modes"]:
         for stage_name, mode in result["llm_stage_modes"].items():
             print(f"    {stage_name:<25}: {mode}")

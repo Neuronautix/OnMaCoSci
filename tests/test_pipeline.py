@@ -672,8 +672,12 @@ class TestPipelineExports:
         tmp_path: Path,
         tmp_csv_file: Path,
         tmp_ontology_yaml: Path,
+        monkeypatch: pytest.MonkeyPatch,
     ) -> None:
         """LLM orchestration is explicit even when it falls back without a client."""
+        monkeypatch.setenv("OMCS_DISABLE_DOTENV", "1")
+        monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+
         result = run_pipeline(
             source_filepath=tmp_csv_file,
             ontology_filepath=tmp_ontology_yaml,
@@ -689,10 +693,30 @@ class TestPipelineExports:
 
         assert result["llm_enabled"] is True
         modes = result["llm_stage_modes"]
-        assert modes["candidate_generation"] in {"llm", "lexical_fallback"}
-        assert modes["adversarial_review"] in {"llm", "heuristic_fallback"}
-        assert modes["ontology_engineer_review"] in {"llm", "noop_fallback"}
-        assert modes["domain_scientist_review"] in {"llm", "noop_fallback"}
+        assert modes["candidate_generation"] in {
+            "llm",
+            "lexical_fallback",
+            "budget_skipped",
+            "disabled_overloaded",
+        }
+        assert modes["adversarial_review"] in {
+            "llm",
+            "heuristic_fallback",
+            "disabled_overloaded",
+        }
+        assert modes["ontology_engineer_review"] in {
+            "llm",
+            "noop_fallback",
+            "disabled_overloaded",
+        }
+        assert modes["domain_scientist_review"] in {
+            "llm",
+            "noop_fallback",
+            "disabled_overloaded",
+        }
+        assert "llm_disabled_reasons" in result
+        assert "llm_call_stats" in result
+        assert "candidate_generation" in result["llm_call_stats"]
         assert result["llm_review_top_k"] == 1
         assert result["llm_reviewed_hypotheses"] == result["total_source_entities"]
         assert result["llm_budget"] == {
@@ -708,5 +732,7 @@ class TestPipelineExports:
         assert data["metadata"]["llm_enabled"] is True
         assert data["metadata"]["domain_context"] == "preclinical mouse metadata"
         assert "llm_stage_modes" in data["metadata"]
+        assert "llm_disabled_reasons" in data["metadata"]
+        assert "llm_call_stats" in data["metadata"]
         assert data["metadata"]["llm_review_top_k"] == 1
         assert data["metadata"]["llm_budget"]["candidate_top_k"] == 2

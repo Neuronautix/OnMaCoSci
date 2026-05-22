@@ -151,6 +151,7 @@ OMCS_LLM_CANDIDATE_TOP_K=2
 OMCS_LLM_MAX_CANDIDATE_ENTITIES=10
 OMCS_LLM_MAX_REVIEW_HYPOTHESES=10
 OMCS_LLM_CALL_DELAY_SECONDS=1.0
+OMCS_LLM_MAX_RETRIES=0
 ```
 
 Then enable the LLM-orchestrated path:
@@ -184,6 +185,7 @@ Cost control defaults are intentionally conservative:
 - at most 10 source entities receive LLM candidate scoring;
 - only the top 2 lexical candidates per scored entity are sent to the LLM;
 - each LLM reviewer sees at most 10 hypotheses;
+- SDK retries are disabled by default to avoid retry storms during provider overload;
 - heuristic review still evaluates every hypothesis.
 
 Or directly via Python:
