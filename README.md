@@ -432,6 +432,36 @@ ontology-mapping-co-scientist/
 
 ---
 
+## Claude Code Plugin
+
+This repository ships a Claude Code plugin scaffold that lets you run the pipelines and review mappings interactively using slash commands.
+
+### Setup
+
+Open the repository in Claude Code. The `CLAUDE.md` file at the root is loaded automatically as project context.
+
+### Commands
+
+| Command | Description |
+|---------|-------------|
+| `/ontology-align` | Run ontology alignment pipeline and review SKOS mapping candidates |
+| `/schema-align` | Run schema alignment pipeline and review field mapping candidates |
+| `/review-mappings` | Open an existing output directory for structured review with a selected persona |
+| `/validate-and-export` | Run pre-export checks and regenerate final artefacts |
+
+### Reviewer personas
+
+The plugin includes four reviewer persona definitions in `claude-plugin/agents/`:
+
+- **Ontology Engineer Reviewer** — validates SKOS relations, guards against premature exactMatch
+- **Data Integration Reviewer** — validates transformation operations, datatype safety, information loss
+- **Adversarial Reviewer** — stress-tests every top-1 candidate
+- **Meta Reviewer** — detects cross-mapping collisions and inconsistencies
+
+See `claude-plugin/README.md` for full plugin documentation and `CLAUDE_PLUGIN_TRANSITION_REPORT.md` for design decisions.
+
+---
+
 ## Contributing
 
 Contributions are welcome.  Before submitting a pull request:

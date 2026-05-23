@@ -1,0 +1,61 @@
+{
+  "name": "mapping-co-scientist",
+  "version": "0.2.0",
+  "description": "Claude Code plugin for ontology alignment and schema field mapping with human-in-the-loop review.",
+  "author": "Neuronautix",
+  "repository": "neuronautix/onmacosci",
+  "commands": [
+    {
+      "name": "ontology-align",
+      "file": ".claude/commands/ontology-align.md",
+      "description": "Run ontology alignment pipeline and guide semantic mapping review"
+    },
+    {
+      "name": "schema-align",
+      "file": ".claude/commands/schema-align.md",
+      "description": "Run schema alignment pipeline and guide field mapping review"
+    },
+    {
+      "name": "review-mappings",
+      "file": ".claude/commands/review-mappings.md",
+      "description": "Review existing pipeline output with a selected reviewer persona"
+    },
+    {
+      "name": "validate-and-export",
+      "file": ".claude/commands/validate-and-export.md",
+      "description": "Run pre-export checks and generate final mapping artefacts"
+    }
+  ],
+  "agents": [
+    {
+      "name": "ontology-engineer-reviewer",
+      "file": "claude-plugin/agents/ontology-engineer-reviewer.md"
+    },
+    {
+      "name": "data-integration-reviewer",
+      "file": "claude-plugin/agents/data-integration-reviewer.md"
+    },
+    {
+      "name": "adversarial-reviewer",
+      "file": "claude-plugin/agents/adversarial-reviewer.md"
+    },
+    {
+      "name": "meta-reviewer",
+      "file": "claude-plugin/agents/meta-reviewer.md"
+    }
+  ],
+  "references": [
+    {
+      "name": "mapping-status-model",
+      "file": "claude-plugin/references/mapping-status-model.md"
+    },
+    {
+      "name": "human-review-policy",
+      "file": "claude-plugin/references/human-review-policy.md"
+    }
+  ],
+  "requires": {
+    "python": ">=3.11",
+    "packages": ["mapping_co_scientist"]
+  }
+}
