@@ -1,6 +1,6 @@
 # /schema-align
 
-Run the schema alignment pipeline against a source CSV and a target JSON Schema, then present a structured review of all field mapping candidates for human decision.
+Run the schema alignment pipeline against a source CSV and a target JSON Schema, then run the three-agent debate protocol to produce evidence-weighted ranked candidates for human review.
 
 ## Usage
 
@@ -35,46 +35,60 @@ After a successful run, call:
 python scripts/read_run_summary.py <output-dir>
 ```
 
-Present the full Markdown output to the user. This shows all candidate hypotheses grouped by source field path, with the top-1 mapping, alternatives, datatype information, information loss flags, and current `human_review_status`.
+Present the full Markdown output. This shows all candidate hypotheses grouped by source field, with the top-1 mapping, alternatives, datatype information, information loss flags, and current `human_review_status`.
 
-### Step 3 — Apply the Data Integration Reviewer persona
+### Step 3 — Run the three-agent debate
 
-You are now acting as the **Data Integration Reviewer** (see `claude-plugin/agents/data-integration-reviewer.md`). For each source field listed in the summary:
+Load the three agent definitions:
+- `claude-plugin/agents/source-schema-advocate.md` — speaks for the source CSV fields (source system data engineer)
+- `claude-plugin/agents/target-schema-advocate.md` — speaks for the target JSON Schema fields (target system data engineer)
+- `claude-plugin/agents/mapping-mediator.md` — runs the debate, computes LR scores, produces ranked output
 
-1. **Read** the top mapping target path, mapping operation, confidence score, and datatype information.
-2. **Flag** information loss entries: any hypothesis where `information_loss: true` needs explicit acknowledgement before approval.
-3. **Call out** datatype mismatches (e.g., `number → string`) — these require a `DATATYPE_CONVERSION` operation, not `DIRECT_COPY`.
-4. **Identify** special cases:
-   - Unit-bearing fields (e.g., `Weight_g`): check whether a companion `CONSTANT_ASSIGNMENT` entry exists for the unit field.
-   - `ActivityCount` or similar ambiguous count/index fields: flag as ambiguous measurement requiring contextual definition before mapping.
-   - Fields with `confidence < 0.50`: classify as low-confidence; user must decide whether to accept or reject.
-5. **Review** constant assignments (no source field): confirm the inferred constant value is correct (e.g., `measurements.bodyWeight.unit = "g"`).
-6. **Present** a review table with columns: Source Field | Top Target | Operation | Confidence | Info Loss | Recommended Action.
+For each source field in the run summary, run the full Structured Evidence Debate (SED) protocol as defined in `mapping-mediator.md`:
 
-### Step 4 — Guide human review decisions
+1. **Round 0** (mediator): inject pipeline context (confidence, rank, adversarial flags, information loss, warnings, evidence lists)
+2. **Round 1** (both advocates independently): each produces 1–3 arguments using the FOR/AGAINST/evidence-type/confidence/counterpoint-weakness structure
+3. **Round 2** (advocates see each other's Round 1): each may produce 0–2 rebuttals
+4. **Scoring** (mediator): compute `debate_score` using the LR formula; re-rank candidates; identify rank inversions
 
-For each field, prompt the user to choose one of:
+After all per-field debates, the mediator runs the **Cross-Mapping Consistency Report** (collision detection, unit companion gap analysis, confidence cliff analysis, coverage by field type).
+
+### Step 4 — Present mediator output
+
+Present the full mediator output:
+- Per-field debate summaries with argument logs and score computation tables
+- Cross-mapping consistency report including unit companion gaps
+- Prioritised review queue (Tier 1 / Tier 2 / Tier 3)
+
+### Step 5 — Guide human review
+
+Work through the review queue in tier order. For each field, present the mediator's recommended action and ask the user to choose one of:
 
 | Action | What it means |
 |--------|---------------|
-| `approve` | Accept the top mapping and its transformation rule |
+| `approve` | Accept the debate top-1 mapping and its transformation rule |
 | `reject` | Discard this mapping; leave field unmapped |
 | `change-target` | Keep operation, change target path (ask which one) |
-| `change-operation` | Keep target, change transformation operation (ask which one) |
-| `request-evidence` | Mark `needs_more_evidence`; defer decision |
+| `change-operation` | Keep target, change MappingOperation (ask which one) |
+| `request-evidence` | Mark `needs_more_evidence`; defer |
 
-For constant assignments, actions are:
+For constant assignments (no source field):
 | Action | What it means |
 |--------|---------------|
 | `approve` | Accept the constant value |
 | `change-value` | Use a different constant value |
 | `reject` | Remove this constant assignment |
 
-Do NOT auto-approve any mapping. Every approval must be an explicit user decision.
+For any mapping where `information_loss: true`, before accepting `approve`:
+1. Quote the `information_loss_description` to the user
+2. Ask explicitly: "Do you accept this information loss? (yes/no)"
+3. Only proceed to approve if the user says yes; record the acknowledgement in notes
 
-### Step 5 — Summarise decisions
+Do NOT auto-approve any mapping.
 
-After the user has reviewed all fields, output a decision log:
+### Step 6 — Decision summary and coverage
+
+After all items are reviewed:
 
 ```markdown
 ## Review Decisions — <run-id>
@@ -82,25 +96,23 @@ After the user has reviewed all fields, output a decision log:
 | Source Field | Target Path | Operation | Decision | Notes |
 |---|---|---|---|---|
 | Weight_g | measurements.bodyWeight.value | nested_path | approved | |
-| measurements.bodyWeight.unit | "g" | constant_assignment | approved | inferred from column suffix |
-| ActivityCount | measurements.activity.date | nested_path | rejected | ambiguous; needs clarification |
+| measurements.bodyWeight.unit | "g" | constant_assignment | approved | inferred from _g suffix |
+| ActivityCount | — | — | rejected | ambiguous; needs clarification |
 ...
-```
 
-### Step 6 — Coverage summary
-
-After decisions, report:
+## Coverage
 - Fields approved: N
 - Fields rejected: N
-- Fields deferred (`needs_more_evidence`): N
-- Unmapped fields remaining: N
-- Information loss acknowledged: list approved lossy mappings
+- Fields deferred: N
+- Unmapped: N
+- Lossy mappings acknowledged: [list]
+```
 
 ## Critical constraints
 
 - NEVER claim the pipeline validated a file you did not actually run.
 - NEVER produce an SSSOM file — schema-align outputs YAML and JSON specs, not SSSOM TSV.
-- NEVER use SKOS predicates (skos:exactMatch, skos:closeMatch, etc.) to describe schema field mappings. Schema mappings use `MappingOperation` values (`direct_copy`, `rename`, `nested_path`, etc.).
+- NEVER use SKOS predicates to describe schema field mappings. Schema mappings use MappingOperation values.
 - NEVER auto-approve any mapping on behalf of the user.
 - NEVER approve a lossy mapping without the user explicitly acknowledging the information loss.
 - This command covers **schema field mapping only**. For ontology term alignment use `/ontology-align`.
@@ -110,7 +122,7 @@ After decisions, report:
 | File | Description |
 |------|-------------|
 | `field_mapping_candidates.json` | All FieldMappingHypothesis objects |
-| `approved_mapping_spec.yaml` | YAML mapping specification (approved mappings) |
+| `approved_mapping_spec.yaml` | YAML mapping specification |
 | `transformation_rules.json` | TransformationRule objects (JSON) |
 | `transformation_validation_report.md` | Human review report with adversarial flags |
 | `unmapped_fields_report.md` | Source fields with no suitable target |

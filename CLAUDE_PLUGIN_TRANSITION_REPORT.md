@@ -150,7 +150,7 @@ These are reference documents, not separate Claude Code features. Any command ca
 
 2. **v0.3.0: LLM-backed semantic scoring**
    - When `LLMCandidateGeneratorAgent` is ported to the new architecture, update the commands to note that confidence scores now include semantic similarity (not just lexical)
-   - Update the adversarial reviewer persona to adjust challenge questions for LLM-scored candidates
+   - Update the debate advocate instructions to note that high confidence no longer implies only string similarity
 
 3. **v0.3.0: SHACL validation integration**
    - When `shacl_adapter.py` is wired into `OntologyValidationAgent`, update `/validate-and-export` to report SHACL validation results
@@ -158,3 +158,48 @@ These are reference documents, not separate Claude Code features. Any command ca
 
 4. **Long-term: Plugin manifest standard**
    - If Claude Code introduces a formal plugin manifest format, migrate `claude-plugin/.claude-plugin/plugin.json` to the standard schema
+
+---
+
+## Addendum: Four-persona → Three-agent debate architecture (v0.2.0 plugin revision)
+
+### Why four sequential personas were replaced
+
+The original plugin scaffold used four sequential reviewer personas: Ontology Engineer Reviewer, Data Integration Reviewer, Adversarial Reviewer, and Meta Reviewer. Each ran as a separate pass over the candidate set. This design had three weaknesses:
+
+1. **No productive tension**: Reviewers worked sequentially and could not challenge each other's reasoning. The adversarial reviewer challenged the pipeline's output, but not the other reviewers' conclusions.
+2. **Role overlap and gaps**: The ontology engineer and data integration reviewers both did some adversarial work; the meta reviewer duplicated some of their cross-mapping checks. There was no clear ownership model.
+3. **Wrong abstraction level**: The personas were defined around professional roles (who you are) rather than epistemic positions (what you know and therefore can argue). The natural epistemic divide in mapping is source vs. target, not "ontology engineer" vs. "data engineer."
+
+### What the three-agent debate provides
+
+The Structured Evidence Debate (SED) architecture is grounded in the observation that every mapping dispute has exactly two legitimate epistemic positions: "here is what the source field means" and "here is what the target term/field requires." These map directly to the source and target advocates. The mediator is not a domain expert — it is a scoring and synthesis function.
+
+This provides:
+- **Productive tension by design**: Advocates argue opposite sides simultaneously and then rebut each other. The mediator scores all arguments, not just the strongest ones.
+- **Adversarial challenge embedded structurally**: The `counterpoint_weakness` field on every FOR argument, and the advocate's duty to challenge low-confidence candidates, replaces the separate adversarial pass.
+- **Meta-review always included**: The mediator's cross-mapping consistency report runs automatically after all per-entity debates — it is not a separate invocation.
+
+### How the LR scoring works
+
+The `debate_score` re-weights the pipeline's lexical confidence using structured arguments:
+
+```
+debate_score = clamp(pipeline_confidence + advocacy_delta, 0.0, 1.0) × penalty_multiplier
+
+advocacy_delta = Σ(±argument.confidence × evidence_type_weight), clamped to [-0.30, +0.30]
+penalty_multiplier = product of applicable penalty terms (skos:exactMatch → ×0.50, etc.)
+```
+
+Evidence type weights encode domain knowledge: semantic overreach and information loss risk carry weight 0.18 (highest), while precedent consistency carries 0.08 (lowest). This is not learned from data in v0.2.0 — the weights are fixed heuristics based on the severity taxonomy used in the Python pipeline's adversarial agents.
+
+When the LLM-backed candidate generator is integrated (v0.3.0), the base `pipeline_confidence` will include semantic similarity, and the weight table may be recalibrated using annotation data from historical review sessions.
+
+### Absorption table
+
+| Old persona | Absorbed into |
+|-------------|---------------|
+| Ontology Engineer Reviewer | Target Schema Advocate when run type = ontology-align |
+| Data Integration Reviewer | Target Schema Advocate when run type = schema-align |
+| Adversarial Reviewer | Source advocate (`ambiguity_unresolved`), target advocate (`semantic_overreach`), mediator penalty multipliers |
+| Meta Reviewer | Mediator cross-mapping consistency report (runs automatically) |

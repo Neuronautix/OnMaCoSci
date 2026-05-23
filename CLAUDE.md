@@ -60,15 +60,18 @@ Every hypothesis in `*_candidates.json` has:
 
 ```
 candidate_generated
-  → ai_reviewed          (adversarial + specialist review complete)
+  → ai_reviewed          (Python pipeline adversarial + validation agents complete)
     → validation_pending
       → validation_failed   (blocking — do not proceed)
       → validation_passed
-        → human_review_required
-          → human_approved    (safe to export/reuse)
-          → human_rejected    (archived)
+        → debate_complete  (three-agent SED protocol run by plugin commands)
+          → human_review_required
+            → human_approved    (safe to export/reuse)
+            → human_rejected    (archived)
     → released_for_reuse  (ONLY after human_approved)
 ```
+
+The `debate_complete` stage corresponds to the Structured Evidence Debate (SED) run by the plugin's three-agent system. The mediator's `debate_score` re-ranks candidates but does NOT change `human_review_status` — that still requires explicit human action.
 
 ## Critical constraints Claude must enforce
 
@@ -97,10 +100,10 @@ python -m pytest tests/ -q
 
 All 325 tests must pass before any pipeline changes are committed.
 
-## Reviewer personas (for plugin commands)
+## Three-agent debate system (plugin commands)
 
-See `claude-plugin/agents/` for full persona definitions:
-- `ontology-engineer-reviewer.md` — semantic correctness, hierarchy, SKOS predicate strength
-- `data-integration-reviewer.md` — datatype, unit, cardinality, information loss
-- `adversarial-reviewer.md` — falsification, ambiguity, unsupported claims
-- `meta-reviewer.md` — synthesis only; never independently approves
+Plugin commands run a Structured Evidence Debate (SED) for every mapping candidate. See `claude-plugin/agents/` for full definitions:
+
+- `source-schema-advocate.md` — speaks for the source schema; argues FOR or AGAINST whether proposed mappings correctly characterise what the source field means; raises `ambiguity_unresolved`, `information_loss_risk`, `missing_unit_companion`, `domain_definition_match` arguments
+- `target-schema-advocate.md` — speaks for the target schema/ontology; argues FOR or AGAINST whether proposed predicates/operations are semantically appropriate; raises `semantic_overreach`, `type_incompatibility`, `operation_safety`, `scope_relationship` arguments
+- `mapping-mediator.md` — runs debate rounds; applies LR scoring (`debate_score = clamp(base + advocacy_delta, 0, 1) × penalties`); re-ranks candidates; produces cross-mapping consistency report (collisions, symmetry violations, rank inversions, coverage)

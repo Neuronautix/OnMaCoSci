@@ -1,24 +1,24 @@
 {
   "name": "mapping-co-scientist",
-  "version": "0.2.0",
-  "description": "Claude Code plugin for ontology alignment and schema field mapping with human-in-the-loop review.",
+  "version": "0.3.0",
+  "description": "Claude Code plugin for ontology alignment and schema field mapping with three-agent debate review.",
   "author": "Neuronautix",
   "repository": "neuronautix/onmacosci",
   "commands": [
     {
       "name": "ontology-align",
       "file": ".claude/commands/ontology-align.md",
-      "description": "Run ontology alignment pipeline and guide semantic mapping review"
+      "description": "Run ontology alignment pipeline and guide semantic mapping review via three-agent debate"
     },
     {
       "name": "schema-align",
       "file": ".claude/commands/schema-align.md",
-      "description": "Run schema alignment pipeline and guide field mapping review"
+      "description": "Run schema alignment pipeline and guide field mapping review via three-agent debate"
     },
     {
       "name": "review-mappings",
       "file": ".claude/commands/review-mappings.md",
-      "description": "Review existing pipeline output with a selected reviewer persona"
+      "description": "Review existing pipeline output using the three-agent debate protocol"
     },
     {
       "name": "validate-and-export",
@@ -28,20 +28,19 @@
   ],
   "agents": [
     {
-      "name": "ontology-engineer-reviewer",
-      "file": "claude-plugin/agents/ontology-engineer-reviewer.md"
+      "name": "source-schema-advocate",
+      "file": "claude-plugin/agents/source-schema-advocate.md",
+      "role": "Advocates for the source schema; argues FROM the source side whether proposed mappings correctly characterise source field meaning"
     },
     {
-      "name": "data-integration-reviewer",
-      "file": "claude-plugin/agents/data-integration-reviewer.md"
+      "name": "target-schema-advocate",
+      "file": "claude-plugin/agents/target-schema-advocate.md",
+      "role": "Advocates for the target schema/ontology; argues FROM the target side whether proposed predicates/operations are semantically appropriate"
     },
     {
-      "name": "adversarial-reviewer",
-      "file": "claude-plugin/agents/adversarial-reviewer.md"
-    },
-    {
-      "name": "meta-reviewer",
-      "file": "claude-plugin/agents/meta-reviewer.md"
+      "name": "mapping-mediator",
+      "file": "claude-plugin/agents/mapping-mediator.md",
+      "role": "Runs the Structured Evidence Debate protocol; applies LR scoring formula; produces ranked candidates and cross-mapping consistency report"
     }
   ],
   "references": [

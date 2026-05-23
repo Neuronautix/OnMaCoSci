@@ -1,14 +1,14 @@
 # /review-mappings
 
-Open an existing pipeline output directory and guide the user through reviewing all pending mapping candidates. Works for both ontology alignment and schema alignment outputs.
+Open an existing pipeline output directory, run the three-agent debate protocol across all pending candidates, and guide the user through the prioritised review queue. Works for both ontology alignment and schema alignment outputs.
 
 ## Usage
 
 ```
-/review-mappings <output-dir> [--persona <ontology-engineer|data-integration|adversarial|meta>]
+/review-mappings <output-dir>
 ```
 
-If the user omits the output directory, ask them to supply one. If `--persona` is omitted, auto-detect based on run type (ontology-align → ontology-engineer, schema-align → data-integration).
+If the user omits the output directory, ask them to supply one.
 
 ## What this command does
 
@@ -30,76 +30,94 @@ Call:
 python scripts/read_run_summary.py <output-dir>
 ```
 
-Present the structured Markdown summary. Identify:
+Present the structured Markdown summary. Identify at a glance:
 - Total items awaiting review (`human_review_status: awaiting_review`)
 - Items already reviewed (approved / rejected / needs_more_evidence)
-- Items with high-severity adversarial flags
+- Items with high-severity pipeline adversarial flags
 - Items with information loss (schema runs)
 - Term gap proposals (ontology runs)
 
-### Step 3 — Apply the selected persona
+### Step 3 — Run the three-agent debate
 
-**Ontology Engineer Reviewer** (default for ontology runs):
-- Focus: SKOS relation correctness, scope analysis, hierarchy compatibility, OWL axiom safety
-- Red flags: `skos:exactMatch` from lexical match alone, identifier-to-class mismatches, owl:equivalentClass proposals without domain expert sign-off
-- See full persona: `claude-plugin/agents/ontology-engineer-reviewer.md`
+Load all three agent definitions:
+- `claude-plugin/agents/source-schema-advocate.md`
+- `claude-plugin/agents/target-schema-advocate.md`
+- `claude-plugin/agents/mapping-mediator.md`
 
-**Data Integration Reviewer** (default for schema runs):
-- Focus: transformation operation correctness, datatype compatibility, unit handling, information loss acknowledgement
-- Red flags: DIRECT_COPY across incompatible types, missing unit constant assignments, unmapped fields silently dropped
-- See full persona: `claude-plugin/agents/data-integration-reviewer.md`
+The debate roles adapt to the run type automatically:
 
-**Adversarial Reviewer** (any run, explicit `--persona adversarial`):
-- Focus: actively challenge every top-1 mapping; look for subtle errors the generator may have missed
-- Questions: "Is this the best available target, or just the closest lexical match?", "Does the confidence score reflect genuine semantic similarity?"
-- See full persona: `claude-plugin/agents/adversarial-reviewer.md`
+| Run type | Source advocate role | Target advocate role |
+|----------|---------------------|---------------------|
+| ontology-align | Field scientist who collected source CSV data | Ontology engineer who knows the OWL/SKOS ontology |
+| schema-align | Source system data engineer | Target schema data engineer |
 
-**Meta Reviewer** (any run, explicit `--persona meta`):
-- Focus: cross-cutting consistency across all mappings in a single run
-- Questions: "Are structurally similar source fields mapped consistently?", "Do any pairs of mappings create circular or contradictory assertions?"
-- See full persona: `claude-plugin/agents/meta-reviewer.md`
+For **every source entity/field** with `human_review_status: awaiting_review`, run the full Structured Evidence Debate (SED) protocol:
 
-### Step 4 — Prioritised review queue
+1. **Round 0** (mediator, silent): load pipeline context — confidence, rank, adversarial flags, semantic warnings / information loss, evidence lists
+2. **Round 1**: both advocates produce 1–3 independent arguments (FOR or AGAINST each top-k candidate)
+3. **Round 2**: advocates see each other's Round 1; each may produce 0–2 rebuttals
+4. **Scoring**: mediator computes `debate_score` for each candidate, re-ranks, identifies rank inversions
 
-Sort items into three tiers:
+After all per-entity debates, the mediator produces a **Cross-Mapping Consistency Report** covering:
+- Target path/term collisions
+- SKOS symmetry violations (ontology runs)
+- Rank inversions
+- Ambiguous top-1 selections (debate_score delta < 0.05)
+- Strong isolations (delta > 0.30)
+- Coverage by entity/field type
+- Unit companion gaps (schema runs)
 
-**Tier 1 — Needs immediate decision** (present these first):
-- `human_review_status: awaiting_review` AND adversarial severity `high`
-- `human_review_status: awaiting_review` AND `information_loss: true`
-- `human_review_status: awaiting_review` AND `confidence < 0.50`
+### Step 4 — Present mediator output
 
-**Tier 2 — Standard review**:
-- `human_review_status: awaiting_review` AND adversarial severity `medium`
+Present:
+1. The cross-mapping consistency report (so the user sees the whole-run picture first)
+2. The prioritised review queue sorted into Tier 1, Tier 2, Tier 3
 
-**Tier 3 — Low-risk approval candidates**:
-- `human_review_status: awaiting_review` AND adversarial severity `clean` or `low`
-- `confidence >= 0.85`
+### Step 5 — Work through the review queue
 
-Present Tier 1 items one at a time and ask for an explicit decision before moving to Tier 2. Tier 3 items may be batch-presented for bulk approval, but ONLY after the user explicitly confirms they want bulk review.
+**Tier 1** — present one at a time, require explicit decision before advancing:
+- Pipeline adversarial severity `high`
+- `information_loss == true` with no rebuttal from source advocate
+- `debate_score < 0.35`
+- Rank inversion occurred
+- `skos:exactMatch` present (ontology runs)
 
-### Step 5 — Collect decisions
+**Tier 2** — present in sequence:
+- Pipeline adversarial severity `medium`
+- `debate_score` between 0.35 and 0.65
 
-For each item, record:
-- The user's decision (approve / reject / change-relation / change-target / change-operation / request-evidence / propose-new-term)
-- Any notes the user adds
-- The timestamp of the decision
+**Tier 3** — may be batch-presented **only** with explicit user consent:
+- No blocking concerns; `debate_score >= 0.65`; advocates in agreement
 
-### Step 6 — Decision summary
+For each item, present the mediator's recommendation and ask the user to choose an action.
 
-After completing the review queue, output:
+**Ontology alignment decisions:**
+| approve | reject | change-relation | change-target | request-evidence | propose-new-term |
+
+**Schema alignment decisions:**
+| approve | reject | change-target | change-operation | request-evidence |
+
+**Constant assignment decisions:**
+| approve | change-value | reject |
+
+For any `information_loss: true` mapping, require explicit acknowledgement before `approve`.
+
+### Step 6 — Session summary
+
+After completing the review queue (or when the user stops):
 
 ```markdown
 ## Review Session Summary
 
 **Output directory**: `<output-dir>`
 **Run type**: ontology-align | schema-align
-**Persona used**: <persona>
+**Items debated**: N
 **Items reviewed this session**: N
 
 ### Decisions Made
 
-| ID | Source | Target | Decision | Notes |
-|----|--------|--------|----------|-------|
+| Source | Debate Top-1 | Decision | Notes |
+|---|---|---|---|
 ...
 
 ### Remaining Items
@@ -107,17 +125,21 @@ After completing the review queue, output:
 - **Awaiting review**: N
 - **Deferred (needs_more_evidence)**: N
 
-### Suggested Next Steps
+### Consistency Issues Requiring Follow-up
 
-- [ ] Persist decisions to candidates JSON (run review ledger when available in v0.3.0)
-- [ ] Re-run validation for changed mappings: `/validate-and-export <output-dir>`
-- [ ] Address term gap proposals (ontology runs)
+(list any unresolved collisions, symmetry violations, or rank inversions)
+
+### Next Steps
+
+- [ ] Persist decisions to candidates JSON (review ledger available in v0.3.0)
+- [ ] Re-run for changed mappings: `/validate-and-export <output-dir>`
 - [ ] Investigate deferred items with domain expert
+- [ ] Address term gap proposals (ontology runs)
 ```
 
 ## Critical constraints
 
-- NEVER auto-approve any item, including low-risk Tier 3 items.
+- NEVER auto-approve any item, including low-risk Tier 3 items without explicit user decision per item.
 - NEVER claim a validation was performed unless you actually ran the CLI command.
-- NEVER modify hypothesis JSON files directly — inform the user that persistence requires the review ledger (not yet available in v0.2.0).
-- NEVER apply ontology reviewer logic to schema alignment items or vice versa.
+- NEVER modify hypothesis JSON files — decisions are recorded in session summary only until v0.3.0.
+- NEVER apply ontology debate logic to schema alignment candidates or vice versa.
