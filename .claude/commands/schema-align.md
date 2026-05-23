@@ -49,7 +49,7 @@ For each source field in the run summary, run the full Structured Evidence Debat
 1. **Round 0** (mediator): inject pipeline context (confidence, rank, adversarial flags, information loss, warnings, evidence lists)
 2. **Round 1** (both advocates independently): each produces 1–3 arguments using the FOR/AGAINST/evidence-type/confidence/counterpoint-weakness structure
 3. **Round 2** (advocates see each other's Round 1): each may produce 0–2 rebuttals
-4. **Scoring** (mediator): compute `debate_score` using the LR formula; re-rank candidates; identify rank inversions
+4. **Scoring** (mediator): compute Elo ratings using pairwise argument-weighted updates; apply flat Elo penalties for blocking conditions; re-rank candidates by final Elo; identify rank inversions
 
 After all per-field debates, the mediator runs the **Cross-Mapping Consistency Report** (collision detection, unit companion gap analysis, confidence cliff analysis, coverage by field type).
 

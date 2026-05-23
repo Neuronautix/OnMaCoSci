@@ -180,20 +180,27 @@ This provides:
 - **Adversarial challenge embedded structurally**: The `counterpoint_weakness` field on every FOR argument, and the advocate's duty to challenge low-confidence candidates, replaces the separate adversarial pass.
 - **Meta-review always included**: The mediator's cross-mapping consistency report runs automatically after all per-entity debates — it is not a separate invocation.
 
-### How the LR scoring works
+### How the Elo ranking works
 
-The `debate_score` re-weights the pipeline's lexical confidence using structured arguments:
+Each candidate starts with an Elo rating derived from pipeline lexical confidence:
 
 ```
-debate_score = clamp(pipeline_confidence + advocacy_delta, 0.0, 1.0) × penalty_multiplier
-
-advocacy_delta = Σ(±argument.confidence × evidence_type_weight), clamped to [-0.30, +0.30]
-penalty_multiplier = product of applicable penalty terms (skos:exactMatch → ×0.50, etc.)
+initial_elo = 1000 + round(pipeline_confidence × 800)   → range [1000, 1800]
 ```
 
-Evidence type weights encode domain knowledge: semantic overreach and information loss risk carry weight 0.18 (highest), while precedent consistency carries 0.08 (lowest). This is not learned from data in v0.2.0 — the weights are fixed heuristics based on the severity taxonomy used in the Python pipeline's adversarial agents.
+Every debate argument triggers a series of pairwise Elo matches between the argued candidate and every other candidate for the same source entity. The K-factor scales by evidence type weight and argument confidence:
 
-When the LLM-backed candidate generator is integrated (v0.3.0), the base `pipeline_confidence` will include semantic similarity, and the weight table may be recalibrated using annotation data from historical review sessions.
+```
+K = 32 × weight[evidence_type] × argument.confidence
+```
+
+FOR arguments give the argued candidate a "win" (positive Elo swing); AGAINST arguments give it a "loss". Updates follow the standard Elo formula and are zero-sum between candidates. Arguments are processed in order so each update reflects the current standings before the next argument is applied.
+
+After debate, flat Elo penalties are deducted for blocking conditions (exactMatch → −200, high adversarial → −150, unrebutted info loss → −100, advocate net negative → −50 each). Penalties are additive.
+
+The final ranking is by descending Elo. Tier thresholds: Tier 1 below 1250, Tier 2 between 1250 and 1500, Tier 3 at or above 1500. Ambiguous top-1 = Elo gap < 50; strong isolation = gap > 200; debate-unmapped = best candidate Elo < 1150.
+
+Evidence type weights encode domain knowledge: semantic overreach and information loss risk carry weight 0.18 (highest), while precedent consistency carries 0.08 (lowest). These are fixed heuristics in v0.2.0, consistent with the severity taxonomy in the Python pipeline's adversarial agents. When the LLM-backed candidate generator is integrated (v0.3.0), the base Elo and weight table may be recalibrated using annotation data from historical review sessions.
 
 ### Absorption table
 

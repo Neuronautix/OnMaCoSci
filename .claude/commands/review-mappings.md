@@ -56,13 +56,13 @@ For **every source entity/field** with `human_review_status: awaiting_review`, r
 1. **Round 0** (mediator, silent): load pipeline context — confidence, rank, adversarial flags, semantic warnings / information loss, evidence lists
 2. **Round 1**: both advocates produce 1–3 independent arguments (FOR or AGAINST each top-k candidate)
 3. **Round 2**: advocates see each other's Round 1; each may produce 0–2 rebuttals
-4. **Scoring**: mediator computes `debate_score` for each candidate, re-ranks, identifies rank inversions
+4. **Scoring**: mediator computes Elo ratings via pairwise K-weighted updates per argument, applies flat Elo penalties for blocking conditions, re-ranks by final Elo, identifies rank inversions
 
 After all per-entity debates, the mediator produces a **Cross-Mapping Consistency Report** covering:
 - Target path/term collisions
 - SKOS symmetry violations (ontology runs)
 - Rank inversions
-- Ambiguous top-1 selections (debate_score delta < 0.05)
+- Ambiguous top-1 selections (Elo gap top-1 vs top-2 < 50)
 - Strong isolations (delta > 0.30)
 - Coverage by entity/field type
 - Unit companion gaps (schema runs)
@@ -78,16 +78,16 @@ Present:
 **Tier 1** — present one at a time, require explicit decision before advancing:
 - Pipeline adversarial severity `high`
 - `information_loss == true` with no rebuttal from source advocate
-- `debate_score < 0.35`
+- final Elo < 1250
 - Rank inversion occurred
 - `skos:exactMatch` present (ontology runs)
 
 **Tier 2** — present in sequence:
 - Pipeline adversarial severity `medium`
-- `debate_score` between 0.35 and 0.65
+- final Elo between 1250 and 1500
 
 **Tier 3** — may be batch-presented **only** with explicit user consent:
-- No blocking concerns; `debate_score >= 0.65`; advocates in agreement
+- No blocking concerns; final Elo ≥ 1500; advocates in agreement
 
 For each item, present the mediator's recommendation and ask the user to choose an action.
 

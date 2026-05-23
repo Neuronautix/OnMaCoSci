@@ -37,17 +37,19 @@ For each source entity/field:
 3. **Round 2** (cross-examination): each advocate sees the other's Round 1 and may produce 0–2 rebuttals
 4. **Scoring** (mediator): computes `debate_score = clamp(pipeline_conf + advocacy_delta, 0, 1) × penalty_multiplier`
 
-### LR scoring
+### Elo ranking
 
-Advocacy delta = sum of `±argument.confidence × evidence_type_weight` across all rounds, clamped to [-0.30, +0.30].
+Each candidate starts with an Elo rating derived from pipeline confidence: `initial_elo = 1000 + round(confidence × 800)`.
 
-Penalty multipliers stack multiplicatively:
-- Pipeline adversarial severity `high` → ×0.60
-- `skos:exactMatch` present → ×0.50 (ontology)
-- `information_loss` unrebutted → ×0.75 (schema)
-- Either advocate net negative → ×0.85
+Each argument triggers pairwise Elo updates between the argued candidate and every other candidate for that source entity. The K-factor scales by evidence type weight and argument confidence: `K = 32 × weight[evidence_type] × argument.confidence`. Updates are zero-sum and applied in argument order so later arguments reflect current standings.
 
-After scoring, candidates are re-ranked by `debate_score`. Rank inversions are flagged and reported.
+After debate, flat Elo penalties are deducted for blocking conditions:
+- Pipeline adversarial severity `high` → −150 Elo
+- `skos:exactMatch` present → −200 Elo (ontology)
+- Unrebutted `information_loss` → −100 Elo (schema)
+- Either advocate net negative for this candidate → −50 Elo each
+
+Candidates are re-ranked by final Elo. Rank inversions (debate rank ≠ pipeline rank) are flagged and reported. Ambiguous top-1 = Elo gap < 50; strong isolation = gap > 200.
 
 ### Cross-mapping consistency
 
