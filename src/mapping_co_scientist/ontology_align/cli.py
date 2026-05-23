@@ -16,6 +16,9 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--output-dir", required=True, type=Path, help="Output directory")
     parser.add_argument("--top-k", type=int, default=3, help="Max candidates per source entity")
     parser.add_argument("--run-id", type=str, default=None, help="Pipeline run ID")
+    parser.add_argument("--ledger", type=Path, default=None, help="Review ledger YAML file (skip already-decided entities)")
+    parser.add_argument("--llm", action="store_true", help="Use Claude LLM for semantic candidate scoring (requires ANTHROPIC_API_KEY)")
+    parser.add_argument("--llm-model", type=str, default=None, help="Claude model to use (default: claude-sonnet-4-6)")
     parser.add_argument("-v", "--verbose", action="store_true", help="Verbose logging")
 
     args = parser.parse_args(argv)
@@ -30,6 +33,9 @@ def main(argv: list[str] | None = None) -> int:
             pipeline_run_id=args.run_id,
             top_k=args.top_k,
             verbose=args.verbose,
+            ledger_path=args.ledger,
+            use_llm=args.llm,
+            llm_model=args.llm_model,
         )
         print(json.dumps(summary, indent=2))
         return 0

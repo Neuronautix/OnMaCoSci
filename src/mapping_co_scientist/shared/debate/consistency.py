@@ -61,7 +61,7 @@ class CrossMappingConsistencyAnalyzer:
                 )
 
         # ---- Collision detection ----
-        # A collision is when two different sources share the same debate_top1_id
+        # A collision is when two different sources share the same debate top-1 target label
         debate_top1_to_sources: dict[str, list[tuple[str, float]]] = defaultdict(list)
         for er in entity_results:
             top_candidate = None
@@ -70,7 +70,8 @@ class CrossMappingConsistencyAnalyzer:
                     top_candidate = cand
                     break
             if top_candidate is not None:
-                debate_top1_to_sources[er.debate_top1_id].append(
+                # Key on target_label (target term/path), not mapping_id
+                debate_top1_to_sources[top_candidate.target_label].append(
                     (er.source_id, top_candidate.final_elo)
                 )
 

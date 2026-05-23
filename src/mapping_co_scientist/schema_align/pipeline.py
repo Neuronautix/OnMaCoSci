@@ -1,5 +1,4 @@
 from __future__ import annotations
-import json
 import logging
 import uuid
 from datetime import datetime
@@ -17,6 +16,7 @@ from mapping_co_scientist.schema_align.exporters.transformation_spec_exporter im
 from mapping_co_scientist.schema_align.exporters.schema_review_report import SchemaReviewReport
 from mapping_co_scientist.schema_align.validation.lossiness_checks import build_lossiness_report
 from mapping_co_scientist.shared.io.common_serialization import write_json
+from mapping_co_scientist.shared.debate import run_debate
 
 logger = logging.getLogger(__name__)
 
@@ -28,6 +28,9 @@ def run_schema_alignment_pipeline(
     pipeline_run_id: str | None = None,
     top_k: int = 3,
     verbose: bool = False,
+    ledger_path: Path | None = None,
+    use_llm: bool = False,
+    llm_model: str | None = None,
 ) -> dict[str, Any]:
     if verbose:
         logging.basicConfig(level=logging.INFO)
@@ -37,16 +40,39 @@ def run_schema_alignment_pipeline(
 
     logger.info("=== Schema Alignment Pipeline === run_id=%s", run_id)
 
+    # Load review ledger to skip already-decided fields
+    decided_source_paths: set[str] = set()
+    if ledger_path:
+        from mapping_co_scientist.shared.persistence.review_ledger import load_ledger
+        ledger = load_ledger(ledger_path)
+        decided_source_paths = {d.source_id for d in ledger.decisions}
+        logger.info("Ledger loaded: %d decided source fields will be skipped", len(decided_source_paths))
+
     # Stage 1: Profile source and target schemas
     source_agent = SourceSchemaProfilerAgent()
     target_agent = TargetSchemaProfilerAgent()
     source_fields = source_agent.profile(source_path)
     target_fields = target_agent.profile(target_schema_path)
 
+    # Filter out already-decided fields
+    if decided_source_paths:
+        source_fields = [f for f in source_fields if f.source_path not in decided_source_paths]
+        logger.info("After ledger filter: %d source fields remain", len(source_fields))
+
     logger.info("Source: %d fields, Target: %d fields", len(source_fields), len(target_fields))
 
-    # Stage 2: Generate field mapping candidates
-    generator = FieldCandidateGeneratorAgent(top_k=top_k, pipeline_run_id=run_id)
+    # Stage 2: Generate field mapping candidates (lexical or LLM-backed)
+    if use_llm:
+        from mapping_co_scientist.schema_align.agents.llm_field_generator import LLMSchemaFieldGenerator
+        from mapping_co_scientist.shared.llm.claude_provider import ClaudeProvider
+        from mapping_co_scientist.shared.llm.cost_tracker import CostTracker
+        tracker = CostTracker()
+        provider = ClaudeProvider(model=llm_model, cost_tracker=tracker)
+        generator = LLMSchemaFieldGenerator(llm=provider, top_k=top_k, pipeline_run_id=run_id)
+        logger.info("Using LLM field generator (%s)", provider.model_name)
+    else:
+        generator = FieldCandidateGeneratorAgent(top_k=top_k, pipeline_run_id=run_id)
+
     hypotheses = generator.generate(source_fields, target_fields)
 
     # Stage 3: Adversarial review
@@ -64,13 +90,26 @@ def run_schema_alignment_pipeline(
     rule_gen = MappingRuleGeneratorAgent()
     rules = rule_gen.generate_rules(hypotheses)
 
-    # Stage 7: Export
+    # Stage 7: Three-agent debate (Elo ranking)
+    by_source: dict[str, list] = {}
+    for h in hypotheses:
+        key = h.source_path or f"__const_{h.target_path}"
+        by_source.setdefault(key, []).append(h)
+    debate_report = run_debate(
+        hypotheses_by_source=by_source,
+        run_type="schema_align",
+        adversarial_results=adv_results,
+        run_id=run_id,
+    )
+
+    # Stage 8: Export
     candidates_path = output_dir / "field_mapping_candidates.json"
     mapping_spec_path = output_dir / "approved_mapping_spec.yaml"
     rules_path = output_dir / "transformation_rules.json"
     report_path = output_dir / "transformation_validation_report.md"
     unmapped_path = output_dir / "unmapped_fields_report.md"
     loss_path = output_dir / "information_loss_report.md"
+    debate_path = output_dir / "debate_report.json"
 
     write_json([h.model_dump(mode="json") for h in hypotheses], candidates_path)
     export_mapping_spec(hypotheses, mapping_spec_path, pipeline_run_id=run_id)
@@ -88,7 +127,9 @@ def run_schema_alignment_pipeline(
     write_json(loss_report.model_dump(mode="json"), loss_path.with_suffix(".json"))
     _write_loss_report(loss_path, loss_report)
 
-    summary = {
+    write_json(debate_report.model_dump(mode="json"), debate_path)
+
+    summary: dict[str, Any] = {
         "pipeline_run_id": run_id,
         "source_fields": len(source_fields),
         "target_fields": len(target_fields),
@@ -96,6 +137,13 @@ def run_schema_alignment_pipeline(
         "transformation_rules": len(rules),
         "unmapped_fields": loss_report.unmapped_fields,
         "coverage_pct": round(loss_report.coverage_pct, 1),
+        "debate": {
+            "rank_inversions": debate_report.consistency.rank_inversions,
+            "collisions": debate_report.consistency.collisions,
+            "tier_1_items": sum(1 for e in debate_report.entity_results if e.tier == 1),
+            "tier_2_items": sum(1 for e in debate_report.entity_results if e.tier == 2),
+            "tier_3_items": sum(1 for e in debate_report.entity_results if e.tier == 3),
+        },
         "outputs": {
             "candidates_json": str(candidates_path),
             "mapping_spec_yaml": str(mapping_spec_path),
@@ -103,8 +151,13 @@ def run_schema_alignment_pipeline(
             "validation_report_md": str(report_path),
             "unmapped_report_md": str(unmapped_path),
             "loss_report_json": str(loss_path.with_suffix(".json")),
+            "debate_report_json": str(debate_path),
         },
     }
+
+    if use_llm and "tracker" in dir():
+        summary["llm_usage"] = tracker.summary()
+
     logger.info("Pipeline complete: %s", summary)
     return summary
 
