@@ -1,8 +1,8 @@
 """Profile example records to extract per-field statistics."""
 from __future__ import annotations
+
 import csv
 from pathlib import Path
-from mapping_co_scientist.schema_align.models.schema_entity import SchemaEntity
 
 
 def profile_csv_examples(path: Path, max_rows: int = 100) -> dict[str, list[str]]:
@@ -13,7 +13,7 @@ def profile_csv_examples(path: Path, max_rows: int = 100) -> dict[str, list[str]
     if not rows:
         return {}
     result: dict[str, list[str]] = {}
-    for header in rows[0].keys():
+    for header in rows[0]:
         seen: list[str] = []
         for row in rows:
             v = row.get(header, "").strip()

@@ -1,6 +1,6 @@
 {
   "name": "mapping-co-scientist",
-  "version": "0.3.0",
+  "version": "0.2.0",
   "description": "Claude Code plugin for ontology alignment and schema field mapping with three-agent debate review.",
   "author": "Neuronautix",
   "repository": "neuronautix/onmacosci",

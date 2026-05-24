@@ -1,5 +1,6 @@
 """CLI for ontology alignment tool."""
 from __future__ import annotations
+
 import argparse
 import json
 import sys
@@ -16,7 +17,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--output-dir", required=True, type=Path, help="Output directory")
     parser.add_argument("--top-k", type=int, default=3, help="Max candidates per source entity")
     parser.add_argument("--run-id", type=str, default=None, help="Pipeline run ID")
-    parser.add_argument("--ledger", type=Path, default=None, help="Review ledger YAML file (skip already-decided entities)")
+    parser.add_argument("--ledger", type=Path, default=None, help="Review ledger JSON file (skip already-decided entities)")
     parser.add_argument("--llm", action="store_true", help="Use Claude LLM for semantic candidate scoring (requires ANTHROPIC_API_KEY)")
     parser.add_argument("--llm-model", type=str, default=None, help="Claude model to use (default: claude-sonnet-4-6)")
     parser.add_argument("-v", "--verbose", action="store_true", help="Verbose logging")

@@ -1,10 +1,9 @@
 from __future__ import annotations
-from pathlib import Path
-from mapping_co_scientist.shared.reports.markdown_report_base import MarkdownReportBase
+
 from mapping_co_scientist.schema_align.models.field_mapping_hypothesis import FieldMappingHypothesis
 from mapping_co_scientist.schema_align.models.lossiness_report import LossinessReport
 from mapping_co_scientist.shared.models.review import AdversarialReviewResult
-from mapping_co_scientist.schema_align.models.transformation_rule import MappingOperation
+from mapping_co_scientist.shared.reports.markdown_report_base import MarkdownReportBase
 
 
 class SchemaReviewReport(MarkdownReportBase):

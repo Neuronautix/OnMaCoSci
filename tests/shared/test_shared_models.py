@@ -2,7 +2,11 @@
 from __future__ import annotations
 
 import pytest
+from pydantic import ValidationError
 
+from mapping_co_scientist.shared.llm.mock_provider import MockLLMProvider
+from mapping_co_scientist.shared.llm.provider_interface import LLMMessage
+from mapping_co_scientist.shared.models.confidence import ConfidenceScore
 from mapping_co_scientist.shared.models.evidence import Evidence, Provenance
 from mapping_co_scientist.shared.models.review import (
     AdversarialFlag,
@@ -10,11 +14,7 @@ from mapping_co_scientist.shared.models.review import (
     HumanReviewStatus,
     ValidationStatus,
 )
-from mapping_co_scientist.shared.models.confidence import ConfidenceScore
-from mapping_co_scientist.shared.models.human_decision import HumanReviewAction, SuggestedAction
 from mapping_co_scientist.shared.models.source_entity import SourceEntity
-from mapping_co_scientist.shared.llm.mock_provider import MockLLMProvider
-from mapping_co_scientist.shared.llm.provider_interface import LLMMessage
 from mapping_co_scientist.shared.scoring.ranking import rank_by_confidence
 
 
@@ -30,7 +30,7 @@ class TestEvidence:
         assert ev.score == 0.87
 
     def test_score_bounds(self):
-        with pytest.raises(Exception):
+        with pytest.raises(ValidationError):
             Evidence(evidence_type="test", description="bad", score=1.5)
 
     def test_qualitative_evidence(self):
@@ -174,3 +174,27 @@ class TestRanking:
         ranked = rank_by_confidence(hyps, top_k=2)
         assert len(ranked) == 2
         assert ranked[0].confidence == 0.90
+
+    def test_top_k_zero(self):
+        from dataclasses import dataclass
+
+        @dataclass
+        class FakeHyp:
+            confidence: float
+            rank: int | None = None
+
+        hyps = [FakeHyp(0.60), FakeHyp(0.90)]
+        ranked = rank_by_confidence(hyps, top_k=0)
+        assert ranked == []
+
+    def test_top_k_negative_raises(self):
+        from dataclasses import dataclass
+
+        @dataclass
+        class FakeHyp:
+            confidence: float
+            rank: int | None = None
+
+        hyps = [FakeHyp(0.60), FakeHyp(0.90)]
+        with pytest.raises(ValueError, match="top_k must be >= 0"):
+            rank_by_confidence(hyps, top_k=-1)

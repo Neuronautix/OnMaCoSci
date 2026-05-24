@@ -1,16 +1,15 @@
 """Confirms that schema-align never emits ontology predicates or SSSOM output by default."""
 from __future__ import annotations
 
-import tempfile
-from pathlib import Path
-
-import pytest
-
-from mapping_co_scientist.schema_align.models.transformation_rule import MappingOperation
 from mapping_co_scientist.schema_align.exporters.generic_mapping_exporter import export_mapping_spec
-from mapping_co_scientist.schema_align.exporters.transformation_spec_exporter import export_transformation_rules
+from mapping_co_scientist.schema_align.exporters.transformation_spec_exporter import (
+    export_transformation_rules,
+)
 from mapping_co_scientist.schema_align.models.field_mapping_hypothesis import FieldMappingHypothesis
-from mapping_co_scientist.schema_align.models.transformation_rule import TransformationRule
+from mapping_co_scientist.schema_align.models.transformation_rule import (
+    MappingOperation,
+    TransformationRule,
+)
 from mapping_co_scientist.shared.models.evidence import Provenance
 
 NOW = "2024-01-01T00:00:00"
@@ -81,7 +80,7 @@ class TestNoOntologyPredicates:
         output_dir = tmp_path / "out"
 
         from mapping_co_scientist.schema_align.pipeline import run_schema_alignment_pipeline
-        summary = run_schema_alignment_pipeline(
+        run_schema_alignment_pipeline(
             source_path=source,
             target_schema_path=schema,
             output_dir=output_dir,

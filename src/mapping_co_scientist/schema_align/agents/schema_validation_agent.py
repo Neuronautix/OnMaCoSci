@@ -1,9 +1,11 @@
 from __future__ import annotations
+
 import logging
-from mapping_co_scientist.shared.agents.base_agent import BaseAgent
-from mapping_co_scientist.shared.models.review import ValidationStatus
+
 from mapping_co_scientist.schema_align.models.field_mapping_hypothesis import FieldMappingHypothesis
 from mapping_co_scientist.schema_align.models.transformation_rule import MappingOperation
+from mapping_co_scientist.shared.agents.base_agent import BaseAgent
+from mapping_co_scientist.shared.models.review import ValidationStatus
 
 logger = logging.getLogger(__name__)
 
@@ -22,13 +24,16 @@ class SchemaValidationAgent(BaseAgent):
         issues = []
 
         # datatype conversion without a rule
-        if h.mapping_operation == MappingOperation.DATATYPE_CONVERSION:
-            if h.transformation_rule is None or h.transformation_rule.expression is None:
-                issues.append("DATATYPE_CONVERSION requires a transformation expression")
+        if (
+            h.mapping_operation == MappingOperation.DATATYPE_CONVERSION
+            and (h.transformation_rule is None or h.transformation_rule.expression is None)
+        ):
+            issues.append("DATATYPE_CONVERSION requires a transformation expression")
 
         # information loss must be flagged
-        if h.information_loss and h.information_loss_description:
-            issues.append(f"Information loss: {h.information_loss_description}")
+        if h.information_loss:
+            description = h.information_loss_description or "Information loss flagged without description"
+            issues.append(f"Information loss: {description}")
 
         if issues:
             h.validation_status = ValidationStatus.WARNING

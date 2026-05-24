@@ -1,7 +1,10 @@
 """Export field mapping hypotheses as a generic YAML mapping specification."""
 from __future__ import annotations
-import yaml
+
 from pathlib import Path
+
+import yaml
+
 from mapping_co_scientist.schema_align.models.field_mapping_hypothesis import FieldMappingHypothesis
 from mapping_co_scientist.schema_align.models.transformation_rule import MappingOperation
 
@@ -65,4 +68,4 @@ def export_mapping_spec(
 
         spec["mappings"].append(mapping_entry)
 
-    output_path.write_text(yaml.dump(spec, default_flow_style=False, allow_unicode=True), encoding="utf-8")
+    output_path.write_text(yaml.safe_dump(spec, default_flow_style=False, allow_unicode=True), encoding="utf-8")

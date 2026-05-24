@@ -1,5 +1,7 @@
 from __future__ import annotations
+
 from typing import Any
+
 from pydantic import BaseModel, Field
 
 
@@ -16,5 +18,5 @@ class Provenance(BaseModel):
     created_at: str
     method: str
     pipeline_run_id: str | None = None
-    extra: dict[str, Any] = {}
+    extra: dict[str, Any] = Field(default_factory=dict)
     model_config = {"frozen": False, "extra": "forbid"}
