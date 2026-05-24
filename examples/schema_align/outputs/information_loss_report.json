@@ -1,0 +1,10 @@
+{
+  "pipeline_run_id": "example-sa-001",
+  "total_source_fields": 9,
+  "mapped_fields": 9,
+  "unmapped_fields": 0,
+  "lossy_mappings": [],
+  "ambiguous_fields": [
+    "Weight_g"
+  ]
+}

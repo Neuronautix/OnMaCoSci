@@ -1,0 +1,99 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "MetadatApp Animal Record Import Schema",
+  "description": "Canonical import schema for animal study records in MetadatApp.",
+  "type": "object",
+  "required": ["animal", "study"],
+  "properties": {
+    "animal": {
+      "type": "object",
+      "description": "Core animal identity and biological attributes",
+      "properties": {
+        "externalId": {
+          "type": "string",
+          "description": "External identifier for the animal, e.g. from the source LIMS."
+        },
+        "biologicalAttributes": {
+          "type": "object",
+          "properties": {
+            "strain": {
+              "type": "string",
+              "description": "Genetic strain or background of the animal."
+            },
+            "sex": {
+              "type": "string",
+              "enum": ["M", "F", "unknown"],
+              "description": "Biological sex of the animal."
+            }
+          }
+        }
+      }
+    },
+    "measurements": {
+      "type": "object",
+      "description": "Quantitative measurements recorded for the animal",
+      "properties": {
+        "bodyWeight": {
+          "type": "object",
+          "properties": {
+            "value": {
+              "type": "number",
+              "description": "Body weight numeric value."
+            },
+            "unit": {
+              "type": "string",
+              "description": "Unit of body weight measurement.",
+              "enum": ["g", "kg"]
+            }
+          }
+        },
+        "activity": {
+          "type": "object",
+          "properties": {
+            "value": {
+              "type": "number",
+              "description": "Activity count or index value."
+            },
+            "date": {
+              "type": "string",
+              "format": "date",
+              "description": "Date on which the activity was recorded."
+            }
+          }
+        }
+      }
+    },
+    "housing": {
+      "type": "object",
+      "properties": {
+        "cageIdentifier": {
+          "type": "string",
+          "description": "Identifier for the housing cage."
+        }
+      }
+    },
+    "study": {
+      "type": "object",
+      "properties": {
+        "experimentalGroup": {
+          "type": "string",
+          "description": "Name of the experimental group the animal belongs to."
+        }
+      }
+    },
+    "acquisition": {
+      "type": "object",
+      "properties": {
+        "device": {
+          "type": "object",
+          "properties": {
+            "identifier": {
+              "type": "string",
+              "description": "Serial number or identifier of the acquisition device."
+            }
+          }
+        }
+      }
+    }
+  }
+}
