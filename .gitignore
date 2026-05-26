@@ -68,6 +68,9 @@ examples/outputs/*.json
 examples/outputs/*.tsv
 examples/outputs/*.md
 
+# Runtime-generated ledger artifact
+mapping_review_ledger.yaml
+
 # Split workflow example outputs
 examples/ontology_align/outputs/*.json
 examples/ontology_align/outputs/*.tsv
