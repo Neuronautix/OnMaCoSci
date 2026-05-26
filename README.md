@@ -146,11 +146,12 @@ CLI loads this file automatically and `.env` is ignored by git:
 ANTHROPIC_API_KEY=sk-ant-api03-your-key-here
 OMCS_LLM_MODEL=claude-haiku-4-5-20251001
 OMCS_DOMAIN_CONTEXT=preclinical mouse metadata
+OMCS_LLM_REVIEW_AGENTS=domain_scientist
 OMCS_LLM_REVIEW_TOP_K=1
-OMCS_LLM_CANDIDATE_TOP_K=2
-OMCS_LLM_MAX_CANDIDATE_ENTITIES=10
-OMCS_LLM_MAX_REVIEW_HYPOTHESES=10
-OMCS_LLM_CALL_DELAY_SECONDS=1.0
+OMCS_LLM_CANDIDATE_TOP_K=1
+OMCS_LLM_MAX_CANDIDATE_ENTITIES=0
+OMCS_LLM_MAX_REVIEW_HYPOTHESES=1
+OMCS_LLM_CALL_DELAY_SECONDS=2.0
 OMCS_LLM_MAX_RETRIES=0
 ```
 
@@ -163,10 +164,11 @@ omcs-run \
   --output-dir examples/outputs \
   --llm \
   --require-llm \
+  --llm-review-agents domain_scientist \
   --llm-review-top-k 1 \
-  --llm-candidate-top-k 2 \
-  --llm-max-candidate-entities 10 \
-  --llm-max-review-hypotheses 10 \
+  --llm-candidate-top-k 1 \
+  --llm-max-candidate-entities 0 \
+  --llm-max-review-hypotheses 1 \
   --domain-context "preclinical mouse metadata" \
   --verbose
 ```
@@ -180,11 +182,16 @@ hypothesis per source entity to avoid provider overload.  Increase
 configuration falls back to deterministic non-LLM behavior and records the
 fallback modes in the generated `*_review_queue.json`.
 
+Use `--llm-review-agents domain_scientist` or
+`OMCS_LLM_REVIEW_AGENTS=domain_scientist` for the lowest-cost LLM-assisted HITL
+mode.  Valid values are `all`, `none`, `adversarial`, `ontology_engineer`, and
+`domain_scientist`, with comma-separated combinations allowed.
+
 Cost control defaults are intentionally conservative:
 
-- at most 10 source entities receive LLM candidate scoring;
-- only the top 2 lexical candidates per scored entity are sent to the LLM;
-- each LLM reviewer sees at most 10 hypotheses;
+- candidate LLM scoring is disabled by default in the example env;
+- only the domain-scientist LLM reviewer is enabled in the example env;
+- the enabled LLM reviewer sees at most 1 hypothesis;
 - SDK retries are disabled by default to avoid retry storms during provider overload;
 - heuristic review still evaluates every hypothesis.
 

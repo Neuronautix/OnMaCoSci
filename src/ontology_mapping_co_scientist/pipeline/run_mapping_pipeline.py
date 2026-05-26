@@ -541,6 +541,46 @@ def _agent_has_llm_client(agent: object) -> bool:
     return bool(getattr(agent, "llm_client", None) is not None)
 
 
+_LLM_REVIEW_AGENT_ALIASES = {
+    "adversarial": "adversarial_review",
+    "adversarial_review": "adversarial_review",
+    "ontology": "ontology_engineer_review",
+    "ontology_engineer": "ontology_engineer_review",
+    "ontology_engineer_review": "ontology_engineer_review",
+    "domain": "domain_scientist_review",
+    "domain_scientist": "domain_scientist_review",
+    "domain_scientist_review": "domain_scientist_review",
+}
+
+
+def _parse_llm_review_agents(value: str | None) -> set[str]:
+    """Parse a comma-separated LLM reviewer allow-list."""
+    if value is None or not value.strip() or value.strip().lower() == "all":
+        return set(_LLM_REVIEW_AGENT_ALIASES.values())
+    if value.strip().lower() in {"none", "off", "disabled", "0"}:
+        return set()
+
+    selected: set[str] = set()
+    unknown: list[str] = []
+    for raw_part in value.split(","):
+        part = raw_part.strip().lower().replace("-", "_")
+        if not part:
+            continue
+        agent = _LLM_REVIEW_AGENT_ALIASES.get(part)
+        if agent is None:
+            unknown.append(raw_part.strip())
+        else:
+            selected.add(agent)
+    if unknown:
+        valid = "all, none, adversarial, ontology_engineer, domain_scientist"
+        raise ValueError(
+            "Unknown LLM review agent(s): "
+            + ", ".join(unknown)
+            + f". Valid values: {valid}."
+        )
+    return selected
+
+
 # ---------------------------------------------------------------------------
 # Public API
 # ---------------------------------------------------------------------------
@@ -561,6 +601,7 @@ def run_pipeline(
     llm_candidate_top_k: int = 2,
     llm_max_candidate_entities: int | None = 10,
     llm_max_review_hypotheses: int | None = 10,
+    llm_review_agents: str | None = None,
     ledger_path: str | Path | None = None,
 ) -> dict:
     """Execute the full ontology mapping pipeline.
@@ -644,11 +685,13 @@ def run_pipeline(
     llm_stage_modes: dict[str, str] = {}
     llm_disabled_reasons: dict[str, str] = {}
     llm_call_stats: dict[str, dict[str, int]] = {}
-    llm_budget: dict[str, int | None] = {
+    selected_llm_review_agents = _parse_llm_review_agents(llm_review_agents)
+    llm_budget = {
         "candidate_top_k": llm_candidate_top_k,
         "max_candidate_entities": llm_max_candidate_entities,
         "review_top_k": llm_review_top_k,
         "max_review_hypotheses": llm_max_review_hypotheses,
+        "review_agents": sorted(selected_llm_review_agents),
     }
 
     # ------------------------------------------------------------------
@@ -745,21 +788,38 @@ def run_pipeline(
             model=llm_model,
             domain_context=domain_context,
         )
-        llm_stage_modes["adversarial_review"] = (
-            "llm" if _agent_has_llm_client(llm_adversarial) else "heuristic_fallback"
-        )
-        llm_stage_modes["ontology_engineer_review"] = (
-            "llm" if _agent_has_llm_client(ontology_reviewer) else "noop_fallback"
-        )
-        llm_stage_modes["domain_scientist_review"] = (
-            "llm" if _agent_has_llm_client(domain_reviewer) else "noop_fallback"
-        )
+        if "adversarial_review" in selected_llm_review_agents:
+            llm_stage_modes["adversarial_review"] = (
+                "llm" if _agent_has_llm_client(llm_adversarial) else "heuristic_fallback"
+            )
+        else:
+            llm_stage_modes["adversarial_review"] = "budget_skipped"
+
+        if "ontology_engineer_review" in selected_llm_review_agents:
+            llm_stage_modes["ontology_engineer_review"] = (
+                "llm" if _agent_has_llm_client(ontology_reviewer) else "noop_fallback"
+            )
+        else:
+            llm_stage_modes["ontology_engineer_review"] = "budget_skipped"
+
+        if "domain_scientist_review" in selected_llm_review_agents:
+            llm_stage_modes["domain_scientist_review"] = (
+                "llm" if _agent_has_llm_client(domain_reviewer) else "noop_fallback"
+            )
+        else:
+            llm_stage_modes["domain_scientist_review"] = "budget_skipped"
+
         if require_llm and not all(
             _agent_has_llm_client(agent)
-            for agent in (llm_adversarial, ontology_reviewer, domain_reviewer)
+            for stage_name, agent in (
+                ("adversarial_review", llm_adversarial),
+                ("ontology_engineer_review", ontology_reviewer),
+                ("domain_scientist_review", domain_reviewer),
+            )
+            if stage_name in selected_llm_review_agents
         ):
             raise RuntimeError(
-                "LLM review was requested, but one or more LLM reviewer agents "
+                "LLM review was requested, but one or more enabled LLM reviewer agents "
                 "do not have an active LLM client. Install the llm extra and set "
                 "ANTHROPIC_API_KEY."
             )
@@ -787,18 +847,27 @@ def run_pipeline(
             result.mapping_id: result
             for result in heuristic_reviewer.review_all(hypotheses)
         }
-        llm_adv_results = {
-            result.mapping_id: result
-            for result in llm_adversarial.review_all(llm_review_targets)
-        }
-        ontology_results = {
-            result.mapping_id: result
-            for result in ontology_reviewer.review_all(llm_review_targets)
-        }
-        domain_results = {
-            result.mapping_id: result
-            for result in domain_reviewer.review_all(llm_review_targets)
-        }
+        llm_adv_results = {}
+        if "adversarial_review" in selected_llm_review_agents:
+            llm_adv_results = {
+                result.mapping_id: result
+                for result in llm_adversarial.review_all(llm_review_targets)
+            }
+
+        ontology_results = {}
+        if "ontology_engineer_review" in selected_llm_review_agents:
+            ontology_results = {
+                result.mapping_id: result
+                for result in ontology_reviewer.review_all(llm_review_targets)
+            }
+
+        domain_results = {}
+        if "domain_scientist_review" in selected_llm_review_agents:
+            domain_results = {
+                result.mapping_id: result
+                for result in domain_reviewer.review_all(llm_review_targets)
+            }
+
         for stage_name, reviewer_agent in (
             ("adversarial_review", llm_adversarial),
             ("ontology_engineer_review", ontology_reviewer),
@@ -814,15 +883,22 @@ def run_pipeline(
                 llm_disabled_reasons[stage_name] = reason
                 llm_stage_modes[stage_name] = "disabled_overloaded"
         for h in hypotheses:
+            stage_results = [("heuristic", heuristic_results[h.mapping_id])]
             if h.mapping_id in llm_adv_results:
+                stage_results.append(("llm_adversarial", llm_adv_results[h.mapping_id]))
+            if h.mapping_id in ontology_results:
+                stage_results.append(
+                    ("llm_ontology_engineer", ontology_results[h.mapping_id])
+                )
+            if h.mapping_id in domain_results:
+                stage_results.append(
+                    ("llm_domain_scientist", domain_results[h.mapping_id])
+                )
+
+            if len(stage_results) > 1:
                 review_results[h.mapping_id] = _merge_review_results(
                     h.mapping_id,
-                    [
-                        ("heuristic", heuristic_results[h.mapping_id]),
-                        ("llm_adversarial", llm_adv_results[h.mapping_id]),
-                        ("llm_ontology_engineer", ontology_results[h.mapping_id]),
-                        ("llm_domain_scientist", domain_results[h.mapping_id]),
-                    ],
+                    stage_results,
                 )
             else:
                 review_results[h.mapping_id] = heuristic_results[h.mapping_id]
@@ -1045,6 +1121,7 @@ def main() -> None:
     load_dotenv()
     default_llm_model = os.environ.get("OMCS_LLM_MODEL", "claude-haiku-4-5-20251001")
     default_domain_context = os.environ.get("OMCS_DOMAIN_CONTEXT", "biomedical research")
+    default_llm_review_agents = os.environ.get("OMCS_LLM_REVIEW_AGENTS", "all")
     default_llm_review_top_k = int(os.environ.get("OMCS_LLM_REVIEW_TOP_K", "1"))
     default_llm_candidate_top_k = int(os.environ.get("OMCS_LLM_CANDIDATE_TOP_K", "2"))
     default_llm_max_candidate_entities = int(
@@ -1160,6 +1237,16 @@ def main() -> None:
         ),
     )
     parser.add_argument(
+        "--llm-review-agents",
+        default=default_llm_review_agents,
+        metavar="LIST",
+        help=(
+            "Comma-separated LLM reviewer allow-list: all, none, adversarial, "
+            "ontology_engineer, domain_scientist. Use domain_scientist for a "
+            "low-cost HITL run. Can also be set with OMCS_LLM_REVIEW_AGENTS."
+        ),
+    )
+    parser.add_argument(
         "--llm-candidate-top-k",
         default=default_llm_candidate_top_k,
         type=int,
@@ -1217,6 +1304,7 @@ def main() -> None:
         llm_candidate_top_k=args.llm_candidate_top_k,
         llm_max_candidate_entities=args.llm_max_candidate_entities,
         llm_max_review_hypotheses=args.llm_max_review_hypotheses,
+        llm_review_agents=args.llm_review_agents,
         ledger_path=args.ledger,
     )
 

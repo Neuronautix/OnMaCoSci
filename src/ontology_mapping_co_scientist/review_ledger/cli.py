@@ -33,6 +33,11 @@ _CHANGE_PREDICATE = "change_predicate"
 _REQUEST_EVIDENCE = "request_more_evidence"
 _CREATE_TERM = "create_new_ontology_term"
 
+_DECISION_MENU = (
+    "Decision: [1/a/match] approve  [2/p] change predicate  "
+    "[3/e] need evidence  [4/r] reject  [5/n] new term  [6/s] skip  [7/q] quit"
+)
+
 
 # ---------------------------------------------------------------------------
 # Interactive review helpers
@@ -141,24 +146,46 @@ def action_from_choice(choice: str, packet: dict[str, Any]) -> tuple[str | None,
     contains strict-mode blockers.
     """
     normalized = choice.strip().lower()
-    if normalized in {"a", "approve"}:
+    if normalized in {"h", "help", "menu", "?"}:
+        return None, _DECISION_MENU
+    if normalized in {"1", "a", "approve", "match", "yes", "y"}:
         blockers = approval_blockers(packet)
         if blockers:
-            return None, "Approval is blocked: " + "; ".join(blockers)
+            return (
+                None,
+                "Approval is blocked. Use 2/p to soften the predicate, "
+                "3/e to request evidence, or 4/r to reject.",
+            )
         return _APPROVE, None
-    if normalized in {"r", "reject"}:
+    if normalized in {"4", "r", "reject", "no"}:
         return _REJECT, None
-    if normalized in {"e", "evidence", "request-evidence", "request_more_evidence"}:
+    if normalized in {
+        "3",
+        "e",
+        "evidence",
+        "more",
+        "unsure",
+        "request-evidence",
+        "request_more_evidence",
+    }:
         return _REQUEST_EVIDENCE, None
-    if normalized in {"p", "predicate", "change-predicate", "change_predicate"}:
+    if normalized in {
+        "2",
+        "p",
+        "predicate",
+        "close",
+        "closematch",
+        "change-predicate",
+        "change_predicate",
+    }:
         return _CHANGE_PREDICATE, None
-    if normalized in {"n", "new-term", "new", "create-term"}:
+    if normalized in {"5", "n", "new-term", "new", "create-term"}:
         return _CREATE_TERM, None
-    if normalized in {"s", "skip"}:
+    if normalized in {"6", "s", "skip"}:
         return None, None
-    if normalized in {"q", "quit", "exit"}:
+    if normalized in {"7", "q", "quit", "exit"}:
         return "quit", None
-    return None, "Unknown choice."
+    return None, "Unknown choice. Type 'help' to show valid decisions."
 
 
 def _top_mapping(packet: dict[str, Any]) -> dict[str, Any]:
@@ -175,6 +202,28 @@ def _target_label(mapping: dict[str, Any]) -> str:
     return f"{term_id} - {label}".strip()
 
 
+def _shorten(text: Any, limit: int = 140) -> str:
+    value = " ".join(str(text).split())
+    if len(value) <= limit:
+        return value
+    return value[: max(0, limit - 3)].rstrip() + "..."
+
+
+def _unique_texts(items: list[Any], limit: int) -> list[str]:
+    seen: set[str] = set()
+    values: list[str] = []
+    for item in items:
+        text = _shorten(item)
+        key = text.lower()
+        if key in seen:
+            continue
+        seen.add(key)
+        values.append(text)
+        if len(values) >= limit:
+            break
+    return values
+
+
 def _print_packet(packet: dict[str, Any], index: int, total: int) -> None:
     top = _top_mapping(packet)
     source_id = packet.get("source_entity_id", "")
@@ -184,24 +233,29 @@ def _print_packet(packet: dict[str, Any], index: int, total: int) -> None:
         suggested = {}
 
     print()
-    print("-" * 72)
-    print(f"Review {index}/{total}: {source_label} ({source_id})")
-    print("-" * 72)
-    print(f"Top hypothesis : {top.get('mapping_id', '(none)')}")
-    print(f"Target         : {_target_label(top)}")
-    print(f"Predicate      : {top.get('predicate', '(unknown)')}")
-    print(f"Confidence     : {float(top.get('confidence') or 0.0):.3f}")
-    print(f"Validation     : {top.get('validation_status', '(unknown)')}")
+    print("=" * 72)
+    print(f"Review {index}/{total} | {source_label} | {source_id}")
+    print("=" * 72)
+    print(
+        "Top: "
+        f"{_target_label(top)} | {top.get('predicate', '(unknown)')} | "
+        f"conf={float(top.get('confidence') or 0.0):.3f} | "
+        f"validation={top.get('validation_status', '(unknown)')}"
+    )
+    print(f"ID : {top.get('mapping_id', '(none)')}")
     if suggested:
-        print(f"Agent suggests : {suggested.get('action')} - {suggested.get('reason', '')}")
+        print(
+            "Suggested: "
+            f"{suggested.get('action')} - {_shorten(suggested.get('reason', ''), 150)}"
+        )
 
     blockers = approval_blockers(packet)
     if blockers:
-        print("Review gate    : approval blocked")
-        for blocker in blockers[:5]:
+        print("Gate: BLOCKED for approval")
+        for blocker in _unique_texts(blockers, 3):
             print(f"  - {blocker}")
     else:
-        print("Review gate    : approval allowed after human check")
+        print("Gate: approval allowed after human check")
 
     evidence = top.get("evidence") or []
     if evidence:
@@ -210,24 +264,28 @@ def _print_packet(packet: dict[str, Any], index: int, total: int) -> None:
             if isinstance(item, dict):
                 score = item.get("score")
                 score_text = f" ({float(score):.3f})" if isinstance(score, (int, float)) else ""
-                print(f"  - {item.get('evidence_type', 'evidence')}{score_text}: {item.get('description', '')}")
+                print(
+                    f"  - {item.get('evidence_type', 'evidence')}{score_text}: "
+                    f"{_shorten(item.get('description', ''))}"
+                )
 
     warnings = packet.get("all_warnings") or []
     if warnings:
-        print("Warnings:")
-        for warning in warnings[:5]:
+        print("Key issues:")
+        for warning in _unique_texts(warnings, 4):
             print(f"  - {warning}")
 
     alternatives = packet.get("alternative_mappings") or []
     if alternatives:
         print("Alternatives:")
-        for alt in alternatives[:3]:
+        for alt in alternatives[:2]:
             if isinstance(alt, dict):
                 print(
                     "  - "
-                    f"{alt.get('mapping_id')} -> {_target_label(alt)} "
+                    f"{_target_label(alt)} "
                     f"({alt.get('predicate')}, conf={float(alt.get('confidence') or 0.0):.3f})"
                 )
+    print(_DECISION_MENU)
 
 
 def _cmd_chat(args: argparse.Namespace) -> None:
@@ -256,8 +314,8 @@ def _cmd_chat(args: argparse.Namespace) -> None:
     print(f"Run ID      : {metadata.get('pipeline_run_id', '(unknown)')}")
     print(f"Queue       : {len(pending_packets)} pending / {len(packets)} total")
     print()
-    print("Menu: [a]pprove  [r]eject  request [e]vidence  change [p]redicate")
-    print("      [n]ew term  [s]kip  [q]uit")
+    print("Use the numbered decision menu shown under each mapping.")
+    print("Approval stays blocked when strict review found high-severity issues.")
 
     recorded = 0
     for idx, packet in enumerate(pending_packets, start=1):
@@ -270,7 +328,7 @@ def _cmd_chat(args: argparse.Namespace) -> None:
             continue
 
         while True:
-            choice = input("Decision> ")
+            choice = input("Decision [help]> ")
             action, error = action_from_choice(choice, packet)
             if error:
                 print(error)

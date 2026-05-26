@@ -724,6 +724,11 @@ class TestPipelineExports:
             "max_candidate_entities": 10,
             "review_top_k": 1,
             "max_review_hypotheses": 10,
+            "review_agents": [
+                "adversarial_review",
+                "domain_scientist_review",
+                "ontology_engineer_review",
+            ],
         }
 
         review_queue = Path(result["output_review_queue"])
@@ -736,3 +741,39 @@ class TestPipelineExports:
         assert "llm_call_stats" in data["metadata"]
         assert data["metadata"]["llm_review_top_k"] == 1
         assert data["metadata"]["llm_budget"]["candidate_top_k"] == 2
+        assert data["metadata"]["llm_budget"]["review_agents"] == [
+            "adversarial_review",
+            "domain_scientist_review",
+            "ontology_engineer_review",
+        ]
+
+    def test_pipeline_llm_review_agent_allow_list_skips_unselected_agents(
+        self,
+        tmp_path: Path,
+        tmp_csv_file: Path,
+        tmp_ontology_yaml: Path,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        """LLM reviewer allow-list limits provider-call stages for cost control."""
+        monkeypatch.setenv("OMCS_DISABLE_DOTENV", "1")
+        monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+
+        result = run_pipeline(
+            source_filepath=tmp_csv_file,
+            ontology_filepath=tmp_ontology_yaml,
+            output_dir=tmp_path,
+            verbose=False,
+            llm_enabled=True,
+            llm_review_agents="domain_scientist",
+            llm_max_candidate_entities=0,
+            llm_max_review_hypotheses=1,
+        )
+
+        modes = result["llm_stage_modes"]
+        assert modes["candidate_generation"] == "budget_skipped"
+        assert modes["adversarial_review"] == "budget_skipped"
+        assert modes["ontology_engineer_review"] == "budget_skipped"
+        assert modes["domain_scientist_review"] == "noop_fallback"
+        assert result["llm_budget"]["review_agents"] == ["domain_scientist_review"]
+        assert result["llm_call_stats"]["adversarial_review"]["attempted"] == 0
+        assert result["llm_call_stats"]["ontology_engineer_review"]["attempted"] == 0

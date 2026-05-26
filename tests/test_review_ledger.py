@@ -337,6 +337,40 @@ def test_action_from_choice_blocks_approval_for_high_severity() -> None:
     assert "Approval is blocked" in error
 
 
+def test_action_from_choice_accepts_match_alias_for_approval() -> None:
+    """The chat CLI accepts natural reviewer language for an unblocked match."""
+    packet = {
+        "top_mapping": {
+            "mapping_id": "map-001",
+            "predicate": "skos:closeMatch",
+            "validation_status": "passed",
+            "_adv_flags": [],
+        },
+        "all_warnings": [],
+    }
+
+    action, error = action_from_choice("match", packet)
+
+    assert error is None
+    assert action == "approve"
+
+
+def test_action_from_choice_accepts_numbered_decisions() -> None:
+    """The chat CLI supports compact numbered choices."""
+    packet = {
+        "top_mapping": {
+            "mapping_id": "map-001",
+            "predicate": "skos:exactMatch",
+            "validation_status": "passed",
+        },
+        "all_warnings": [],
+    }
+
+    assert action_from_choice("2", packet) == ("change_predicate", None)
+    assert action_from_choice("3", packet) == ("request_more_evidence", None)
+    assert action_from_choice("4", packet) == ("reject", None)
+
+
 def test_action_from_choice_allows_request_evidence_when_blocked() -> None:
     """Blocked hypotheses remain in the negative feedback loop."""
     packet = {
