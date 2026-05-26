@@ -121,10 +121,9 @@ Report all output files:
 
 Verify no skos:exactMatch appears without human sign-off:
 ```bash
-grep "skos:exactMatch" <output-dir>/ontology_mapping_candidates.sssom.tsv
+python -c "from pathlib import Path; p=Path(r'<output-dir>')/'ontology_mapping_candidates.sssom.tsv'; print(''.join([ln for ln in p.read_text(encoding='utf-8', errors='ignore').splitlines(True) if 'skos:exactMatch' in ln]))"
 ```
 If any exactMatch rows appear, review them individually before sharing the SSSOM file.
-```
 
 ### Checklist items skipped (if --force was used)
 

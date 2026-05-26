@@ -12,7 +12,7 @@ The plugin scaffold connects the existing Python pipeline to Claude Code's slash
 
 1. **Guided pipeline execution**: Users can type `/ontology-align` or `/schema-align` and be walked through the full workflow without knowing the CLI arguments.
 2. **Structured human review**: Every pipeline run produces candidates that require human decision; the plugin presents them in a structured, prioritised queue rather than leaving the user to read raw JSON.
-3. **Reviewer persona specialisation**: Different people review ontology mappings (ontology engineers) vs schema mappings (data engineers) vs adversarial edge cases. The plugin encodes these review profiles explicitly.
+3. **Structured Evidence Debate**: Source and target advocates challenge each candidate from complementary perspectives while a mediator computes Elo-based rankings and consistency checks.
 4. **Policy enforcement**: Critical constraints (no auto-approval, no exactMatch from lexical similarity, no SSSOM from schema-align) are documented in `CLAUDE.md` and repeated in each command instruction file so they cannot be accidentally bypassed by Claude.
 
 ---
@@ -36,7 +36,7 @@ The `CLAUDE.md` file at the repository root is automatically loaded by Claude Co
 
 ### Agent personas
 
-Claude Code does not have a formal "agent file" mechanism distinct from custom commands. The four persona files in `claude-plugin/agents/` are reference documents that command files cite using relative paths. Claude reads them as part of command execution context when a command says "see `claude-plugin/agents/ontology-engineer-reviewer.md`."
+Claude Code does not have a formal "agent file" mechanism distinct from custom commands. The three debate role files in `claude-plugin/agents/` are reference documents that command files cite using relative paths: `source-schema-advocate.md`, `target-schema-advocate.md`, and `mapping-mediator.md`.
 
 ---
 
@@ -52,10 +52,9 @@ Claude Code does not have a formal "agent file" mechanism distinct from custom c
 | `.claude/commands/review-mappings.md` | `/review-mappings` slash command |
 | `.claude/commands/validate-and-export.md` | `/validate-and-export` slash command |
 | `claude-plugin/.claude-plugin/plugin.json` | Plugin metadata (for tooling; not a Claude Code runtime file) |
-| `claude-plugin/agents/ontology-engineer-reviewer.md` | Ontology reviewer persona |
-| `claude-plugin/agents/data-integration-reviewer.md` | Schema/ETL reviewer persona |
-| `claude-plugin/agents/adversarial-reviewer.md` | Adversarial challenge persona |
-| `claude-plugin/agents/meta-reviewer.md` | Cross-mapping consistency persona |
+| `claude-plugin/agents/source-schema-advocate.md` | Source-side debate advocate |
+| `claude-plugin/agents/target-schema-advocate.md` | Target-side debate advocate |
+| `claude-plugin/agents/mapping-mediator.md` | Debate mediator and consistency synthesiser |
 | `claude-plugin/skills/ontology-alignment/SKILL.md` | Ontology alignment skill documentation |
 | `claude-plugin/skills/schema-mapping/SKILL.md` | Schema mapping skill documentation |
 | `claude-plugin/skills/mapping-review/SKILL.md` | Mapping review skill documentation |
@@ -102,16 +101,17 @@ The plugin commands need a stable, human-readable summary of pipeline output. Re
 - Status icons for quick visual scanning
 - All relevant warning and adversarial flag content
 
-### Why four reviewer personas
+### Why the three-agent debate model
 
-| Persona | Rationale |
-|---------|-----------|
-| Ontology Engineer | Domain-specific rules (SKOS semantics, OWL hierarchy safety) that a general reviewer would miss |
-| Data Integration | ETL-specific rules (datatype safety, unit handling, lossy transforms) that an ontology reviewer would not consider |
-| Adversarial | Complementary to the default reviewer; catches cases where a plausible mapping is wrong for non-obvious reasons |
-| Meta | Catches cross-mapping issues (collisions, inconsistencies) that are invisible when reviewing one mapping at a time |
+The plugin shifted from sequential reviewer personas to a three-agent debate model because it provides direct source-vs-target tension and a single mediator that owns ranking and consistency synthesis.
 
-These are reference documents, not separate Claude Code features. Any command can "apply" a persona by reading the file and following its rules.
+| Role | Rationale |
+|------|-----------|
+| Source Schema Advocate | Captures source meaning, ambiguity, and measurement context |
+| Target Schema Advocate | Enforces target semantics, relation/operation safety, and scope constraints |
+| Mapping Mediator | Applies Elo-based synthesis and global consistency checks across all mappings |
+
+These are reference documents, not separate Claude Code runtime features. Commands apply them by loading the role files and following their protocol.
 
 ---
 

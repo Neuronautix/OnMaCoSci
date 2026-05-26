@@ -42,7 +42,7 @@ Present the full Markdown output. This shows all candidate hypotheses grouped by
 Load the three agent definitions:
 - `claude-plugin/agents/source-schema-advocate.md` — speaks for the source CSV concepts
 - `claude-plugin/agents/target-schema-advocate.md` — speaks for the ontology terms (ontology engineer role)
-- `claude-plugin/agents/mapping-mediator.md` — runs the debate, computes LR scores, produces ranked output
+- `claude-plugin/agents/mapping-mediator.md` — runs the debate, computes Elo-based rankings, produces ranked output
 
 For each source entity in the run summary, run the full Structured Evidence Debate (SED) protocol as defined in `mapping-mediator.md`:
 

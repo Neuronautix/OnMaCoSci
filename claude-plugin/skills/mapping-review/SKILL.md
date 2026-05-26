@@ -2,24 +2,23 @@
 
 ## What this skill does
 
-Provides structured human-in-the-loop review of pipeline-generated mapping candidates. Works with existing output directories from either the `ontology-align` or `schema-align` pipeline. Supports four reviewer personas with different priorities and review styles.
+Provides structured human-in-the-loop review of pipeline-generated mapping candidates. Works with existing output directories from either the `ontology-align` or `schema-align` pipeline. Uses a three-agent Structured Evidence Debate (source advocate, target advocate, mediator) to prioritise review.
 
 ## When to invoke
 
 Use this skill when:
 - A pipeline run has already completed and the user needs to review the candidates
-- The user wants a second opinion on mappings using a different reviewer perspective
+- The user wants debate-based challenge from source and target perspectives
 - The user wants to batch-process a review queue with tiered prioritisation
-- The user needs a cross-mapping consistency check (meta review)
+- The user needs a cross-mapping consistency check from the mediator report
 
-## Reviewer personas
+## Debate roles
 
-| Persona | Invocation | Focus |
-|---------|-----------|-------|
-| Ontology Engineer | default for ontology runs | SKOS predicate correctness, OWL safety, scope analysis |
-| Data Integration | default for schema runs | Transformation operations, datatype safety, information loss |
-| Adversarial | `--persona adversarial` | Challenges every top-1; stress-tests pipeline assumptions |
-| Meta | `--persona meta` | Cross-run consistency, collisions, coverage patterns |
+| Role | Focus |
+|------|-------|
+| Source Schema Advocate | Whether mappings faithfully represent source meaning and context |
+| Target Schema Advocate | Whether target semantics, predicates, and operations are appropriate |
+| Mapping Mediator | Elo-based ranking, penalties, and cross-mapping consistency checks |
 
 ## Review lifecycle
 

@@ -40,7 +40,7 @@
     {
       "name": "mapping-mediator",
       "file": "claude-plugin/agents/mapping-mediator.md",
-      "role": "Runs the Structured Evidence Debate protocol; applies LR scoring formula; produces ranked candidates and cross-mapping consistency report"
+      "role": "Runs the Structured Evidence Debate protocol; applies Elo-based scoring and penalties; produces ranked candidates and cross-mapping consistency report"
     }
   ],
   "references": [

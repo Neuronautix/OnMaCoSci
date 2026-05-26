@@ -20,7 +20,7 @@ Check which candidates file exists:
 
 If neither exists, report the error and list what files are present:
 ```bash
-ls <output-dir>/
+python -c "from pathlib import Path; p=Path(r'<output-dir>'); [print(x.name) for x in sorted(p.iterdir())]"
 ```
 
 ### Step 2 — Read the run summary

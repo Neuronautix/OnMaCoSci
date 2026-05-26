@@ -27,7 +27,7 @@ Every mapping review runs a **Structured Evidence Debate (SED)** with three agen
 |-------|------|------|
 | **Source Schema Advocate** | `agents/source-schema-advocate.md` | Speaks for the source data; argues whether proposed mappings correctly characterise what the source field means |
 | **Target Schema Advocate** | `agents/target-schema-advocate.md` | Speaks for the target schema/ontology; argues whether proposed predicates or operations are semantically appropriate |
-| **Mapping Mediator** | `agents/mapping-mediator.md` | Runs debate rounds; applies LR scoring formula; ranks candidates; produces cross-mapping consistency report |
+| **Mapping Mediator** | `agents/mapping-mediator.md` | Runs debate rounds; applies Elo-based scoring and penalties; ranks candidates; produces cross-mapping consistency report |
 
 ### Debate protocol summary
 
@@ -35,7 +35,7 @@ For each source entity/field:
 1. **Round 0** (mediator): injects pipeline context — confidence, adversarial flags, information loss, evidence
 2. **Round 1** (both advocates independently): each produces 1–3 FOR/AGAINST arguments with evidence type, claim, confidence, and counterpoint weakness
 3. **Round 2** (cross-examination): each advocate sees the other's Round 1 and may produce 0–2 rebuttals
-4. **Scoring** (mediator): computes `debate_score = clamp(pipeline_conf + advocacy_delta, 0, 1) × penalty_multiplier`
+4. **Scoring** (mediator): computes pairwise Elo updates per argument, applies blocking-condition penalties, and re-ranks candidates by final Elo
 
 ### Elo ranking
 
@@ -92,7 +92,7 @@ Claude Code plugin (.claude/ + claude-plugin/)
       └── references/                       ← policy and status model docs
 ```
 
-The plugin layer calls the Python CLIs via Bash and runs the debate protocol on their output. It does not replicate, bypass, or replace the Python core.
+The plugin layer calls the Python CLIs from the host shell and runs the debate protocol on their output. It does not replicate, bypass, or replace the Python core.
 
 ## Limitations (v0.2.0)
 
